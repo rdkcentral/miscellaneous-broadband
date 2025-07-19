@@ -1,0 +1,57 @@
+##########################################################################
+# If not stated otherwise in this file or this component's Licenses.txt
+# file the following copyright and licenses apply:
+#
+# Copyright 2015 RDK Management
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+##########################################################################
+if NOTIFYLEASE_ENABLE
+NOTIFY = Notify_Lease
+endif
+
+if SETLED_ENABLE
+SETLED = SetLED
+endif
+
+if WEBCFG_TESTAPP_ENABLE
+WBCFG_TEST = wbCfgTestDaemon wbCfgTestApp
+endif
+
+if MULTIPART_UTIL_ENABLE
+MULTIPART_UTIL = multipartRoot
+endif
+
+if BRIDGE_UTILS_BIN_ENABLE
+BRIDGE_UTIL = bridge_utils
+endif
+
+if RDKSCHEDULER_TESTAPP_ENABLE
+RDKSCHEDULER_TESTAPP = RdkSchdeuler_TestApp
+endif
+
+if SOCKET_EXAMPLE_ENABLE
+SOCKET_EXAMPLE = Socket_Example
+endif
+
+if DHCP_MANAGER_ENABLE
+DHCP_CLIENT_UTILS_EXAMPLE = 
+else
+DHCP_CLIENT_UTILS_EXAMPLE = dhcp_client_utils
+endif
+
+if UNIT_TEST_DOCKER_SUPPORT
+SUBDIRS = test
+else
+SUBDIRS = Psmcli parcon LTime ServiceCtrl TimeConv webcfg_decoder MemFrag_Calc $(SETLED) $(MULTIPART_UTIL) $(BRIDGE_UTIL) $(WBCFG_TEST) $(DHCP_CLIENT_UTILS_EXAMPLE) msgq_util EventSubscription FwBankInfo $(RDKSCHEDULER_TESTAPP) $(SOCKET_EXAMPLE)
+endif
