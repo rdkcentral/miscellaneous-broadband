@@ -66,13 +66,6 @@ typedef enum DeviceNetworkMode
 }DeviceNetworkMode;
 #endif
 
-typedef enum {
-    INVALID_PROFILE = -1,
-    LNF,
-    MESH_ONBOARD,
-    MAX_PROFILES
-} profiles_t;
-
 typedef struct br_shm_mutex {
   pthread_mutex_t *ptr; 
   int br_shm_create;        
