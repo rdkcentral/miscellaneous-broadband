@@ -180,6 +180,10 @@ class BridgeUtilsTestFixture : public ::testing::TestWithParam<int> {
         }
 };
 
+int MESH_WIFI_BACKHAUL_5G = 14;
+int MESH_ONBOARD = 18;					        // **< Mesh Onboard configuration
+int MESH_WIFI_ONBOARD_2G = 19;
+
 TEST (BridgeUtils, getMTU)
 {
     EXPECT_EQ(1600, getMTU(MESH));
