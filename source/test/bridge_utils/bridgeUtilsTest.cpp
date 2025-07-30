@@ -69,6 +69,9 @@ libnet_status bridge_create(const char* bridge_name);
 
 }
 
+#define MESH_ONBOARD 18
+#define MESH_WIFI_ONBOARD_2G 19
+
 extern int ovsEnable, bridgeUtilEnable, skipWiFi, skipMoCA, eb_enable;
 extern int wan_mode;
 extern int InstanceNumber;
@@ -179,11 +182,6 @@ class BridgeUtilsTestFixture : public ::testing::TestWithParam<int> {
                 ::testing::UnitTest::GetInstance()->current_test_info()->name());
         }
 };
-
-typedef enum {
-    MESH_ONBOARD = 18,
-    MESH_WIFI_ONBOARD_2G = 19
-} MeshOnboardType;
 
 TEST (BridgeUtils, getMTU)
 {
