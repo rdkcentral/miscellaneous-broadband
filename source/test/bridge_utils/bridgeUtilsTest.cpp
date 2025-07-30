@@ -44,6 +44,9 @@
 #include <mocks/mock_trace.h>
 #include <mocks/mock_libnet.h>
 
+#define MESH_ONBOARD 18
+#define MESH_WIFI_ONBOARD_2G 19
+
 using namespace std;
 using std::experimental::filesystem::exists;
 
