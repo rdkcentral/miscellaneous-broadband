@@ -44,9 +44,6 @@
 #include <mocks/mock_trace.h>
 #include <mocks/mock_libnet.h>
 
-#define MESH_ONBOARD 18
-#define MESH_WIFI_ONBOARD_2G 19
-
 using namespace std;
 using std::experimental::filesystem::exists;
 
@@ -182,6 +179,11 @@ class BridgeUtilsTestFixture : public ::testing::TestWithParam<int> {
                 ::testing::UnitTest::GetInstance()->current_test_info()->name());
         }
 };
+
+typedef enum {
+    MESH_ONBOARD = 18,
+    MESH_WIFI_ONBOARD_2G = 19
+} MeshOnboardType;
 
 TEST (BridgeUtils, getMTU)
 {
