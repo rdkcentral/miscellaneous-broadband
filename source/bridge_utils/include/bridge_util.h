@@ -66,6 +66,9 @@ typedef enum DeviceNetworkMode
 }DeviceNetworkMode;
 #endif
 
+int MESH_ONBOARD = 18;					        // **< Mesh Onboard configuration
+int MESH_WIFI_ONBOARD_2G = 19;
+
 typedef struct br_shm_mutex {
   pthread_mutex_t *ptr; 
   int br_shm_create;        
