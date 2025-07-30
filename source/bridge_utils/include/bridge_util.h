@@ -58,9 +58,6 @@
 
 #define BR_SHM_MUTEX "BridgeUtilMutex"
 
-#define MESH_ONBOARD 18
-#define MESH_WIFI_ONBOARD_2G 19
-
 #ifdef RDKB_EXTENDER_ENABLED
 typedef enum DeviceNetworkMode
 {
