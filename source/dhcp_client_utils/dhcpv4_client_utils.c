@@ -125,6 +125,7 @@ pid_t start_dhcpv4_client (dhcp_params * params)
     // building args and starting dhcpv4 client
     DBG_PRINT("%s %d: Starting DHCP Clients\n", __FUNCTION__, __LINE__);
 #ifdef DHCPV4_CLIENT_UDHCPC
+#errr
     if ((params->ifType == WAN_LOCAL_IFACE) && ( 0 != strncmp(params->ifname, HOTSPOT_IF_NAME, strlen(HOTSPOT_IF_NAME) ) ))
     {
     pid =  start_udhcpc (params, req_opt_list, send_opt_list);
