@@ -69,9 +69,6 @@ libnet_status bridge_create(const char* bridge_name);
 
 }
 
-#define MESH_ONBOARD 18
-#define MESH_WIFI_ONBOARD_2G 19
-
 extern int ovsEnable, bridgeUtilEnable, skipWiFi, skipMoCA, eb_enable;
 extern int wan_mode;
 extern int InstanceNumber;
