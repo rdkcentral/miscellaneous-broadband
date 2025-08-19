@@ -1,0 +1,281 @@
+#include "gw_stats.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <errno.h>
+
+
+#define ROOTFS_PATH "/"
+#define TMPFS_PATH "/tmp"
+
+// API to initialize system statistics
+void initialize_system_stats(SystemStats *stats) {
+    memset(stats, 0, sizeof(SystemStats));
+    strncpy(stats->model, "UNKNOWN", sizeof(stats->model));
+    strncpy(stats->firmware, "UNKNOWN", sizeof(stats->firmware));
+    strncpy(stats->cmac, "UNKNOWN", sizeof(stats->cmac));
+    strncpy(stats->uptime, "UNKNOWN", sizeof(stats->uptime));
+    stats->cpu_usage = -1.0;
+    stats->free_memory = -1.0;
+    stats->slab_memory = -1.0;
+    stats->avail_memory = -1.0;
+    stats->cached_mem = -1.0;
+    stats->slab_unreclaim = -1.0;
+    stats->loadavg_1min = -1.0;
+    stats->loadavg_5min = -1.0;
+    stats->loadavg_15min = -1.0;
+    stats->rootfs_used_kb = 0;
+    stats->rootfs_total_kb = 0;
+    stats->tmpfs_used_kb = 0;
+    stats->tmpfs_total_kb = 0;
+    stats->fw_restart_time = NULL;
+    stats->fw_restart_count = 0;
+}
+
+// API to collect device model
+void get_device_model(char *model, size_t size) {
+    FILE *fp = v_secure_popen("r", "deviceinfo.sh -mo");
+    if (fp) {
+        if (fgets(model, size, fp)) {
+            model[strcspn(model, "\n")] = '\0'; // Remove newline character
+        } else {
+            strncpy(model, "UNKNOWN", size);
+        }
+        v_secure_pclose(fp);
+    } else {
+        strncpy(model, "UNKNOWN", size);
+    }
+}
+
+// API to collect firmware version
+void get_firmware_version(char *firmware, size_t size) {
+    FILE *fp = v_secure_popen("r", "deviceinfo.sh -fw");
+    if (fp) {
+        if (fgets(firmware, size, fp)) {
+            firmware[strcspn(firmware, "\n")] = '\0'; // Remove newline character
+        } else {
+            strncpy(firmware, "UNKNOWN", size);
+        }
+        v_secure_pclose(fp);
+    } else {
+        strncpy(firmware, "UNKNOWN", size);
+    }
+}
+
+// API to collect CMAC address
+void get_cmac_address(char *cmac, size_t size) {
+    FILE *fp = v_secure_popen("r", "deviceinfo.sh -cmac");
+    if (fp) {
+        if (fgets(cmac, size, fp)) {
+            cmac[strcspn(cmac, "\n")] = '\0'; // Remove newline character
+        } else {
+            strncpy(cmac, "UNKNOWN", size);
+        }
+        v_secure_pclose(fp);
+    } else {
+        strncpy(cmac, "UNKNOWN", size);
+    }
+}
+
+// API to collect CPU usage
+void get_cpu_usage(double *cpu_usage) {
+    char buffer[256];
+    FILE *fp = v_secure_popen("r", "dmcli eRT retv Device.DeviceInfo.ProcessStatus.CPUUsage");
+    if (fp) {
+        if (fgets(buffer, sizeof(buffer), fp)) {
+            *cpu_usage = atof(buffer);
+        } else {
+            *cpu_usage = -1.0; // Default value if reading fails
+        }
+        v_secure_pclose(fp);
+    } else {
+        *cpu_usage = -1.0; // Default value if command fails
+    }
+}
+
+// API to collect memory information (free memory and slab memory)
+void get_memory_info(double *free_memory, double *slab_memory, double *avail_memory, double *cached_mem, double *slab_unreclaim) {
+    char buffer[256];
+    FILE *fp = fopen("/proc/meminfo", "r");
+    *free_memory = *slab_memory = *avail_memory = *cached_mem = *slab_unreclaim = -1.0;
+    if (fp) {
+        while (fgets(buffer, sizeof(buffer), fp)) {
+            if (strncmp(buffer, "MemFree:", 8) == 0) {
+                sscanf(buffer, "MemFree: %lf", free_memory);
+                *free_memory /= 1024.0; // Convert to MB
+                *free_memory = (int)(*free_memory * 1000.0 + 0.5) / 1000.0;
+            } else if (strncmp(buffer, "Slab:", 5) == 0) {
+                sscanf(buffer, "Slab: %lf", slab_memory);
+                *slab_memory /= 1024.0;
+                *slab_memory = (int)(*slab_memory * 1000.0 + 0.5) / 1000.0;
+            } else if (strncmp(buffer, "MemAvailable:", 13) == 0) {
+                sscanf(buffer, "MemAvailable: %lf", avail_memory);
+                *avail_memory /= 1024.0;
+                *avail_memory = (int)(*avail_memory * 1000.0 + 0.5) / 1000.0;
+            } else if (strncmp(buffer, "Cached:", 7) == 0) {
+                sscanf(buffer, "Cached: %lf", cached_mem);
+                *cached_mem /= 1024.0;
+                *cached_mem = (int)(*cached_mem * 1000.0 + 0.5) / 1000.0;
+            } else if (strncmp(buffer, "SUnreclaim:", 11) == 0) {
+                sscanf(buffer, "SUnreclaim: %lf", slab_unreclaim);
+                *slab_unreclaim /= 1024.0;
+                *slab_unreclaim = (int)(*slab_unreclaim * 1000.0 + 0.5) / 1000.0;
+            }
+        }
+        fclose(fp);
+    }
+}
+
+// API to collect load average
+void get_load_average(double *load1, double *load5, double *load15) {
+    FILE *fp = fopen("/proc/loadavg", "r");
+    if (fp) {
+        if (fscanf(fp, "%lf %lf %lf", load1, load5, load15) != 3) {
+            *load1 = *load5 = *load15 = -1.0;
+        }
+        fclose(fp);
+    } else {
+        *load1 = *load5 = *load15 = -1.0;
+    }
+}
+
+// API to collect device uptime
+void get_device_uptime(char *uptime, size_t size) {
+    FILE *fp = fopen("/proc/uptime", "r");
+    if (fp) {
+        double seconds;
+        if (fscanf(fp, "%lf", &seconds) == 1) {
+            int days = seconds / 86400;
+            int hours = ((int)seconds % 86400) / 3600;
+            int minutes = ((int)seconds % 3600) / 60;
+            snprintf(uptime, size, "%d days, %d hours, %d minutes", days, hours, minutes);
+        } else {
+            strncpy(uptime, "UNKNOWN", size);
+        }
+        fclose(fp);
+    } else {
+        strncpy(uptime, "UNKNOWN", size);
+    }
+}
+
+// API to collect rootfs and tmpfs memory
+void get_fs_data(char* path, uint32_t* used_kb, uint32_t* total_kb) {
+    int res;
+    struct statfs fs_info;
+
+
+    res = statfs(path, &fs_info);
+    if (res != 0)
+    {
+        log_message("Error getting filesystem status info: %s", path);
+        return;
+    }
+    *total_kb = (fs_info.f_blocks * fs_info.f_bsize) / 1024;
+    *used_kb  = ((*total_kb) - (fs_info.f_bfree * fs_info.f_bsize) / 1024);
+}
+
+// API to collect pidStats for all running processes
+int get_pid_stats(pidStats **stats, int *count) {
+    const char *proc_dirname = "/proc";
+    DIR *proc_dir = NULL;
+    struct dirent *dire;
+    int num_allocated = 128;
+    int num = 0;
+    pidStats *pid_stats = malloc(num_allocated * sizeof(pidStats));
+    if (!pid_stats) return -1;
+
+    proc_dir = opendir(proc_dirname);
+    if (!proc_dir) {
+        free(pid_stats);
+        return -1;
+    }
+
+    while ((dire = readdir(proc_dir)) != NULL) {
+        char c = dire->d_name[0];
+        if (!(c >= '0' && c <= '9')) continue;
+        uint32_t pid = (uint32_t)atoi(dire->d_name);
+
+        char status_path[64], smaps_path[64];
+        snprintf(status_path, sizeof(status_path), "/proc/%u/status", pid);
+        snprintf(smaps_path, sizeof(smaps_path), "/proc/%u/smaps", pid);
+
+        FILE *status_file = fopen(status_path, "r");
+        if (!status_file) continue;
+        char line[512];
+        pid_stats[num].pName[0] = '\0';
+        pid_stats[num].rss = 0;
+        while (fgets(line, sizeof(line), status_file)) {
+            if (strncmp(line, "Name:", 5) == 0) {
+                char *name = line + 5;
+                while (*name == ' ' || *name == '\t') name++;
+                size_t name_len = strcspn(name, "\n");
+                if (name_len > sizeof(pid_stats[num].pName) - 1)
+                    name_len = sizeof(pid_stats[num].pName) - 1;
+                strncpy(pid_stats[num].pName, name, name_len);
+                pid_stats[num].pName[name_len] = '\0';
+            } else if (strncmp(line, "VmRSS:", 6) == 0) {
+                char *rss_str = line + 6;
+                while (*rss_str == ' ' || *rss_str == '\t') rss_str++;
+                unsigned int rss = 0;
+                sscanf(rss_str, "%u", &rss);
+                pid_stats[num].rss = rss; // VmRSS is already in kB
+            }
+        }
+        fclose(status_file);
+
+        // Get PSS from smaps
+        FILE *smaps_file = fopen(smaps_path, "r");
+        uint32_t pss_total = 0;
+        if (smaps_file) {
+            char buf[256];
+            while (fgets(buf, sizeof(buf), smaps_file)) {
+                if (strncmp(buf, "Pss:", 4) == 0) {
+                    unsigned int pss = 0;
+                    sscanf(buf, "Pss: %u", &pss);
+                    pss_total += pss;
+                }
+            }
+            fclose(smaps_file);
+        }
+        pid_stats[num].pss = pss_total;
+
+        // mem_util: use pss if available, else rss
+        pid_stats[num].mem_util = (pss_total > 0) ? pss_total : pid_stats[num].rss;
+
+        // cpu_util: not available here, set to 0
+        pid_stats[num].cpu_util = 0;
+
+        pid_stats[num].pid = pid;
+
+        num++;
+        if (num == num_allocated) {
+            num_allocated *= 2;
+            pidStats *tmp = realloc(pid_stats, num_allocated * sizeof(pidStats));
+            if (!tmp) {
+                free(pid_stats);
+                closedir(proc_dir);
+                return -1;
+            }
+            pid_stats = tmp;
+        }
+    }
+    closedir(proc_dir);
+    *stats = pid_stats;
+    *count = num;
+    return 0;
+}
+
+// API to collect system statistics using the individual APIs
+void collect_system_stats(SystemStats *stats) {
+    get_device_model(stats->model, sizeof(stats->model));
+    get_firmware_version(stats->firmware, sizeof(stats->firmware));
+    get_cmac_address(stats->cmac, sizeof(stats->cmac));
+    get_cpu_usage(&stats->cpu_usage);
+    get_memory_info(&stats->free_memory, &stats->slab_memory, &stats->avail_memory, &stats->cached_mem, &stats->slab_unreclaim);
+    get_load_average(&stats->loadavg_1min, &stats->loadavg_5min, &stats->loadavg_15min);
+    get_device_uptime(stats->uptime, sizeof(stats->uptime));
+    get_fs_data(ROOTFS_PATH, &stats->rootfs_used_kb, &stats->rootfs_total_kb);
+    get_fs_data(TMPFS_PATH, &stats->tmpfs_used_kb, &stats->tmpfs_total_kb);
+    get_pid_stats(&stats->pid_stats, &stats->pid_stats_count);
+}
