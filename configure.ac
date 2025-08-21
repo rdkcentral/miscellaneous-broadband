@@ -162,13 +162,14 @@ AC_CONFIG_FILES(
 	source/TimeConv/Makefile
 	source/parcon/Makefile
 	source/ServiceCtrl/Makefile
+	source/SyscfgMethodHandler/Makefile
 	source/webcfg_decoder/Makefile
 	source/MemFrag_Calc/Makefile
 	source/EventSubscription/Makefile
 	source/Makefile
 	source/dhcp_client_utils/Makefile
 	source/msgq_util/Makefile
-  source/FwBankInfo/Makefile
+	source/FwBankInfo/Makefile
 	Makefile
 )
 
