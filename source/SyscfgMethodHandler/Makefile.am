@@ -18,4 +18,4 @@
 bin_PROGRAMS = SyscfgMethodHandler
 ServiceCtrl_SOURCES = syscfg_method_handler.c
 ServiceCtrl_CPPFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus
-ServiceCtrl_LDFLAGS = -lrbus
+ServiceCtrl_LDFLAGS = -lrbus -lsyscfg
