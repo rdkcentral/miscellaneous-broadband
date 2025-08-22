@@ -27,4 +27,4 @@ GatewayStats_CPPFLAGS = -I$(top_srcdir)/include \
 
 GatewayStats_SOURCES = main.c
 
-GatewayStats_LDFLAGS = -lccsp_common -lsysevent -lsecure_wrapper -lpthread -lrbus -lpcap -lmosquitto
+GatewayStats_LDFLAGS = -lccsp_common -lsysevent -lsecure_wrapper -lpthread -lrbus -lpcap -lmosquitto -lgw_stats
