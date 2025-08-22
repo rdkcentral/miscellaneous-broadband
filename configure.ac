@@ -163,6 +163,7 @@ AC_CONFIG_FILES(
 	source/parcon/Makefile
 	source/ServiceCtrl/Makefile
 	source/SyscfgMethodHandler/Makefile
+	source/syscfg_rbus/Makefile
 	source/webcfg_decoder/Makefile
 	source/MemFrag_Calc/Makefile
 	source/EventSubscription/Makefile

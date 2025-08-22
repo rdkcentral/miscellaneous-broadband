@@ -5,13 +5,23 @@
 #include <rbus/rbus.h>
 #include <syscfg/syscfg.h>
 #define  ARRAY_SZ(x) (sizeof(x) / sizeof((x)[0]))
+#define UNUSED_PARAMETER(x) (void)(x)
+#define ANSC_STATUS_SUCCESS 0
+#define ANSC_STATUS unsigned long
 
 rbusHandle_t rbus_handle = NULL;
 
+rbusError_t syscfg_get_rbus(rbusHandle_t handle, char const* methodName, rbusObject_t inParams, rbusObject_t outParams,
+                                                                        rbusMethodAsyncHandle_t asyncHandle);
+rbusError_t syscfg_set_rbus(rbusHandle_t handle, char const* methodName, rbusObject_t inParams, rbusObject_t outParams,
+                                                                        rbusMethodAsyncHandle_t asyncHandle);
+rbusError_t syscfg_commit_rbus(rbusHandle_t handle, char const* methodName, rbusObject_t inParams, rbusObject_t outParams,
+                                                                        rbusMethodAsyncHandle_t asyncHandle);
 rbusDataElement_t syscfg_RbusElements[] =
 {
     { "syscfg_get()", RBUS_ELEMENT_TYPE_METHOD, {NULL, NULL, NULL, NULL, NULL, syscfg_get_rbus} },
-    { "syscfg_set()", RBUS_ELEMENT_TYPE_METHOD, {NULL, NULL, NULL, NULL, NULL, syscfg_set_rbus} }
+    { "syscfg_set()", RBUS_ELEMENT_TYPE_METHOD, {NULL, NULL, NULL, NULL, NULL, syscfg_set_rbus} },
+    { "syscfg_commit()", RBUS_ELEMENT_TYPE_METHOD, {NULL, NULL, NULL, NULL, NULL, syscfg_commit_rbus} }
 };
 
 rbusError_t syscfg_RbusInit(void)
@@ -58,7 +68,7 @@ rbusError_t syscfg_unreg_elements(void)
 
     if (rc != RBUS_ERROR_SUCCESS)
     {
-        printf("rbus unregister data elements failed for type %d\n",type);
+        printf("rbus unregister data elements failed\n");
         return rc;
     }
     rbus_close(rbus_handle);
@@ -67,61 +77,84 @@ rbusError_t syscfg_unreg_elements(void)
 
 rbusError_t syscfg_get_rbus(rbusHandle_t handle, char const* methodName, rbusObject_t inParams, rbusObject_t outParams,
                                                         rbusMethodAsyncHandle_t asyncHandle) {
-    rbusValue_t value;
-    char *key = NULL;
-    uint32_t len = 0;
-    ANSC_STATUS returnStatus = ANSC_STATUS_SUCCESS;
+    UNUSED_PARAMETER(handle);
+    UNUSED_PARAMETER(methodName);
+    UNUSED_PARAMETER(asyncHandle);
+    rbusValue_t rbus_value;
+    char *syscfg_key = NULL;
+    int len = 0;
     char buf[128]={'\0'};
 
-    value = rbusObject_GetValue(inParams, "key");
-    key = (char*)rbusValue_GetString(value, &len);
-    if(key == NULL)
+    rbus_value = rbusObject_GetValue(inParams, "syscfg_key");
+    syscfg_key = (char*)rbusValue_GetString(rbus_value, &len);
+    if(syscfg_key == NULL)
     {
-        printf("%s: Key is NULL\n", __FUNCTION__);
+        printf("%s: syscfg_key is NULL\n", __FUNCTION__);
         return RBUS_ERROR_INVALID_INPUT;
     }
-    printf("%s: Key: %s\n", __FUNCTION__, key);
+    //printf("%s: syscfg_key: %s\n", __FUNCTION__, syscfg_key);
 
-    syscfg_get( NULL, key, buf, sizeof(buf));
+    syscfg_get( NULL, syscfg_key, buf, sizeof(buf));
 
     /*set syscfg value */
-    rbusValue_Init(&value);
-    rbusValue_SetString(value, buf);
-    rbusObject_SetValue(outParams, "value", value);
-    rbusValue_Release(value);
+    rbusValue_Init(&rbus_value);
+    rbusValue_SetString(rbus_value, buf);
+    rbusObject_SetValue(outParams, "syscfg_value", rbus_value);
+    rbusValue_Release(rbus_value);
 
     return RBUS_ERROR_SUCCESS;
 }
 
 rbusError_t syscfg_set_rbus(rbusHandle_t handle, char const* methodName, rbusObject_t inParams, rbusObject_t outParams,
                                                         rbusMethodAsyncHandle_t asyncHandle) {
-    rbusValue_t value;
-    char *key = NULL;
-    char *val = NULL;
-    uint32_t len = 0;
+    UNUSED_PARAMETER(handle);
+    UNUSED_PARAMETER(methodName);
+    UNUSED_PARAMETER(outParams);
+    UNUSED_PARAMETER(asyncHandle);
+    rbusValue_t rbus_value;
+    char *syscfg_key = NULL;
+    char *syscfg_val = NULL;
+    int len = 0;
 
-    value = rbusObject_GetValue(inParams, "key");
-    key = (char*)rbusValue_GetString(value, &len);
+    rbus_value = rbusObject_GetValue(inParams, "syscfg_key");
+    syscfg_key = (char*)rbusValue_GetString(rbus_value, &len);
 
-    if (key == NULL) {
-        printf("%s: key is NULL\n", __FUNCTION__);
-        return RBUS_ERROR_INVALID_INPUT;
-    }
-    
-    value = rbusObject_GetValue(inParams, "value");
-    val = (char*)rbusValue_GetString(value, &len);
-
-    if (val == NULL) {
-        printf("%s: value is NULL\n", __FUNCTION__);
+    if (syscfg_key == NULL) {
+        printf("%s: syscfg_key is NULL\n", __FUNCTION__);
         return RBUS_ERROR_INVALID_INPUT;
     }
 
-    printf("%s: Key: %s, Value: %s\n", __FUNCTION__, key, val);
+    rbus_value = rbusObject_GetValue(inParams, "syscfg_value");
+    syscfg_val = (char*)rbusValue_GetString(rbus_value, &len);
 
-    if (syscfg_set(NULL, key, val) != 0)
+    if (syscfg_val == NULL) {
+        printf("%s: syscfg_value is NULL\n", __FUNCTION__);
+        return RBUS_ERROR_INVALID_INPUT;
+    }
+
+    //printf("%s: syscfg_key: %s, syscfg_value: %s\n", __FUNCTION__, syscfg_key, syscfg_val);
+
+    if (syscfg_set(NULL, syscfg_key, syscfg_val) != 0)
     {
-        printf("syscfg_set failed for key: %s\n", key);
-        return RBUS_ERROR_INVALID_INPUT;
+        printf("syscfg_set failed for syscfg_key: %s\n", syscfg_key);
+        return RBUS_ERROR_BUS_ERROR;
+    }
+
+    return RBUS_ERROR_SUCCESS;
+}
+
+rbusError_t syscfg_commit_rbus(rbusHandle_t handle, char const* methodName, rbusObject_t inParams, rbusObject_t outParams,
+                                                        rbusMethodAsyncHandle_t asyncHandle) {
+    UNUSED_PARAMETER(handle);
+    UNUSED_PARAMETER(methodName);
+    UNUSED_PARAMETER(inParams);
+    UNUSED_PARAMETER(outParams);
+    UNUSED_PARAMETER(asyncHandle);
+
+    if (syscfg_commit() != 0)
+    {
+        printf("syscfg_commit failed.\n");
+        return RBUS_ERROR_BUS_ERROR;
     }
 
     return RBUS_ERROR_SUCCESS;

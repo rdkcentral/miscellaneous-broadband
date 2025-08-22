@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##########################################################################
-bin_PROGRAMS = SyscfgMethodHandler
-SyscfgMethodHandler_SOURCES = syscfg_method_handler.c
-SyscfgMethodHandler_CPPFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus
-SyscfgMethodHandler_LDFLAGS = -lrbus -lsyscfg
+bin_PROGRAMS = syscfg_rbus
+syscfg_rbus_SOURCES = syscfg_rbus.c
+syscfg_rbus_CPPFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus
+syscfg_rbus_LDFLAGS = -lrbus -lsyscfg
