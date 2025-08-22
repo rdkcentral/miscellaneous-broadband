@@ -170,6 +170,7 @@ AC_CONFIG_FILES(
 	source/msgq_util/Makefile
   source/FwBankInfo/Makefile
   source/gw_stats_collection/Makefile
+  source/GatewayStats/Makefile
 	Makefile
 )
 
