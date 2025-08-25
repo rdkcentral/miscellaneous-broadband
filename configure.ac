@@ -164,12 +164,12 @@ AC_CONFIG_FILES(
 	source/ServiceCtrl/Makefile
 	source/webcfg_decoder/Makefile
 	source/MemFrag_Calc/Makefile
+	source/gw_stats_collection/Makefile
 	source/EventSubscription/Makefile
 	source/Makefile
 	source/dhcp_client_utils/Makefile
 	source/msgq_util/Makefile
   source/FwBankInfo/Makefile
-  source/gw_stats_collection/Makefile
   source/GatewayStats/Makefile
 	Makefile
 )

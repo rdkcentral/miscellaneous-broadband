@@ -53,5 +53,5 @@ endif
 if UNIT_TEST_DOCKER_SUPPORT
 SUBDIRS = test
 else
-SUBDIRS = GatewayStats gw_stats_collection Psmcli parcon LTime ServiceCtrl TimeConv webcfg_decoder MemFrag_Calc $(SETLED) $(MULTIPART_UTIL) $(BRIDGE_UTIL) $(WBCFG_TEST) $(DHCP_CLIENT_UTILS_EXAMPLE) msgq_util EventSubscription FwBankInfo $(RDKSCHEDULER_TESTAPP) $(SOCKET_EXAMPLE)
+SUBDIRS = gw_stats_collection Psmcli parcon LTime ServiceCtrl TimeConv webcfg_decoder MemFrag_Calc GatewayStats $(SETLED) $(MULTIPART_UTIL) $(BRIDGE_UTIL) $(WBCFG_TEST) $(DHCP_CLIENT_UTILS_EXAMPLE) msgq_util EventSubscription FwBankInfo $(RDKSCHEDULER_TESTAPP) $(SOCKET_EXAMPLE)
 endif
