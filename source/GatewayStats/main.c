@@ -42,57 +42,46 @@ void save_to_text(const SystemStats *system_stats, const WanStats *wan_stats, co
     get_current_timestamp(timestamp, sizeof(timestamp));
 
     // Write system_params
-    fprintf(file, "system_params: %s|%s|%s|%s|%s|%.3f|%.3f|%.3f\n",
+    fprintf(file, "system_params: %s|%s|%s|%s|%s|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%d|%d|%d|%d|[",
             timestamp, system_stats->model, system_stats->firmware, system_stats->cmac,
-            system_stats->uptime, system_stats->cpu_usage, system_stats->free_memory, system_stats->slab_memory);
+            system_stats->uptime, system_stats->cpu_usage, system_stats->free_memory, system_stats->slab_memory,
+            system_stats->avail_memory, system_stats->cached_mem, system_stats->slab_unreclaim,
+            system_stats->loadavg_1min, system_stats->loadavg_5min, system_stats->loadavg_15min,
+            system_stats->rootfs_used_kb, system_stats->rootfs_total_kb,
+            system_stats->tmpfs_used_kb, system_stats->tmpfs_total_kb);
+
+    // Print fw_restart_time array as [time1, time2, ...]
+    for (int i = 0; i < system_stats->fw_restart_count; i++) {
+        fprintf(file, "%s%s", (i > 0 ? ", " : ""), system_stats->fw_restart_time[i]);
+    }
+    fprintf(file, "]\n");
 
     // Write WAN statistics
-    fprintf(file, "wan: %s|%s|%s|%s|%s|%s|%s|%s|%s|%.3f|%.3f|%.3f|%.3f\n",
+    fprintf(file, "wan: %s|%s|%s|%s|%s|%s|%s|%s|%s|%.3f|%.3f|%.3f|%.3f|%s|%s|[",
             timestamp, wan_stats->gateway_status, wan_stats->interface_status, wan_stats->ipv4_address,
             wan_stats->ipv6_address, wan_stats->rx_bytes, wan_stats->tx_bytes, wan_stats->rx_dropped,
-            wan_stats->tx_dropped, wan_stats->packet_loss, wan_stats->latency, wan_stats->jitter, wan_stats->dns_time);
+            wan_stats->tx_dropped, wan_stats->packet_loss, wan_stats->latency, wan_stats->jitter, wan_stats->dns_time,
+            wan_stats->ipv4_lease, wan_stats->ipv6_lease);
+    for (int i = 0; i < wan_stats->wan_restart_count; i++) {
+        fprintf(file, "%s%s", (i > 0 ? ", " : ""), wan_stats->wan_restart_time[i]);
+    }
+    fprintf(file, "]\n");
 
     // Write LAN statistics
-    fprintf(file, "lan: %s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%d|%d|%d|%d|%d\n",
+    fprintf(file, "lan: %s|%s|%s|%s|%s|%s|%s|%d\n",
             timestamp, lan_stats->ipv4_address, lan_stats->ipv6_address, lan_stats->rx_bytes,
-            lan_stats->tx_bytes, lan_stats->rx_dropped, lan_stats->tx_dropped,
-            lan_stats->channel_util_2_4ghz, lan_stats->channel_util_5ghz, lan_stats->channel_util_6ghz,
-            lan_stats->total_clients, lan_stats->client_count_2_4ghz, lan_stats->client_count_5ghz,
-            lan_stats->client_count_6ghz, lan_stats->client_count_eth);
+            lan_stats->tx_bytes, lan_stats->rx_dropped, lan_stats->tx_dropped, lan_stats->client_count);
 
-    // Write 2.4GHz clients
-    for (int i = 0; i < lan_stats->client_count_2_4ghz; i++) {
-        fprintf(file, "2.4|%s|%s|%s|%s|%s|%s|%s|%s\n",
-                lan_stats->clients_2_4ghz[i].mac_address, lan_stats->clients_2_4ghz[i].ip_addr,
-                lan_stats->clients_2_4ghz[i].rssi, lan_stats->clients_2_4ghz[i].snr,
-                lan_stats->clients_2_4ghz[i].host_name, lan_stats->clients_2_4ghz[i].status,
-                lan_stats->clients_2_4ghz[i].tx_bytes, lan_stats->clients_2_4ghz[i].rx_bytes);
-    }
-
-    // Write 5GHz clients
-    for (int i = 0; i < lan_stats->client_count_5ghz; i++) {
-        fprintf(file, "5|%s|%s|%s|%s|%s|%s|%s|%s\n",
-                lan_stats->clients_5ghz[i].mac_address, lan_stats->clients_5ghz[i].ip_addr,
-                lan_stats->clients_5ghz[i].rssi, lan_stats->clients_5ghz[i].snr,
-                lan_stats->clients_5ghz[i].host_name, lan_stats->clients_5ghz[i].status,
-                lan_stats->clients_5ghz[i].tx_bytes, lan_stats->clients_5ghz[i].rx_bytes);
-    }
-
-    // Write 6GHz clients
-    for (int i = 0; i < lan_stats->client_count_6ghz; i++) {
-        fprintf(file, "6|%s|%s|%s|%s|%s|%s|%s|%s\n",
-                lan_stats->clients_6ghz[i].mac_address, lan_stats->clients_6ghz[i].ip_addr,
-                lan_stats->clients_6ghz[i].rssi, lan_stats->clients_6ghz[i].snr,
-                lan_stats->clients_6ghz[i].host_name, lan_stats->clients_6ghz[i].status,
-                lan_stats->clients_6ghz[i].tx_bytes, lan_stats->clients_6ghz[i].rx_bytes);
-    }
-
-    // Write Ethernet clients
-    for (int i = 0; i < lan_stats->client_count_eth; i++) {
-        fprintf(file, "eth|%s|%s|%s|%s|%s|%s\n",
-                lan_stats->eth_clients[i].mac_address, lan_stats->eth_clients[i].ip_addr,
-                lan_stats->eth_clients[i].host_name, lan_stats->eth_clients[i].status,
-                lan_stats->eth_clients[i].tx_bytes, lan_stats->eth_clients[i].rx_bytes);
+    // Write LAN client details
+    for (int i = 0; i < lan_stats->client_count; i++) {
+        fprintf(file, "client|%s|%s|%s|%s|%s|%s|%d\n",
+            lan_stats->clients[i].mac_address,
+            lan_stats->clients[i].host_name,
+            lan_stats->clients[i].ip_addr,
+            lan_stats->clients[i].status,
+            lan_stats->clients[i].tx_bytes,
+            lan_stats->clients[i].rx_bytes,
+            lan_stats->clients[i].tcp_est_counts);
     }
 
     // Write IPv6 monitoring statistics
