@@ -2860,11 +2860,10 @@ void getSettings()
         	bridge_util_log("syscfg_get failed to retrieve ovs_enable\n");
 
         }
-        if( (0 == access( ONEWIFI_ENABLED, F_OK )) || (0 == access( OPENVSWITCH_LOADED, F_OK ))
-                                                   || (access(WFO_ENABLED, F_OK) == 0 ) )
+        if( 0 == access( OPENVSWITCH_LOADED, F_OK ) )
         {
             ovsEnable = 1;
-            bridge_util_log("setting ovsEnable to true for onewifi/WFO build\n");
+            bridge_util_log("setting ovsEnable to true for OVS build\n");
         }
 
         memset(buf,0,sizeof(buf));
