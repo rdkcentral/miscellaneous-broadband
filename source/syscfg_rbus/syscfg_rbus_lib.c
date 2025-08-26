@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <rbus/rbus.h>
 
 #define UNREFERENCED_PARAMETER(_p_) (void)(_p_)
@@ -30,8 +31,11 @@ void syscfg_destroy()
 
 int syscfg_get (const char *ns, const char *name, char *out_val, int outbufsz)
 {
-    size_t len;
+    UNREFERENCED_PARAMETER(ns);
+    int len;
     int rc;
+    const char* val = NULL;
+    int rbus_response = RBUS_ERROR_SUCCESS;
     rbusObject_t inParams;
     rbusObject_t outParams;
     rbusValue_t value;
@@ -48,7 +52,7 @@ int syscfg_get (const char *ns, const char *name, char *out_val, int outbufsz)
     //syscfg_get(NULL, cmd[1], val, sizeof(val));
     rbusObject_Init(&inParams, NULL);
     rbusValue_Init(&value);
-    rbusValue_SetString(value, cmd[1]);
+    rbusValue_SetString(value, name);
     rbusObject_SetValue(inParams, "syscfg_key", value);
     rbusValue_Release(value);
     rbus_response = rbusMethod_Invoke(handle, "syscfg_get()", inParams, &outParams);
@@ -61,7 +65,7 @@ int syscfg_get (const char *ns, const char *name, char *out_val, int outbufsz)
             value = rbusProperty_GetValue(outProps);
             if (value && rbusValue_GetType(value) == RBUS_STRING)
             {
-                const char* val = rbusValue_GetString(value,NULL);
+                val = rbusValue_GetString(value,NULL);
                 len = strlen(val);
 
                 if (len >= outbufsz) {
@@ -99,7 +103,9 @@ int syscfg_get (const char *ns, const char *name, char *out_val, int outbufsz)
 
 int syscfg_set (const char *ns, const char *name, const char *val)
 {
+    UNREFERENCED_PARAMETER(ns);
     int rc;
+    int rbus_response = RBUS_ERROR_SUCCESS;
     rbusObject_t inParams;
     rbusObject_t outParams;
     rbusValue_t value;
@@ -130,7 +136,9 @@ int syscfg_set (const char *ns, const char *name, const char *val)
 
 int syscfg_unset(const char *ns, const char *name)
 {
+    UNREFERENCED_PARAMETER(ns);
     int rc;
+    int rbus_response = RBUS_ERROR_SUCCESS;
     rbusObject_t inParams;
     rbusObject_t outParams;
     rbusValue_t value;
@@ -138,7 +146,7 @@ int syscfg_unset(const char *ns, const char *name)
     //rc = syscfg_unset(NULL, cmd[1]);
     rbusObject_Init(&inParams, NULL);
     rbusValue_Init(&value);
-    rbusValue_SetString(value, cmd[1]);
+    rbusValue_SetString(value, name);
     rbusObject_SetValue(inParams, "syscfg_key", value);
     rbusValue_Release(value);
     rbus_response = rbusMethod_Invoke(handle, "syscfg_unset()", inParams, &outParams);
@@ -158,9 +166,9 @@ int syscfg_unset(const char *ns, const char *name)
 int syscfg_commit (void)
 {
     int rc = 0;
+    int rbus_response = RBUS_ERROR_SUCCESS;
     rbusObject_t inParams;
     rbusObject_t outParams;
-    rbusValue_t value;
     syscfg_rbus_lib_init();
     //rc = syscfg_commit();
     rbusObject_Init(&inParams, NULL);
