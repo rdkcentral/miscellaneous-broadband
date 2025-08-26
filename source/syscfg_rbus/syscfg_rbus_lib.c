@@ -3,13 +3,29 @@
 #include <string.h>
 #include <rbus/rbus.h>
 
+#define UNREFERENCED_PARAMETER(_p_) (void)(_p_)
+
 rbusHandle_t handle = NULL;
+char rbus_component_name[128] = { '\0' };
 void syscfg_rbus_lib_init(void)
 {
     if (handle == NULL)
     {
-        rbus_open(&handle, "syscfg_rbus_lib");
+        snprintf(rbus_component_name, sizeof(rbus_component_name), "syscfg_rbus_lib_%d", getpid());
+        rbus_open(&handle, rbus_component_name);
     }
+}
+
+int syscfg_create(const char *file, long int max_file_sz)
+{
+    UNREFERENCED_PARAMETER(file);
+    UNREFERENCED_PARAMETER(max_file_sz);
+    return 0;
+}
+
+void syscfg_destroy()
+{
+    return;
 }
 
 int syscfg_get (const char *ns, const char *name, char *out_val, int outbufsz)
@@ -112,6 +128,33 @@ int syscfg_set (const char *ns, const char *name, const char *val)
     return rc;
 }
 
+int syscfg_unset(const char *ns, const char *name)
+{
+    int rc;
+    rbusObject_t inParams;
+    rbusObject_t outParams;
+    rbusValue_t value;
+    syscfg_rbus_lib_init();
+    //rc = syscfg_unset(NULL, cmd[1]);
+    rbusObject_Init(&inParams, NULL);
+    rbusValue_Init(&value);
+    rbusValue_SetString(value, cmd[1]);
+    rbusObject_SetValue(inParams, "syscfg_key", value);
+    rbusValue_Release(value);
+    rbus_response = rbusMethod_Invoke(handle, "syscfg_unset()", inParams, &outParams);
+    rbusObject_Release(inParams);
+    if (RBUS_ERROR_SUCCESS == rbus_response)
+    {
+        rbusObject_Release(outParams);
+        rc = 0;
+    }
+    else
+    {
+        rc = -1;
+    }
+    return rc;
+}
+
 int syscfg_commit (void)
 {
     int rc = 0;
@@ -136,4 +179,19 @@ int syscfg_commit (void)
         fprintf(stderr, "Error: internal error handling tmp file\n");
     }
     return rc;
+}
+
+int syscfg_getall2(char *buf, size_t bufsz, size_t *outsz)
+{
+    UNREFERENCED_PARAMETER(buf);
+    UNREFERENCED_PARAMETER(bufsz);
+    UNREFERENCED_PARAMETER(outsz);
+    return 0;
+}
+
+int syscfg_getsz (long int *used_sz, long int *max_sz)
+{
+    UNREFERENCED_PARAMETER(used_sz);
+    UNREFERENCED_PARAMETER(max_sz);
+    return 0;
 }
