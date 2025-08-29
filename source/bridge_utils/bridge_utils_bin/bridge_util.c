@@ -2937,7 +2937,7 @@ void getSettings()
 	char *paramValue = NULL;
 
     //read from psm if not available in syscfg db.
-    if(ethWanIfaceName[0] == '\0')
+    if ((ethWanEnabled) && (ethWanIfaceName[0] == '\0'))
     {
         memset(paramName,0,sizeof(paramName));
 
