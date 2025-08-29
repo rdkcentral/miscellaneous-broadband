@@ -222,6 +222,31 @@ unsigned int mask2cidr(char *subnetMask)
     l_iCIDR += countSetBits(l_iFourthByte);
     return l_iCIDR;
 }
+
+#if defined (AMENITIES_NETWORK_ENABLED)
+#define SYS_CLASS_PATH_OF_BRIDGES         "/sys/class/net/%s/bridge/nf_call_iptables"
+void setNfCallIptables(char * pBridgeName, BOOL bValue)
+{
+    if (NULL == pBridgeName)
+        return;
+
+    char cPath [128] = {0};
+    char cVal [8] = {0};
+    snprintf(cPath,sizeof(cPath),SYS_CLASS_PATH_OF_BRIDGES,pBridgeName);
+    int iFd = open(cPath,O_WRONLY);
+    if (iFd >= 0)
+    {
+        snprintf(cVal, sizeof(cVal),"%d",bValue);
+        write(iFd,cVal, 1);
+        close(iFd);
+    }
+    else
+    {
+        bridge_util_log ("%s:%d,Failed to open:%s\n",__FUNCTION__,__LINE__,cPath);
+        perror("open");
+    }
+}
+#endif /*AMENITIES_NETWORK_ENABLED*/
 /***********************************************************************
  * broad cast address set API
 ***********************************************************************/
@@ -1512,7 +1537,16 @@ int HandlePostConfigGeneric(bridgeDetails *bridgeInfo,int InstanceNumber)
                 break;
             }
 #endif /*WIFI_MANAGE_SUPPORTED*/
-
+#if defined (AMENITIES_NETWORK_ENABLED)
+            case AMENITY_BRIDGE_2G:
+            case AMENITY_BRIDGE_5G:
+            case AMENITY_BRIDGE_6G:
+            {
+                bridge_util_log("%s:%d, bridgeName:%s\n",__FUNCTION__,__LINE__,bridgeInfo->bridgeName);
+                setNfCallIptables(bridgeInfo->bridgeName, TRUE);
+                break;
+            }
+#endif /*AMENITIES_NETWORK_ENABLED*/
 			default :
 					bridge_util_log("%s : Default case\n",__FUNCTION__); 
 
@@ -2826,11 +2860,10 @@ void getSettings()
         	bridge_util_log("syscfg_get failed to retrieve ovs_enable\n");
 
         }
-        if( (0 == access( ONEWIFI_ENABLED, F_OK )) || (0 == access( OPENVSWITCH_LOADED, F_OK ))
-                                                   || (access(WFO_ENABLED, F_OK) == 0 ) )
+        if( 0 == access( OPENVSWITCH_LOADED, F_OK ) )
         {
             ovsEnable = 1;
-            bridge_util_log("setting ovsEnable to true for onewifi/WFO build\n");
+            bridge_util_log("setting ovsEnable to true for OVS build\n");
         }
 
         memset(buf,0,sizeof(buf));
