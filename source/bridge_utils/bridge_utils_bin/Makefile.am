@@ -33,6 +33,10 @@ bridgeUtils_SOURCES = bridge_util.c bridge_creation.c main.c bridge_util_generic
 
 bridgeUtils_LDFLAGS =  -lrt -lccsp_common -lsyscfg -lsysevent -lprivilege -lbridge_utils -lsecure_wrapper
 
+if BRIDGE_UTILS_BIN_ENABLE
+bridgeUtils_LDFLAGS += -lOvsAgentApi -lbreakpadwrapper -lpthread -lstdc++ -lm -lcjson
+endif
+
 if FEATURE_VTS_BRIDGE_UTIL
 lib_LTLIBRARIES = libbridgeutils.la
 
