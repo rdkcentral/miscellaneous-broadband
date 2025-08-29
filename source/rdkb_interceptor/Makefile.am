@@ -17,10 +17,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##########################################################################
-AM_CFLAGS += -Wall -Werror -Wextra -Wno-unused-parameter -Wno-pointer-sign -Wno-sign-compare -Wno-type-limits -Wno-format-truncation
+
+AM_CFLAGS = -Wall -Werror
 AM_CPPFLAGS = -Wall -Werror
 
 lib_LTLIBRARIES = librdkb_interceptor.la
-librdkb_interceptor_la_SOURCES = rdkb_interceptor_lib.c
+librdkb_interceptor_la_SOURCES = rdkb_interceptor.c
 librdkb_interceptor_la_CPPFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus
-librdkb_interceptor_la_LDFLAGS = -lrbus -lsyscfg -lsysevent -lev -lpthread
+librdkb_interceptor_la_LDFLAGS = -shared -fPIC -lrbus -lsyscfg -lsysevent -lev -lpthread

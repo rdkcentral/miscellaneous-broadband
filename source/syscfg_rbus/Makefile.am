@@ -1,3 +1,4 @@
+##########################################################################
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
@@ -15,14 +16,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##########################################################################
+
 #bin_PROGRAMS = syscfg_rbus
 #syscfg_rbus_SOURCES = syscfg_rbus.c
 #syscfg_rbus_CPPFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus
 #syscfg_rbus_LDFLAGS = -lrbus -lsyscfg
-AM_CFLAGS += -Wall -Werror -Wextra -Wno-unused-parameter -Wno-pointer-sign -Wno-sign-compare -Wno-type-limits -Wno-format-truncation
+AM_CFLAGS = -Wall -Werror
 AM_CPPFLAGS = -Wall -Werror
 
 lib_LTLIBRARIES = libsyscfg_rbus.la
 libsyscfg_rbus_la_SOURCES = syscfg_rbus_lib.c
 libsyscfg_rbus_la_CPPFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus
-libsyscfg_rbus_la_LDFLAGS = -lrbus -lsyscfg
+libsyscfg_rbus_la_LDFLAGS = -shared -fPIC -lrbus -lsyscfg
