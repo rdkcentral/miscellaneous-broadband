@@ -164,6 +164,7 @@ AC_CONFIG_FILES(
 	source/ServiceCtrl/Makefile
 	source/SyscfgMethodHandler/Makefile
 	source/syscfg_rbus/Makefile
+	source/rdkb_interceptor/Makefile
 	source/webcfg_decoder/Makefile
 	source/MemFrag_Calc/Makefile
 	source/EventSubscription/Makefile
