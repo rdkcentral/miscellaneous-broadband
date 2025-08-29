@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <dlfcn.h>
@@ -8,6 +9,7 @@
 #include <rbus/rbus.h>
 #include <sysevent/sysevent.h>
 #include <syscfg/syscfg.h>
+#include <cjson/cJSON.h>
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
@@ -27,9 +29,19 @@ static struct ev_loop *loop = NULL;
 static ev_stat whitelist_watcher;
 static pthread_t watcher_thread;
 
-
-
-#include <cjson/cJSON.h>
+// Debug logging macro
+static bool is_debug_enabled() {
+    static int checked = 0;
+    static int enabled = 0;
+    if (!checked) {
+        const char *env = getenv("RDKB_INTERCEPTOR_DEBUG");
+        enabled = (env && strcmp(env, "1") == 0);
+        checked = 1;
+    }
+    return enabled;
+}
+#define INTERCEPTOR_LOG(fmt, ...) \
+    do { if (is_debug_enabled()) fprintf(stderr, fmt, ##__VA_ARGS__); } while(0)
 
 // Load whitelist from JSON file using cJSON
 static void reload_whitelist() {
@@ -105,7 +117,7 @@ static void whitelist_cb(EV_P_ ev_stat *w, int revents) {
     UNUSED_PARAMETER(w);
     UNUSED_PARAMETER(revents);
     reload_whitelist();
-    printf("[Whitelist] Reloaded (syscfg: %d, sysevent: %d, rbus: %d names)\n", syscfg_whitelist_count, sysevent_whitelist_count, rbus_whitelist_count);
+    INTERCEPTOR_LOG("[Whitelist] Reloaded (syscfg: %d, sysevent: %d, rbus: %d names)\n", syscfg_whitelist_count, sysevent_whitelist_count, rbus_whitelist_count);
 }
 
 
@@ -166,20 +178,20 @@ static void init_whitelist_monitor() {
 
 __attribute__((constructor))
 void init_library() {
-    printf("Shared library loaded (C)\n");
+    INTERCEPTOR_LOG("Shared library loaded (C)\n");
     init_whitelist_monitor();
 }
 
 __attribute__((destructor))
 void cleanup_library() {
-    printf("Shared library unloaded (C)\n");
+    INTERCEPTOR_LOG("Shared library unloaded (C)\n");
 }
 
 
 // ---- RBUS ----
 rbusError_t rbus_get(rbusHandle_t handle, const char* name, rbusValue_t* value) {
     if (!is_rbus_api_allowed(name)) {
-        printf("[Denied] rbus_get denied for name: %s (not in rbus whitelist). Exiting.\n", name);
+    INTERCEPTOR_LOG("[Denied] rbus_get denied for name: %s (not in rbus whitelist). Exiting.\n", name);
         exit(1);
     }
     static rbusError_t (*real_rbus_get)(rbusHandle_t, const char*, rbusValue_t*) = NULL;
@@ -190,18 +202,18 @@ rbusError_t rbus_get(rbusHandle_t handle, const char* name, rbusValue_t* value) 
             return RBUS_ERROR_BUS_ERROR;
         }
     }
-    printf("[Intercepted] rbus_get called with name: %s\n", name);
+    INTERCEPTOR_LOG("[Intercepted] rbus_get called with name: %s\n", name);
     rbusError_t result = real_rbus_get(handle, name, value);
     if (result == RBUS_ERROR_SUCCESS && value) {
         const char* valStr = rbusValue_ToString(*value, NULL, 0);
-        printf("[Intercepted] rbus_get returned value: %s\n", valStr);
+    INTERCEPTOR_LOG("[Intercepted] rbus_get returned value: %s\n", valStr);
     }
     return result;
 }
 
 rbusError_t rbus_set(rbusHandle_t handle, char const* name, rbusValue_t value, rbusSetOptions_t* opts) {
     if (!is_rbus_api_allowed(name)) {
-        printf("[Denied] rbus_set denied for name: %s (not in rbus whitelist). Exiting.\n", name);
+    INTERCEPTOR_LOG("[Denied] rbus_set denied for name: %s (not in rbus whitelist). Exiting.\n", name);
         exit(1);
     }
     static rbusError_t (*real_rbus_set)(rbusHandle_t, char const*, rbusValue_t, rbusSetOptions_t*) = NULL;
@@ -212,11 +224,11 @@ rbusError_t rbus_set(rbusHandle_t handle, char const* name, rbusValue_t value, r
             return RBUS_ERROR_BUS_ERROR;
         }
     }
-    printf("[Intercepted] rbus_set called with name: %s\n", name);
+    INTERCEPTOR_LOG("[Intercepted] rbus_set called with name: %s\n", name);
     rbusError_t result = real_rbus_set(handle, name, value, opts);
     if (result == RBUS_ERROR_SUCCESS) {
         const char* valStr = rbusValue_ToString(value, NULL, 0);
-        printf("[Intercepted] rbus_set set value: %s\n", valStr);
+    INTERCEPTOR_LOG("[Intercepted] rbus_set set value: %s\n", valStr);
     }
     return result;
 }
@@ -224,7 +236,7 @@ rbusError_t rbus_set(rbusHandle_t handle, char const* name, rbusValue_t value, r
 // ---- SYSEVENT ----
 int sysevent_get(const int fd, const token_t token, const char *inbuf, char *outbuf, int outbytes) {
     if (!is_sysevent_api_allowed(inbuf)) {
-        printf("[Denied] sysevent_get denied for name: %s (not in sysevent whitelist). Exiting.\n", inbuf);
+    INTERCEPTOR_LOG("[Denied] sysevent_get denied for name: %s (not in sysevent whitelist). Exiting.\n", inbuf);
         exit(1);
     }
     static int (*real_sysevent_get)(const int, const token_t, const char *, char *, int) = NULL;
@@ -235,15 +247,15 @@ int sysevent_get(const int fd, const token_t token, const char *inbuf, char *out
             return -1;
         }
     }
-    printf("[Intercepted] sysevent_get called with fd: %d, token: %d, name: %s\n", fd, token, inbuf);
+    INTERCEPTOR_LOG("[Intercepted] sysevent_get called with fd: %d, token: %d, name: %s\n", fd, token, inbuf);
     int result = real_sysevent_get(fd, token, inbuf, outbuf, outbytes);
-    printf("[Intercepted] sysevent_get returned: %d\n", result);
+    INTERCEPTOR_LOG("[Intercepted] sysevent_get returned: %d\n", result);
     return result;
 }
 
 int sysevent_set(const int fd, const token_t token, const char *name, const char *value, int conf_req) {
     if (!is_sysevent_api_allowed(name)) {
-        printf("[Denied] sysevent_set denied for name: %s (not in sysevent whitelist). Exiting.\n", name);
+    INTERCEPTOR_LOG("[Denied] sysevent_set denied for name: %s (not in sysevent whitelist). Exiting.\n", name);
         exit(1);
     }
     static int (*real_sysevent_set)(const int, const token_t, const char *, const char *, int) = NULL;
@@ -254,16 +266,16 @@ int sysevent_set(const int fd, const token_t token, const char *name, const char
             return -1;
         }
     }
-    printf("[Intercepted] sysevent_set called with fd: %d, token: %d, name: %s, value: %s, conf_req: %d\n", fd, token, name, value, conf_req);
+    INTERCEPTOR_LOG("[Intercepted] sysevent_set called with fd: %d, token: %d, name: %s, value: %s, conf_req: %d\n", fd, token, name, value, conf_req);
     int result = real_sysevent_set(fd, token, name, value, conf_req);
-    printf("[Intercepted] sysevent_set returned: %d\n", result);
+    INTERCEPTOR_LOG("[Intercepted] sysevent_set returned: %d\n", result);
     return result;
 }
 
 // ---- SYSCFG ----
 int syscfg_get(const char *ns, const char *name, char *out_val, int outbufsz) {
     if (!is_syscfg_api_allowed(name)) {
-        printf("[Denied] syscfg_get denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
+    INTERCEPTOR_LOG("[Denied] syscfg_get denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
         exit(1);
     }
     static int (*real_syscfg_get)(const char *, const char *, char *, int) = NULL;
@@ -274,15 +286,15 @@ int syscfg_get(const char *ns, const char *name, char *out_val, int outbufsz) {
             return -1;
         }
     }
-    printf("[Intercepted] syscfg_get called with ns: %s, name: %s\n", ns, name);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_get called with ns: %s, name: %s\n", ns, name);
     int result = real_syscfg_get(ns, name, out_val, outbufsz);
-    printf("[Intercepted] syscfg_get returned: %d, value: %s\n", result, out_val);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_get returned: %d, value: %s\n", result, out_val);
     return result;
 }
 
 int syscfg_set_ns(const char *ns, const char *name, const char *value) {
     if (!is_syscfg_api_allowed(name)) {
-        printf("[Denied] syscfg_set_ns denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
+    INTERCEPTOR_LOG("[Denied] syscfg_set_ns denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
         exit(1);
     }
     static int (*real_syscfg_set_ns)(const char *, const char *, const char *) = NULL;
@@ -293,15 +305,15 @@ int syscfg_set_ns(const char *ns, const char *name, const char *value) {
             return -1;
         }
     }
-    printf("[Intercepted] syscfg_set_ns called with ns: %s, name: %s, value: %s\n", ns, name, value);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_ns called with ns: %s, name: %s, value: %s\n", ns, name, value);
     int result = real_syscfg_set_ns(ns, name, value);
-    printf("[Intercepted] syscfg_set_ns returned: %d\n", result);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_ns returned: %d\n", result);
     return result;
 }
 
 int syscfg_set_nns(const char *name, const char *value) {
     if (!is_syscfg_api_allowed(name)) {
-        printf("[Denied] syscfg_set_nns denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
+    INTERCEPTOR_LOG("[Denied] syscfg_set_nns denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
         exit(1);
     }
     static int (*real_syscfg_set_nns)(const char *, const char *) = NULL;
@@ -312,16 +324,16 @@ int syscfg_set_nns(const char *name, const char *value) {
             return -1;
         }
     }
-    printf("[Intercepted] syscfg_set_nns called with name: %s, value: %s\n", name, value);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_nns called with name: %s, value: %s\n", name, value);
     int result = real_syscfg_set_nns(name, value);
-    printf("[Intercepted] syscfg_set_nns returned: %d\n", result);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_nns returned: %d\n", result);
     return result;
 }
 
 int syscfg_set_ns_commit(const char *ns, const char *name, const char *value)
 {
     if (!is_syscfg_api_allowed(name)) {
-        printf("[Denied] syscfg_set_ns_commit denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
+    INTERCEPTOR_LOG("[Denied] syscfg_set_ns_commit denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
         exit(1);
     }
     static int (*real_syscfg_set_ns_commit)(const char *, const char *, const char *) = NULL;
@@ -332,15 +344,15 @@ int syscfg_set_ns_commit(const char *ns, const char *name, const char *value)
             return -1;
         }
     }
-    printf("[Intercepted] syscfg_set_ns_commit called with ns: %s, name: %s, value: %s\n", ns, name, value);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_ns_commit called with ns: %s, name: %s, value: %s\n", ns, name, value);
     int result = real_syscfg_set_ns_commit(ns, name, value);
-    printf("[Intercepted] syscfg_set_ns_commit returned: %d\n", result);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_ns_commit returned: %d\n", result);
     return result;
 }
 
 int syscfg_set_nns_commit(const char *name, const char *value) {
     if (!is_syscfg_api_allowed(name)) {
-        printf("[Denied] syscfg_set_nns_commit denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
+    INTERCEPTOR_LOG("[Denied] syscfg_set_nns_commit denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
         exit(1);
     }
     static int (*real_syscfg_set_nns_commit)(const char *, const char *) = NULL;
@@ -351,15 +363,15 @@ int syscfg_set_nns_commit(const char *name, const char *value) {
             return -1;
         }
     }
-    printf("[Intercepted] syscfg_set_nns_commit called with name: %s, value: %s\n", name, value);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_nns_commit called with name: %s, value: %s\n", name, value);
     int result = real_syscfg_set_nns_commit(name, value);
-    printf("[Intercepted] syscfg_set_nns_commit returned: %d\n", result);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_nns_commit returned: %d\n", result);
     return result;
 }
 
 int syscfg_set_ns_u(const char *ns, const char *name, unsigned long value) {
     if (!is_syscfg_api_allowed(name)) {
-        printf("[Denied] syscfg_set_ns_u denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
+    INTERCEPTOR_LOG("[Denied] syscfg_set_ns_u denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
         exit(1);
     }
     static int (*real_syscfg_set_ns_u)(const char *, const char *, unsigned long) = NULL;
@@ -370,15 +382,15 @@ int syscfg_set_ns_u(const char *ns, const char *name, unsigned long value) {
             return -1;
         }
     }
-    printf("[Intercepted] syscfg_set_ns_u called with ns: %s, name: %s, value: %lu\n", ns, name, value);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_ns_u called with ns: %s, name: %s, value: %lu\n", ns, name, value);
     int result = real_syscfg_set_ns_u(ns, name, value);
-    printf("[Intercepted] syscfg_set_ns_u returned: %d\n", result);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_ns_u returned: %d\n", result);
     return result;
 }
 
 int syscfg_set_nns_u(const char *name, unsigned long value) {
     if (!is_syscfg_api_allowed(name)) {
-        printf("[Denied] syscfg_set_nns_u denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
+    INTERCEPTOR_LOG("[Denied] syscfg_set_nns_u denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
         exit(1);
     }
     static int (*real_syscfg_set_nns_u)(const char *, unsigned long) = NULL;
@@ -389,15 +401,15 @@ int syscfg_set_nns_u(const char *name, unsigned long value) {
             return -1;
         }
     }
-    printf("[Intercepted] syscfg_set_nns_u called with name: %s, value: %lu\n", name, value);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_nns_u called with name: %s, value: %lu\n", name, value);
     int result = real_syscfg_set_nns_u(name, value);
-    printf("[Intercepted] syscfg_set_nns_u returned: %d\n", result);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_nns_u returned: %d\n", result);
     return result;
 }
 
 int syscfg_set_ns_u_commit(const char *ns, const char *name, unsigned long value) {
     if (!is_syscfg_api_allowed(name)) {
-        printf("[Denied] syscfg_set_ns_u_commit denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
+    INTERCEPTOR_LOG("[Denied] syscfg_set_ns_u_commit denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
         exit(1);
     }
     static int (*real_syscfg_set_ns_u_commit)(const char *, const char *, unsigned long) = NULL;
@@ -408,15 +420,15 @@ int syscfg_set_ns_u_commit(const char *ns, const char *name, unsigned long value
             return -1;
         }
     }
-    printf("[Intercepted] syscfg_set_ns_u_commit called with ns: %s, name: %s, value: %lu\n", ns, name, value);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_ns_u_commit called with ns: %s, name: %s, value: %lu\n", ns, name, value);
     int result = real_syscfg_set_ns_u_commit(ns, name, value);
-    printf("[Intercepted] syscfg_set_ns_u_commit returned: %d\n", result);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_ns_u_commit returned: %d\n", result);
     return result;
 }
 
 int syscfg_set_nns_u_commit(const char *name, unsigned long value) {
     if (!is_syscfg_api_allowed(name)) {
-        printf("[Denied] syscfg_set_nns_u_commit denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
+    INTERCEPTOR_LOG("[Denied] syscfg_set_nns_u_commit denied for name: %s (not in syscfg whitelist). Exiting.\n", name);
         exit(1);
     }
     static int (*real_syscfg_set_nns_u_commit)(const char *, unsigned long) = NULL;
@@ -427,9 +439,9 @@ int syscfg_set_nns_u_commit(const char *name, unsigned long value) {
             return -1;
         }
     }
-    printf("[Intercepted] syscfg_set_nns_u_commit called with name: %s, value: %lu\n", name, value);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_nns_u_commit called with name: %s, value: %lu\n", name, value);
     int result = real_syscfg_set_nns_u_commit(name, value);
-    printf("[Intercepted] syscfg_set_nns_u_commit returned: %d\n", result);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_set_nns_u_commit returned: %d\n", result);
     return result;
 }
 
@@ -443,8 +455,8 @@ int syscfg_commit(void) {
             return -1;
         }
     }
-    printf("[Intercepted] syscfg_commit called\n");
+    INTERCEPTOR_LOG("[Intercepted] syscfg_commit called\n");
     int result = real_syscfg_commit();
-    printf("[Intercepted] syscfg_commit returned: %d\n", result);
+    INTERCEPTOR_LOG("[Intercepted] syscfg_commit returned: %d\n", result);
     return result;
 }
