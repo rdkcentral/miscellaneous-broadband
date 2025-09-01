@@ -157,6 +157,7 @@ AC_C_INLINE
 AC_FUNC_MALLOC
 
 AC_CONFIG_FILES(
+	source/commonutil/Makefile
 	source/Psmcli/Makefile
 	source/LTime/Makefile
 	source/TimeConv/Makefile
