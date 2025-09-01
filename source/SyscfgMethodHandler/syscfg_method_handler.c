@@ -2,12 +2,37 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include <rbus/rbus.h>
 #include <syscfg/syscfg.h>
 #define  ARRAY_SZ(x) (sizeof(x) / sizeof((x)[0]))
 #define UNUSED_PARAMETER(x) (void)(x)
 #define ANSC_STATUS_SUCCESS 0
 #define ANSC_STATUS unsigned long
+
+static volatile sig_atomic_t keep_running = 1;
+static volatile sig_atomic_t signal_received = 0;
+
+rbusError_t syscfg_unreg_elements(void);
+
+void cleanup_and_exit(int code)
+{
+    syscfg_unreg_elements(); // Unregister elements on exit
+    printf("Cleanup done. Exiting.\n");
+    exit(code);
+}
+
+void handle_signal(int sig)
+{
+    if (!signal_received) {
+        signal_received = sig;
+        printf("\nReceived signal %d, exiting...\n", sig);
+        keep_running = 0;
+    } else {
+        printf("\nReceived signal %d again, forcing exit.\n", sig);
+        cleanup_and_exit(128 + sig);
+    }
+}
 
 rbusHandle_t rbus_handle = NULL;
 
@@ -206,10 +231,19 @@ int main()
         printf("Failed to register rbus elements: %d\n", rc);
         return rc;
     }
-    while(1)
+
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = handle_signal;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+
+    while(keep_running)
     {
-        sleep(30);
+        sleep(1);
     }
-    syscfg_unreg_elements(); // Optionally unregister elements on exit
-    return 0;
+
+    cleanup_and_exit(0);
 }

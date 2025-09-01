@@ -6,6 +6,8 @@
 
 #define UNREFERENCED_PARAMETER(_p_) (void)(_p_)
 
+int syscfg_commit (void);
+
 rbusHandle_t handle = NULL;
 char rbus_component_name[128] = { '\0' };
 void syscfg_rbus_lib_init(void)
@@ -21,7 +23,7 @@ int syscfg_create(const char *file, long int max_file_sz)
 {
     UNREFERENCED_PARAMETER(file);
     UNREFERENCED_PARAMETER(max_file_sz);
-    return 0;
+    return -10;
 }
 
 void syscfg_destroy()
@@ -101,9 +103,40 @@ int syscfg_get (const char *ns, const char *name, char *out_val, int outbufsz)
     return rc;
 }
 
-int syscfg_set (const char *ns, const char *name, const char *val)
+int syscfg_set_ns(const char *ns, const char *name, const char *value)
 {
     UNREFERENCED_PARAMETER(ns);
+    UNREFERENCED_PARAMETER(name);
+    UNREFERENCED_PARAMETER(value);
+    return -1;
+}
+
+int syscfg_set_ns_commit(const char *ns, const char *name, const char *value)
+{
+    UNREFERENCED_PARAMETER(ns);
+    UNREFERENCED_PARAMETER(name);
+    UNREFERENCED_PARAMETER(value);
+    return -1;
+}
+
+int syscfg_set_ns_u(const char *ns, const char *name, unsigned long value)
+{
+    UNREFERENCED_PARAMETER(ns);
+    UNREFERENCED_PARAMETER(name);
+    UNREFERENCED_PARAMETER(value);
+    return -1;
+}
+
+int syscfg_set_ns_u_commit(const char *ns, const char *name, unsigned long value)
+{
+    UNREFERENCED_PARAMETER(ns);
+    UNREFERENCED_PARAMETER(name);
+    UNREFERENCED_PARAMETER(value);
+    return -1;
+}
+
+int syscfg_set_nns (const char *name, const char *val)
+{
     int rc;
     int rbus_response = RBUS_ERROR_SUCCESS;
     rbusObject_t inParams;
@@ -132,6 +165,32 @@ int syscfg_set (const char *ns, const char *name, const char *val)
         rc = -1;
     }
     return rc;
+}
+
+int syscfg_set_nns_commit(const char *name, const char *value)
+{
+    int rc = 0;
+    rc = syscfg_set_nns(name, value);
+    if (rc == 0)
+    {
+        rc = syscfg_commit();
+    }
+    return rc;
+}
+
+int syscfg_set_nns_u(const char *name, unsigned long value)
+{
+    char buf[sizeof(long)*3];
+    sprintf (buf, "%lu", value);
+    return syscfg_set_nns(name, buf);
+}
+
+int syscfg_set_nns_u_commit (const char *name, unsigned long value)
+{
+    int result = syscfg_set_nns_u (name, value);
+    if (result == 0)
+        result = syscfg_commit();
+    return result;
 }
 
 int syscfg_unset(const char *ns, const char *name)
@@ -189,17 +248,25 @@ int syscfg_commit (void)
     return rc;
 }
 
+int syscfg_getall(char *buf, int bufsz, int *outsz)
+{
+    UNREFERENCED_PARAMETER(buf);
+    UNREFERENCED_PARAMETER(bufsz);
+    UNREFERENCED_PARAMETER(outsz);
+    return -1;
+}
+
 int syscfg_getall2(char *buf, size_t bufsz, size_t *outsz)
 {
     UNREFERENCED_PARAMETER(buf);
     UNREFERENCED_PARAMETER(bufsz);
     UNREFERENCED_PARAMETER(outsz);
-    return 0;
+    return -1;
 }
 
 int syscfg_getsz (long int *used_sz, long int *max_sz)
 {
     UNREFERENCED_PARAMETER(used_sz);
     UNREFERENCED_PARAMETER(max_sz);
-    return 0;
+    return -1;
 }
