@@ -22,14 +22,15 @@ AM_CFLAGS += -Wall -Wextra
 bin_PROGRAMS = GatewayStats
 
 GatewayStats_CPPFLAGS = -I$(top_srcdir)/source/gw_stats_collection \
+                        -I$(top_srcdir)/source/GatewayStats/include \
                         -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/ccsp \
                         -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus
 
-GatewayStats_SOURCES = main.c
+GatewayStats_SOURCES = source/gateway_stats.pb-c.c source/gw_collect_data.c source/main.c
 
 GatewayStats_LDADD = ../gw_stats_collection/libgw_stats.la
 GatewayStats_DEPENDENCIES = $(GatewayStats_LDADD)
 
 GatewayStats_LDFLAGS = -L${PKG_CONFIG_SYSROOT_DIR}/usr/lib \
                        -lccsp_common -lsysevent -lsecure_wrapper \
-                       -lpthread -lrbus -lpcap
+                       -lpthread -lrbus -lpcap -lprotobuf-c
