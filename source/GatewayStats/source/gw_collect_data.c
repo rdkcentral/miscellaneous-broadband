@@ -9,6 +9,13 @@ int gw_stats_init() {
     log_message("Gateway Stats Init\n");
     memset(&g_report, 0, sizeof(gw_stats_report));
 
+    // Set initial counts for each stats array (change as needed)
+    g_report.n_system_stats = 1;
+    g_report.n_wan_stats = 1;
+    g_report.n_lan_stats = 1;
+    g_report.n_ipv6_stats = 1;
+    g_report.n_tcp_stats = 1;
+
     g_report.system_stats = (SystemStats*)malloc(sizeof(SystemStats) * g_report.n_system_stats);
     g_report.wan_stats = (WanStats*)malloc(sizeof(WanStats) * g_report.n_wan_stats);
     g_report.lan_stats = (LanStats*)malloc(sizeof(LanStats) * g_report.n_lan_stats);
@@ -26,12 +33,6 @@ int gw_stats_init() {
     initialize_ipv6_monitoring_stats(g_report.ipv6_stats);
     initialize_tcp_stats(g_report.tcp_stats);
     initialize_restart_count_stats(g_report.restart_count_stats);
-
-    g_report.n_system_stats = 0;
-    g_report.n_wan_stats = 0;
-    g_report.n_lan_stats = 0;
-    g_report.n_ipv6_stats = 0;
-    g_report.n_tcp_stats = 0;
 
     sampling_interval = SAMPLING_INTERVAL;
     reporting_interval = REPORTING_INTERVAL;
