@@ -10,6 +10,7 @@
 
 void initialize_lan_stats(LanStats *stats) {
     memset(stats, 0, sizeof(LanStats));
+    stats->timestamp_ms = 0;
     strncpy(stats->ipv4_address, "N/A", sizeof(stats->ipv4_address));
     strncpy(stats->ipv6_address, "N/A", sizeof(stats->ipv6_address));
     strncpy(stats->rx_bytes, "", sizeof(stats->rx_bytes));
@@ -18,6 +19,7 @@ void initialize_lan_stats(LanStats *stats) {
     strncpy(stats->tx_dropped, "", sizeof(stats->tx_dropped));
     stats->clients = NULL;
     stats->client_count = 0;
+    stats->next = NULL;
 }
 
 void get_lan_ipv4_address(char *ipv4_address, size_t size) {

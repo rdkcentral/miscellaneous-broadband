@@ -3,6 +3,7 @@
 // API to initialize IPv6 monitoring statistics
 void initialize_ipv6_monitoring_stats(IPv6MonitoringStats *stats) {
     memset(stats, 0, sizeof(IPv6MonitoringStats));
+    stats->timestamp_ms = 0;
     strncpy(stats->global_ipv6_address, "N/A", sizeof(stats->global_ipv6_address));
     strncpy(stats->link_local_ipv6_address, "N/A", sizeof(stats->link_local_ipv6_address));
     strncpy(stats->ipv6_reachability, "N/A", sizeof(stats->ipv6_reachability));
@@ -10,6 +11,7 @@ void initialize_ipv6_monitoring_stats(IPv6MonitoringStats *stats) {
     stats->ipv6_latency = -1.0;
     stats->ipv4_packet_loss = -1.0;
     stats->ipv6_packet_loss = -1.0;
+    stats->next = NULL;
 }
 
 // Updated API to check IPv6 Address Assignment (Global & Link-Local)

@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+package gwstats;
+
+// ===== PID Stats =====
+message PidStats {
+  uint32 pid = 1;
+  string pName = 2;
+  uint32 rss = 3;
+  uint32 pss = 4;
+  uint32 mem_util = 5;
+  uint32 cpu_util = 6;
+}
+
+// ===== System Stats =====
+message SystemStats {
+  uint64 timestamp_ms = 1;
+  string model = 2;
+  string firmware = 3;
+  string cmac = 4;
+  string uptime = 5;
+  double cpu_usage = 6;
+  double free_memory = 7;
+  double slab_memory = 8;
+  double avail_memory = 9;
+  double cached_mem = 10;
+  double slab_unreclaim = 11;
+  double loadavg_1min = 12;
+  double loadavg_5min = 13;
+  double loadavg_15min = 14;
+  uint32 rootfs_used_kb = 15;
+  uint32 rootfs_total_kb = 16;
+  uint32 tmpfs_used_kb = 17;
+  uint32 tmpfs_total_kb = 18;
+  int32 pid_stats_count = 19;
+  repeated PidStats pid_stats = 20;
+}
+
+// ===== WAN Stats =====
+message WanStats {
+  uint64 timestamp_ms = 1;
+  string interface_status = 2;
+  string ipv4_address = 3;
+  string ipv6_address = 4;
+  string gateway_status = 5;
+  double packet_loss = 6;
+  double latency = 7;
+  double jitter = 8;
+  double dns_time = 9;
+  string rx_bytes = 10;
+  string tx_bytes = 11;
+  string rx_dropped = 12;
+  string tx_dropped = 13;
+  string ipv4_lease = 14;
+  string ipv6_lease = 15;
+}
+
+// ===== LAN Client Details =====
+message ClientDetails {
+  string mac_address = 1;
+  string ip_addr = 2;
+  string host_name = 3;
+  string status = 4;
+  string tx_bytes = 5;
+  string rx_bytes = 6;
+  int32 tcp_est_counts = 7;
+}
+
+// ===== LAN Stats =====
+message LanStats {
+  uint64 timestamp_ms = 1;
+  string ipv4_address = 2;
+  string ipv6_address = 3;
+  string rx_bytes = 4;
+  string tx_bytes = 5;
+  string rx_dropped = 6;
+  string tx_dropped = 7;
+  repeated ClientDetails clients = 8;
+  int32 client_count = 9;
+}
+
+// ===== IPv6 Monitoring Stats =====
+message IPv6MonitoringStats {
+  uint64 timestamp_ms = 1;
+  string global_ipv6_address = 2;
+  string link_local_ipv6_address = 3;
+  string ipv6_reachability = 4;
+  double ipv4_latency = 5;
+  double ipv6_latency = 6;
+  double ipv4_packet_loss = 7;
+  double ipv6_packet_loss = 8;
+}
+
+// ===== TCP Stats =====
+message TcpStats {
+  uint64 timestamp_ms = 1;
+  string TCPLostRetransmit = 2;
+  string TCPRetransFail = 3;
+  string TCPSackFailures = 4;
+  string TCPTimeouts = 5;
+  string TCPAbortOnTimeout = 6;
+  string ListenOverflows = 7;
+  string TCPOrigDataSent = 8;
+}
+
+// ===== Restart Count Stats =====
+message RestartCountStats {
+  int32 fw_restart_count = 1;
+  repeated string fw_restart_time = 2;
+  int32 wan_restart_count = 3;
+  repeated string wan_restart_time = 4;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Overall report that contain all individual stats reports
+//
+////////////////////////////////////////////////////////////////////////////////
+message GatewayStats {
+  uint64 timestamp_ms = 1;
+  repeated SystemStats system = 2;
+  repeated WanStats wan = 3;
+  repeated LanStats lan = 4;
+  repeated IPv6MonitoringStats ipv6_monitoring = 5;
+  repeated TcpStats tcp = 6;
+  RestartCountStats restartCount = 7;
+}

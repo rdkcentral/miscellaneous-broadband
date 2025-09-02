@@ -12,6 +12,7 @@
 // API to initialize system statistics
 void initialize_system_stats(SystemStats *stats) {
     memset(stats, 0, sizeof(SystemStats));
+    stats->timestamp_ms = 0;
     strncpy(stats->model, "UNKNOWN", sizeof(stats->model));
     strncpy(stats->firmware, "UNKNOWN", sizeof(stats->firmware));
     strncpy(stats->cmac, "UNKNOWN", sizeof(stats->cmac));
@@ -29,8 +30,16 @@ void initialize_system_stats(SystemStats *stats) {
     stats->rootfs_total_kb = 0;
     stats->tmpfs_used_kb = 0;
     stats->tmpfs_total_kb = 0;
+    stats->pid_stats_count = 0;
+    stats->pid_stats = NULL;
+    stats->next = NULL;
+}
+
+void initialize_restart_count_stats(RestartCountStats *stats) {
+    if (!stats) return;
+    memset(stats, 0, sizeof(RestartCountStats));
     stats->fw_restart_time = NULL;
-    stats->fw_restart_count = 0;
+    stats->wan_restart_time = NULL;
 }
 
 // API to collect device model

@@ -9,22 +9,22 @@
 // API to initialize WAN statistics
 void initialize_wan_stats(WanStats *stats) {
     memset(stats, 0, sizeof(WanStats));
+    stats->timestamp_ms = 0;
     strncpy(stats->interface_status, "N/A", sizeof(stats->interface_status));
     strncpy(stats->ipv4_address, "N/A", sizeof(stats->ipv4_address));
     strncpy(stats->ipv6_address, "N/A", sizeof(stats->ipv6_address));
     strncpy(stats->gateway_status, "N/A", sizeof(stats->gateway_status));
+    stats->packet_loss = -1.0;
+    stats->latency = -1.0;
+    stats->jitter = -1.0;
+    stats->dns_time = -1.0;
     strncpy(stats->rx_bytes, "", sizeof(stats->rx_bytes));
     strncpy(stats->tx_bytes, "", sizeof(stats->tx_bytes));
     strncpy(stats->rx_dropped, "", sizeof(stats->rx_dropped));
     strncpy(stats->tx_dropped, "", sizeof(stats->tx_dropped));
     strncpy(stats->ipv4_lease, "", sizeof(stats->ipv4_lease));
     strncpy(stats->ipv6_lease, "", sizeof(stats->ipv6_lease));
-    stats->packet_loss = -1.0;
-    stats->latency = -1.0;
-    stats->jitter = -1.0;
-    stats->dns_time = -1.0;
-    stats->wan_restart_time = NULL;
-    stats->wan_restart_count = 0;
+    stats->next = NULL;
 }
 
 // API to check WAN Interface Status
@@ -69,21 +69,61 @@ void check_gateway_reachability(char *status, size_t size) {
 }
 
 // API to calculate Packet Loss
-void calculate_packet_loss(const char *gateway_ip, double *packet_loss) {
-    char command[256];
-    char output[64];
-    snprintf(command, sizeof(command), "ping -c 10 -w 5 %s | grep 'packet loss' | awk '{print $6}'", gateway_ip);
-    execute_command(command, output, sizeof(output));
-    *packet_loss = atof(output);
+// API to calculate Packet Drop Rate for WAN interface
+void calculate_packet_loss(const char *interface, double *drop_rate) {
+    char rx_dropped_path[128], tx_dropped_path[128];
+    char rx_packets_path[128], tx_packets_path[128];
+    unsigned long rx_dropped1 = 0, tx_dropped1 = 0, rx_packets1 = 0, tx_packets1 = 0;
+    unsigned long rx_dropped2 = 0, tx_dropped2 = 0, rx_packets2 = 0, tx_packets2 = 0;
+    FILE *fp;
+
+    // Paths to statistics files
+    snprintf(rx_dropped_path, sizeof(rx_dropped_path), "/sys/class/net/%s/statistics/rx_dropped", interface);
+    snprintf(tx_dropped_path, sizeof(tx_dropped_path), "/sys/class/net/%s/statistics/tx_dropped", interface);
+    snprintf(rx_packets_path, sizeof(rx_packets_path), "/sys/class/net/%s/statistics/rx_packets", interface);
+    snprintf(tx_packets_path, sizeof(tx_packets_path), "/sys/class/net/%s/statistics/tx_packets", interface);
+
+    // Read initial values
+    fp = fopen(rx_dropped_path, "r");
+    if (fp) { fscanf(fp, "%lu", &rx_dropped1); fclose(fp); }
+    fp = fopen(tx_dropped_path, "r");
+    if (fp) { fscanf(fp, "%lu", &tx_dropped1); fclose(fp); }
+    fp = fopen(rx_packets_path, "r");
+    if (fp) { fscanf(fp, "%lu", &rx_packets1); fclose(fp); }
+    fp = fopen(tx_packets_path, "r");
+    if (fp) { fscanf(fp, "%lu", &tx_packets1); fclose(fp); }
+
+    // Sleep for a short interval (e.g., 1 second)
+    sleep(1);
+
+    // Read values again
+    fp = fopen(rx_dropped_path, "r");
+    if (fp) { fscanf(fp, "%lu", &rx_dropped2); fclose(fp); }
+    fp = fopen(tx_dropped_path, "r");
+    if (fp) { fscanf(fp, "%lu", &tx_dropped2); fclose(fp); }
+    fp = fopen(rx_packets_path, "r");
+    if (fp) { fscanf(fp, "%lu", &rx_packets2); fclose(fp); }
+    fp = fopen(tx_packets_path, "r");
+    if (fp) { fscanf(fp, "%lu", &tx_packets2); fclose(fp); }
+
+    unsigned long delta_dropped = (rx_dropped2 - rx_dropped1) + (tx_dropped2 - tx_dropped1);
+    unsigned long delta_packets = (rx_packets2 - rx_packets1) + (tx_packets2 - tx_packets1);
+
+    if (delta_packets > 0) {
+        *drop_rate = (double)delta_dropped / (double)delta_packets;
+    } else {
+        *drop_rate = 0.0;
+    }
 }
 
 // API to measure Latency (RTT)
-void measure_latency(const char *gateway_ip, double *latency) {
+void measure_latency(const char *gateway_ip, double *latency, double *dns_time) {
     char command[256];
     char output[64];
-    snprintf(command, sizeof(command), "ping -c 1 -w 5 %s | grep 'time=' | awk -F'time=' '{print $2}' | awk '{print $1}'", gateway_ip);
+    snprintf(command, sizeof(command), "dig %s | grep 'Query time:' | awk '{print $4}'", gateway_ip);
     execute_command(command, output, sizeof(output));
     *latency = atof(output);
+    *dns_time = atof(output);
 }
 
 // API to calculate Jitter using pcap
@@ -124,15 +164,6 @@ void calculate_jitter(const char *interface, double *jitter) {
     *jitter = (int)(*jitter * 1000.0 + 0.5) / 1000.0;   // Round to 3 decimal places
 
     pcap_close(handle);
-}
-
-// API to measure DNS Resolution Time
-void measure_dns_resolution_time(const char *domain, double *dns_time) {
-    char command[256];
-    char output[64];
-    snprintf(command, sizeof(command), "dig %s | grep 'Query time:' | awk '{print $4}'", domain);
-    execute_command(command, output, sizeof(output));
-    *dns_time = atof(output);
 }
 
 // API to collect interface statistics (rx_bytes, tx_bytes, rx_dropped, tx_dropped)
@@ -179,10 +210,9 @@ void collect_wan_stats(WanStats *stats) {
     get_wan_ipv4_address(stats->ipv4_address, sizeof(stats->ipv4_address));
     get_wan_ipv6_address(stats->ipv6_address, sizeof(stats->ipv6_address));
     check_gateway_reachability(stats->gateway_status, sizeof(stats->gateway_status));
-    calculate_packet_loss("8.8.8.8", &stats->packet_loss);
-    measure_latency("8.8.8.8", &stats->latency);
+    calculate_packet_loss(WAN_INTERFACE, &stats->packet_loss);
+    measure_latency("8.8.8.8", &stats->latency, &stats->dns_time);
     calculate_jitter(WAN_INTERFACE, &stats->jitter);
-    measure_dns_resolution_time("google.com", &stats->dns_time);
     collect_interface_stats(WAN_INTERFACE, stats->rx_bytes, stats->tx_bytes, stats->rx_dropped, stats->tx_dropped);
     get_wan_ipv4_lease(stats->ipv4_lease, sizeof(stats->ipv4_lease));
     get_wan_ipv6_lease(stats->ipv6_lease, sizeof(stats->ipv6_lease));

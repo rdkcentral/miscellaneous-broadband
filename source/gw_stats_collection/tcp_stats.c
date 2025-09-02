@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 void initialize_tcp_stats(TcpStats *stats) {
+    stats->timestamp_ms = 0;
     memset(stats->TCPLostRetransmit, 0, sizeof(stats->TCPLostRetransmit));
     memset(stats->TCPRetransFail, 0, sizeof(stats->TCPRetransFail));
     memset(stats->TCPSackFailures, 0, sizeof(stats->TCPSackFailures));
@@ -11,6 +12,7 @@ void initialize_tcp_stats(TcpStats *stats) {
     memset(stats->TCPAbortOnTimeout, 0, sizeof(stats->TCPAbortOnTimeout));
     memset(stats->ListenOverflows, 0, sizeof(stats->ListenOverflows));
     memset(stats->TCPOrigDataSent, 0, sizeof(stats->TCPOrigDataSent));
+    stats->next = NULL;
 }
 
 //High TCPTimeouts or TCPAbortOnTimeout may indicate poor connectivity, especially for external WAN routes.

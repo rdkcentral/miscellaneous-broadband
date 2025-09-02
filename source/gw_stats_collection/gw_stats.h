@@ -23,7 +23,6 @@
 
 
 #define LOG_FILE "/rdklogs/logs/gateway_stats_logs.txt"
-#define DEFAULT_INTERVAL 900 // 15 minutes in seconds
 
 //System Stats
 // Structure to store PID details
@@ -38,7 +37,8 @@ typedef struct
 } pidStats;
 
 // Structure to store system statistics
-typedef struct {
+typedef struct system_stats {
+    uint64_t timestamp_ms;
     char model[64];
     char firmware[128];
     char cmac[32];
@@ -56,14 +56,14 @@ typedef struct {
     uint32_t rootfs_total_kb;
     uint32_t tmpfs_used_kb;
     uint32_t tmpfs_total_kb;
-    int fw_restart_count;
-    char **fw_restart_time;
     int pid_stats_count;
     pidStats* pid_stats;
+    struct system_stats *next;
 } SystemStats;
 
 //WAN stats
-typedef struct {
+typedef struct wan_stats {
+    uint64_t timestamp_ms;
     char interface_status[32];
     char ipv4_address[32];
     char ipv6_address[128];
@@ -78,13 +78,13 @@ typedef struct {
     char tx_dropped[64];
     char ipv4_lease[32];
     char ipv6_lease[32];
-    int wan_restart_count;
-    char **wan_restart_time;
+    struct wan_stats *next;
 } WanStats;
 
 //LAN Stats
 // Structure to store client details
 typedef struct {
+    uint64_t timestamp_ms;
     char mac_address[32];
     char ip_addr[64];
     char host_name[64];
@@ -95,22 +95,22 @@ typedef struct {
 } ClientDetails;
 
 // Structure to store LAN statistics
-typedef struct {
+typedef struct lan_stats {
+    uint64_t timestamp_ms;
     char ipv4_address[64];
     char ipv6_address[128];
     char rx_bytes[64];
     char tx_bytes[64];
     char rx_dropped[64];
     char tx_dropped[64];
-    char channel_util_2_4ghz[16];
-    char channel_util_5ghz[16];
-    char channel_util_6ghz[16];
     ClientDetails *clients;
     int client_count;
+    struct lan_stats *next;
 } LanStats;
 
 //IPv6 Monitoring Stats
-typedef struct {
+typedef struct ipv6_mon_stats {
+    uint64_t timestamp_ms;
     char global_ipv6_address[128];
     char link_local_ipv6_address[128];
     char ipv6_reachability[32];
@@ -118,10 +118,12 @@ typedef struct {
     double ipv6_latency;
     double ipv4_packet_loss;
     double ipv6_packet_loss;
+    struct ipv6_mon_stats *next;
 } IPv6MonitoringStats;
 
 //TCP Stats
-typedef struct {
+typedef struct tcp_stats {
+    uint64_t timestamp_ms;
     char TCPLostRetransmit[32];  //Retransmissions for packets that still didn’t get ACKed (true losses)
     char TCPRetransFail[32];     //Retransmissions that failed entirely (after all retries)
     char TCPSackFailures[32];    //SACK-based retransmissions that failed
@@ -129,11 +131,21 @@ typedef struct {
     char TCPAbortOnTimeout[32];  //Connections aborted because of timeout
     char ListenOverflows[32];    //Times the socket backlog queue was full — client connections dropped
     char TCPOrigDataSent[32];    //Original bytes sent (useful for rate estimation)
+    struct tcp_stats *next;
 }TcpStats;
+
+//Restart Count Stats
+typedef struct {
+    int fw_restart_count;
+    char **fw_restart_time;
+    int wan_restart_count;
+    char **wan_restart_time;
+}RestartCountStats;
 
 // Function declarations
 //System params
 void initialize_system_stats(SystemStats *stats);
+void initialize_restart_count_stats(RestartCountStats *stats);
 void collect_system_stats(SystemStats *stats);
 
 void get_cpu_usage(double *cpu_usage);
@@ -154,9 +166,8 @@ void get_wan_ipv4_address(char *ipv4_address, size_t size);
 void get_wan_ipv6_address(char *ipv6_address, size_t size);
 void check_gateway_reachability(char *status, size_t size);
 void calculate_packet_loss(const char *gateway_ip, double *packet_loss);
-void measure_latency(const char *gateway_ip, double *latency);
+void measure_latency(const char *gateway_ip, double *latency, double* dns_time);
 void calculate_jitter(const char *interface, double *jitter);
-void measure_dns_resolution_time(const char *domain, double *dns_time);
 void get_ipv4_lease_time(char *ipv4_lease, size_t size);
 void get_ipv6_lease_time(char *ipv6_lease, size_t size);
 void collect_interface_stats(const char *interface, char *rx_bytes, char *tx_bytes, char *rx_dropped, char *tx_dropped);
