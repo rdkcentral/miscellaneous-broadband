@@ -201,5 +201,27 @@ void log_message(const char *format, ...);
 void execute_command(const char *command, char *output, size_t size);
 void get_current_timestamp(char *timestamp, size_t size);
 
+#define TIME_NSEC_IN_SEC   1000000000
+#define TIME_USEC_IN_SEC   1000000
+#define TIME_MSEC_IN_SEC   1000
+#define TIME_NSEC_PER_MSEC (TIME_NSEC_IN_SEC / TIME_MSEC_IN_SEC)
+
+static inline uint64_t timespec_to_timestamp(const struct timespec *ts)
+{
+    return (uint64_t)ts->tv_sec * TIME_MSEC_IN_SEC + ts->tv_nsec / TIME_NSEC_PER_MSEC;
+}
+
+static inline uint64_t get_timestamp_ms(void)
+{
+    struct timespec              ts;
+
+    memset (&ts, 0, sizeof (ts));
+    if(clock_gettime(CLOCK_REALTIME, &ts) != 0)
+    {
+        return 0;
+    }
+    else
+        return timespec_to_timestamp(&ts);
+}
 
 #endif // GW_STATS_COLLECTION_H

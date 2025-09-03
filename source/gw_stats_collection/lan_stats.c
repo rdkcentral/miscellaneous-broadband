@@ -147,6 +147,7 @@ void get_client_tcp_est_counts(LanStats *stats) {
 
 void collect_lan_stats(LanStats *stats) {
     log_message("collect_lan_stats started\n");
+    stats->timestamp_ms = get_timestamp_ms();
     char rx_bytes[64] = {0}, tx_bytes[64] = {0}, rx_dropped[64] = {0}, tx_dropped[64] = {0};
     get_lan_ipv4_address(stats->ipv4_address, sizeof(stats->ipv4_address));
     get_lan_ipv6_address(stats->ipv6_address, sizeof(stats->ipv6_address));

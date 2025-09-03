@@ -88,5 +88,6 @@ void get_tcp_params(TcpStats *stats) {
 }
 
 void collect_tcp_stats(TcpStats *stats) {
+    stats->timestamp_ms = get_timestamp_ms();
     get_tcp_params(stats);
 }

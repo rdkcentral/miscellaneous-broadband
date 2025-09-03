@@ -58,6 +58,7 @@ void compare_dual_stack_performance(const char *ipv4_site, const char *ipv6_site
 
 // Updated API to collect IPv6 monitoring statistics using the IPv6MonitoringStats structure
 void collect_ipv6_monitoring_stats(IPv6MonitoringStats *stats, const char *ipv4_site, const char *ipv6_site) {
+    stats->timestamp_ms = get_timestamp_ms();
     // Collect IPv6 Address Assignment
     check_ipv6_address_assignment(stats->global_ipv6_address, sizeof(stats->global_ipv6_address),
                                    stats->link_local_ipv6_address, sizeof(stats->link_local_ipv6_address));

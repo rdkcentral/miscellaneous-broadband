@@ -277,6 +277,7 @@ int get_pid_stats(pidStats **stats, int *count) {
 
 // API to collect system statistics using the individual APIs
 void collect_system_stats(SystemStats *stats) {
+    stats->timestamp_ms = get_timestamp_ms();
     get_device_model(stats->model, sizeof(stats->model));
     get_firmware_version(stats->firmware, sizeof(stats->firmware));
     get_cmac_address(stats->cmac, sizeof(stats->cmac));

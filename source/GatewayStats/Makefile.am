@@ -33,4 +33,4 @@ GatewayStats_DEPENDENCIES = $(GatewayStats_LDADD)
 
 GatewayStats_LDFLAGS = -L${PKG_CONFIG_SYSROOT_DIR}/usr/lib \
                        -lccsp_common -lsysevent -lsecure_wrapper \
-                       -lpthread -lrbus -lpcap -lprotobuf-c
+                       -lpthread -lrbus -lpcap -lprotobuf-c -lev

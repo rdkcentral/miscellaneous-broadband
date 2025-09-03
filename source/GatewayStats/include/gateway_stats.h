@@ -15,8 +15,12 @@
 
 #include "gw_stats.h"
 
-#define SAMPLING_INTERVAL   300 // 5 minutes
-#define REPORTING_INTERVAL  900 // 15 minutes
+// #define SAMPLING_INTERVAL   300 // 5 minutes
+// #define REPORTING_INTERVAL  900 // 15 minutes
+
+#define SAMPLING_INTERVAL   90
+#define REPORTING_INTERVAL  180
+
 
 typedef struct
 {
@@ -38,6 +42,7 @@ typedef struct
 int gw_stats_init();
 int gw_stats_collect();
 int gw_stats_save();
-int gw_stats_deInit();
+int gw_stats_reset();
+int gw_stats_free_buffer(gw_stats_report *report);
 
 #endif //GATEWAY_STATS_H

@@ -206,6 +206,7 @@ void get_wan_ipv6_lease(char *ipv6_lease, size_t size) {
 
 // API to collect WAN statistics using the WanStats structure
 void collect_wan_stats(WanStats *stats) {
+    stats->timestamp_ms = get_timestamp_ms();
     check_wan_interface_status(stats->interface_status, sizeof(stats->interface_status));
     get_wan_ipv4_address(stats->ipv4_address, sizeof(stats->ipv4_address));
     get_wan_ipv6_address(stats->ipv6_address, sizeof(stats->ipv6_address));
