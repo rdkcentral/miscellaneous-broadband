@@ -184,97 +184,6 @@ void get_fs_data(char* path, uint32_t* used_kb, uint32_t* total_kb) {
     *used_kb  = ((*total_kb) - (fs_info.f_bfree * fs_info.f_bsize) / 1024);
 }
 
-// API to collect pidStats for all running processes
-int get_pid_stats(pidStats **stats, int *count) {
-    const char *proc_dirname = "/proc";
-    DIR *proc_dir = NULL;
-    struct dirent *dire;
-    int num_allocated = 128;
-    int num = 0;
-    pidStats *pid_stats = malloc(num_allocated * sizeof(pidStats));
-    if (!pid_stats) return -1;
-
-    proc_dir = opendir(proc_dirname);
-    if (!proc_dir) {
-        free(pid_stats);
-        return -1;
-    }
-
-    while ((dire = readdir(proc_dir)) != NULL) {
-        char c = dire->d_name[0];
-        if (!(c >= '0' && c <= '9')) continue;
-        uint32_t pid = (uint32_t)atoi(dire->d_name);
-
-        char status_path[64], smaps_path[64];
-        snprintf(status_path, sizeof(status_path), "/proc/%u/status", pid);
-        snprintf(smaps_path, sizeof(smaps_path), "/proc/%u/smaps", pid);
-
-        FILE *status_file = fopen(status_path, "r");
-        if (!status_file) continue;
-        char line[512];
-        pid_stats[num].pName[0] = '\0';
-        pid_stats[num].rss = 0;
-        while (fgets(line, sizeof(line), status_file)) {
-            if (strncmp(line, "Name:", 5) == 0) {
-                char *name = line + 5;
-                while (*name == ' ' || *name == '\t') name++;
-                size_t name_len = strcspn(name, "\n");
-                if (name_len > sizeof(pid_stats[num].pName) - 1)
-                    name_len = sizeof(pid_stats[num].pName) - 1;
-                strncpy(pid_stats[num].pName, name, name_len);
-                pid_stats[num].pName[name_len] = '\0';
-            } else if (strncmp(line, "VmRSS:", 6) == 0) {
-                char *rss_str = line + 6;
-                while (*rss_str == ' ' || *rss_str == '\t') rss_str++;
-                unsigned int rss = 0;
-                sscanf(rss_str, "%u", &rss);
-                pid_stats[num].rss = rss; // VmRSS is already in kB
-            }
-        }
-        fclose(status_file);
-
-        // Get PSS from smaps
-        FILE *smaps_file = fopen(smaps_path, "r");
-        uint32_t pss_total = 0;
-        if (smaps_file) {
-            char buf[256];
-            while (fgets(buf, sizeof(buf), smaps_file)) {
-                if (strncmp(buf, "Pss:", 4) == 0) {
-                    unsigned int pss = 0;
-                    sscanf(buf, "Pss: %u", &pss);
-                    pss_total += pss;
-                }
-            }
-            fclose(smaps_file);
-        }
-        pid_stats[num].pss = pss_total;
-
-        // mem_util: use pss if available, else rss
-        pid_stats[num].mem_util = (pss_total > 0) ? pss_total : pid_stats[num].rss;
-
-        // cpu_util: not available here, set to 0
-        pid_stats[num].cpu_util = 0;
-
-        pid_stats[num].pid = pid;
-
-        num++;
-        if (num == num_allocated) {
-            num_allocated *= 2;
-            pidStats *tmp = realloc(pid_stats, num_allocated * sizeof(pidStats));
-            if (!tmp) {
-                free(pid_stats);
-                closedir(proc_dir);
-                return -1;
-            }
-            pid_stats = tmp;
-        }
-    }
-    closedir(proc_dir);
-    *stats = pid_stats;
-    *count = num;
-    return 0;
-}
-
 // API to collect system statistics using the individual APIs
 void collect_system_stats(SystemStats *stats) {
     stats->timestamp_ms = get_timestamp_ms();
@@ -287,5 +196,4 @@ void collect_system_stats(SystemStats *stats) {
     get_device_uptime(stats->uptime, sizeof(stats->uptime));
     get_fs_data(ROOTFS_PATH, &stats->rootfs_used_kb, &stats->rootfs_total_kb);
     get_fs_data(TMPFS_PATH, &stats->tmpfs_used_kb, &stats->tmpfs_total_kb);
-    get_pid_stats(&stats->pid_stats, &stats->pid_stats_count);
 }

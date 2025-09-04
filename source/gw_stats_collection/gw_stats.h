@@ -24,25 +24,10 @@
 
 #define LOG_FILE "/rdklogs/logs/gateway_stats_logs.txt"
 
-//System Stats
-// Structure to store PID details
-typedef struct
-{
-    uint32_t   pid;
-    char       pName[18];
-    uint32_t   rss;
-    uint32_t   pss;
-    uint32_t   mem_util;
-    uint32_t   cpu_util;
-} pidStats;
 
 // Structure to store system statistics
 typedef struct system_stats {
     uint64_t timestamp_ms;
-    char model[64];
-    char firmware[128];
-    char cmac[32];
-    char uptime[64];
     double cpu_usage;
     double free_memory;
     double slab_memory;
@@ -58,41 +43,50 @@ typedef struct system_stats {
     uint32_t tmpfs_total_kb;
     int pid_stats_count;
     pidStats* pid_stats;
+    char model[64];
+    char firmware[128];
+    char cmac[32];
+    char uptime[64];
     struct system_stats *next;
 } SystemStats;
 
 //WAN stats
 typedef struct wan_stats {
     uint64_t timestamp_ms;
-    char interface_status[32];
-    char ipv4_address[32];
-    char ipv6_address[128];
-    char gateway_status[32];
     double packet_loss;
     double latency;
     double jitter;
     double dns_time;
+    char interface_status[32];
+    char ipv4_address[32];
+    char gateway_status[32];
+    char ipv4_lease[32];
+    char ipv6_lease[32];
     char rx_bytes[64];
     char tx_bytes[64];
     char rx_dropped[64];
     char tx_dropped[64];
-    char ipv4_lease[32];
-    char ipv6_lease[32];
+    char ipv6_address[128];
     struct wan_stats *next;
 } WanStats;
 
-//LAN Stats
 // Structure to store client details
 typedef struct {
-    uint64_t timestamp_ms;
-    char mac_address[32];
     char ip_addr[64];
     char host_name[64];
-    char status[16];
     char tx_bytes[64];
     char rx_bytes[64];
+    char mac_address[32];
+    char status[16];
     int  tcp_est_counts;
 } ClientDetails;
+
+typedef struct client_stats{
+    uint64_t timestamp_ms;
+    int client_count;
+    ClientDetails *clients;
+    struct client_stats *next;
+} ClientStats;
 
 // Structure to store LAN statistics
 typedef struct lan_stats {
@@ -103,21 +97,19 @@ typedef struct lan_stats {
     char tx_bytes[64];
     char rx_dropped[64];
     char tx_dropped[64];
-    ClientDetails *clients;
-    int client_count;
     struct lan_stats *next;
 } LanStats;
 
 //IPv6 Monitoring Stats
 typedef struct ipv6_mon_stats {
     uint64_t timestamp_ms;
-    char global_ipv6_address[128];
-    char link_local_ipv6_address[128];
-    char ipv6_reachability[32];
     double ipv4_latency;
     double ipv6_latency;
     double ipv4_packet_loss;
     double ipv6_packet_loss;
+    char global_ipv6_address[128];
+    char link_local_ipv6_address[128];
+    char ipv6_reachability[32];
     struct ipv6_mon_stats *next;
 } IPv6MonitoringStats;
 
@@ -141,6 +133,24 @@ typedef struct {
     int wan_restart_count;
     char **wan_restart_time;
 }RestartCountStats;
+
+// Structure to store PID details
+typedef struct
+{
+    uint32_t   pid;
+    char       pName[18];
+    uint32_t   rss;
+    uint32_t   pss;
+    uint32_t   mem_util;
+    uint32_t   cpu_util;
+} pidDetails;
+
+typedef struct pid_stats {
+    uint64_t timestamp_ms;
+    int count;
+    pidDetails *pid_details;
+    struct pid_stats *next;
+} pidStats;
 
 // Function declarations
 //System params
@@ -178,9 +188,12 @@ void collect_lan_stats(LanStats *stats);
 
 void get_lan_ipv4_address(char *ipv4_address, size_t size);
 void get_lan_ipv6_address(char *ipv6_address, size_t size);
-void free_lan_stats(LanStats *stats);
-void get_all_clients(LanStats *stats);
-void get_client_traffic_stats(LanStats *stats);
+
+//Client Stats
+void initialize_client_stats(ClientStats *stats);
+void get_client_tcp_est_counts(ClientStats *stats);
+void get_all_clients(ClientStats *stats);
+void get_client_traffic_stats(ClientStats *stats);
 
 //IPv6 Monitoring Stats
 void initialize_ipv6_monitoring_stats(IPv6MonitoringStats *stats);
@@ -195,6 +208,10 @@ void initialize_tcp_stats(TcpStats *stats);
 void collect_tcp_stats(TcpStats *stats);
 void get_tcp_params(TcpStats *stats);
 
+//PID Stats
+void initialize_pid_stats(pidStats *stats);
+int get_pid_stats(pidStats *stats);
+void collect_pid_stats(pidStats *stats);
 
 //helper.h
 void log_message(const char *format, ...);

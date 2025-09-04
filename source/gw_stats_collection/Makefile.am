@@ -20,4 +20,4 @@ libgw_stats_la_CPPFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/ccsp \
 						  -I$(top_srcdir)/ \
 						  $(CPPFLAGS)
 
-libgw_stats_la_SOURCES =  system_stats.c wan_stats.c lan_stats.c tcp_stats.c ipv6_monitoring.c helper.c
+libgw_stats_la_SOURCES =  system_stats.c wan_stats.c lan_stats.c tcp_stats.c ipv6_monitoring.c client_stats.c pid_stats.c helper.c
