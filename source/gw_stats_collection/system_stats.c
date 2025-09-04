@@ -10,8 +10,8 @@
 #define TMPFS_PATH "/tmp"
 
 // API to initialize system statistics
-void initialize_system_stats(SystemStats *stats) {
-    memset(stats, 0, sizeof(SystemStats));
+void initialize_system_stats(system_stats_t *stats) {
+    memset(stats, 0, sizeof(system_stats_t));
     stats->timestamp_ms = 0;
     strncpy(stats->model, "UNKNOWN", sizeof(stats->model));
     strncpy(stats->firmware, "UNKNOWN", sizeof(stats->firmware));
@@ -33,9 +33,9 @@ void initialize_system_stats(SystemStats *stats) {
     stats->next = NULL;
 }
 
-void initialize_restart_count_stats(RestartCountStats *stats) {
+void initialize_restart_count_stats(restart_count_stats_t *stats) {
     if (!stats) return;
-    memset(stats, 0, sizeof(RestartCountStats));
+    memset(stats, 0, sizeof(restart_count_stats_t));
     stats->fw_restart_time = NULL;
     stats->wan_restart_time = NULL;
 }
@@ -183,7 +183,7 @@ void get_fs_data(char* path, uint32_t* used_kb, uint32_t* total_kb) {
 }
 
 // API to collect system statistics using the individual APIs
-void collect_system_stats(SystemStats *stats) {
+void collect_system_stats(system_stats_t *stats) {
     stats->timestamp_ms = get_timestamp_ms();
     get_device_model(stats->model, sizeof(stats->model));
     get_firmware_version(stats->firmware, sizeof(stats->firmware));

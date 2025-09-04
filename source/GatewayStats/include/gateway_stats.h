@@ -26,20 +26,20 @@ typedef struct
 {
     uint64_t timestamp;
     size_t n_system_stats;
-    SystemStats *system_stats;
+    system_stats_t *system_stats;
     size_t n_wan_stats;
-    WanStats *wan_stats;
+    wan_stats_t *wan_stats;
     size_t n_lan_stats;
-    LanStats *lan_stats;
+    lan_stats_t *lan_stats;
     size_t n_ipv6_stats;
-    IPv6MonitoringStats *ipv6_stats;
+    ipv6_mon_stats_t *ipv6_stats;
     size_t n_tcp_stats;
-    TcpStats *tcp_stats;
+    tcp_stats_t *tcp_stats;
     size_t n_client_stats;
-    ClientStats *client_stats;
+    client_stats_t *client_stats;
     size_t n_pid_stats;
-    PidStats *pid_stats;
-    RestartCountStats *restart_count_stats;
+    pid_stats_t *pid_stats;
+    restart_count_stats_t *restart_count_stats;
 } gw_stats_report;
 
 

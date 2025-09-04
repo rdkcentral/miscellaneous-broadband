@@ -46,7 +46,7 @@ typedef struct systemstats {
     char cmac[32];
     char uptime[64];
     struct systemstats *next;
-} SystemStats;
+} system_stats_t;
 
 //WAN stats
 typedef struct wanstats {
@@ -66,7 +66,7 @@ typedef struct wanstats {
     char tx_dropped[64];
     char ipv6_address[128];
     struct wanstats *next;
-} WanStats;
+} wan_stats_t;
 
 // Structure to store client details
 typedef struct {
@@ -89,14 +89,14 @@ typedef struct {
     uint32_t ipv6_ack_min_latency;
     uint32_t ipv6_ack_max_latency;
     uint32_t ipv6_ack_avg_latency;
-} ClientDetails;
+} client_details_t;
 
 typedef struct clientstats{
     uint64_t timestamp_ms;
     int client_count;
-    ClientDetails *clients;
+    client_details_t *clients;
     struct clientstats *next;
-} ClientStats;
+} client_stats_t;
 
 // Structure to store LAN statistics
 typedef struct lanstats {
@@ -108,7 +108,7 @@ typedef struct lanstats {
     char rx_dropped[64];
     char tx_dropped[64];
     struct lanstats *next;
-} LanStats;
+} lan_stats_t;
 
 //IPv6 Monitoring Stats
 typedef struct ipv6_mon_stats {
@@ -121,7 +121,7 @@ typedef struct ipv6_mon_stats {
     char link_local_ipv6_address[128];
     char ipv6_reachability[32];
     struct ipv6_mon_stats *next;
-} IPv6MonitoringStats;
+} ipv6_mon_stats_t;
 
 //TCP Stats
 typedef struct tcpstats {
@@ -134,7 +134,7 @@ typedef struct tcpstats {
     char ListenOverflows[32];    //Times the socket backlog queue was full — client connections dropped
     char TCPOrigDataSent[32];    //Original bytes sent (useful for rate estimation)
     struct tcpstats *next;
-}TcpStats;
+}tcp_stats_t;
 
 //Restart Count Stats
 typedef struct {
@@ -142,7 +142,7 @@ typedef struct {
     char **fw_restart_time;
     int wan_restart_count;
     char **wan_restart_time;
-}RestartCountStats;
+}restart_count_stats_t;
 
 // Structure to store PID details
 typedef struct
@@ -153,20 +153,20 @@ typedef struct
     uint32_t   pss;
     uint32_t   mem_util;
     uint32_t   cpu_util;
-} pidDetails;
+} pid_details_t;
 
 typedef struct pidstats {
     uint64_t timestamp_ms;
     int count;
-    pidDetails *pid_details;
+    pid_details_t *pid_details;
     struct pidstats *next;
-} PidStats;
+} pid_stats_t;
 
 // Function declarations
 //System params
-void initialize_system_stats(SystemStats *stats);
-void initialize_restart_count_stats(RestartCountStats *stats);
-void collect_system_stats(SystemStats *stats);
+void initialize_system_stats(system_stats_t *stats);
+void initialize_restart_count_stats(restart_count_stats_t *stats);
+void collect_system_stats(system_stats_t *stats);
 
 void get_cpu_usage(double *cpu_usage);
 void get_memory_info(double *free_memory, double *slab_memory, double *avail_memory, double *cached_mem, double *slab_unreclaim);
@@ -178,8 +178,8 @@ void get_device_uptime(char *uptime, size_t size);
 void get_fs_data(char* path, uint32_t* used_kb, uint32_t* total_kb);
 
 //WAN Stats
-void initialize_wan_stats(WanStats *stats);
-void collect_wan_stats(WanStats *stats);
+void initialize_wan_stats(wan_stats_t *stats);
+void collect_wan_stats(wan_stats_t *stats);
 
 void check_wan_interface_status(char *status, size_t size);
 void get_wan_ipv4_address(char *ipv4_address, size_t size);
@@ -193,37 +193,37 @@ void get_ipv6_lease_time(char *ipv6_lease, size_t size);
 void collect_interface_stats(const char *interface, char *rx_bytes, char *tx_bytes, char *rx_dropped, char *tx_dropped);
 
 //LAN Stats
-void initialize_lan_stats(LanStats *stats);
-void collect_lan_stats(LanStats *stats);
+void initialize_lan_stats(lan_stats_t *stats);
+void collect_lan_stats(lan_stats_t *stats);
 
 void get_lan_ipv4_address(char *ipv4_address, size_t size);
 void get_lan_ipv6_address(char *ipv6_address, size_t size);
 
 //Client Stats
-void initialize_client_stats(ClientStats *stats);
-void get_all_clients(ClientStats *stats);
-void get_client_traffic_stats(ClientStats *stats);
-void get_client_tcp_est_counts(ClientStats *stats);
-void get_tcp_latency_for_clients(ClientStats *stats);
-void collect_client_stats(ClientStats *stats);
+void initialize_client_stats(client_stats_t *stats);
+void get_all_clients(client_stats_t *stats);
+void get_client_traffic_stats(client_stats_t *stats);
+void get_client_tcp_est_counts(client_stats_t *stats);
+void get_tcp_latency_for_clients(client_stats_t *stats);
+void collect_client_stats(client_stats_t *stats);
 
 //IPv6 Monitoring Stats
-void initialize_ipv6_monitoring_stats(IPv6MonitoringStats *stats);
-void collect_ipv6_monitoring_stats(IPv6MonitoringStats *stats, const char *ipv4_site, const char *ipv6_site);
+void initialize_ipv6_monitoring_stats(ipv6_mon_stats_t *stats);
+void collect_ipv6_monitoring_stats(ipv6_mon_stats_t *stats, const char *ipv4_site, const char *ipv6_site);
 
 void check_ipv6_address_assignment(char *global_address, size_t global_size, char *link_local_address, size_t link_local_size);
 void check_ipv6_routing_reachability(const char *ipv6_site, char *status, size_t size);
 void compare_dual_stack_performance(const char *ipv4_site, const char *ipv6_site, double *ipv4_latency, double *ipv6_latency, double *ipv4_packet_loss, double *ipv6_packet_loss);
 
 //TCP Stats
-void initialize_tcp_stats(TcpStats *stats);
-void collect_tcp_stats(TcpStats *stats);
-void get_tcp_params(TcpStats *stats);
+void initialize_tcp_stats(tcp_stats_t *stats);
+void collect_tcp_stats(tcp_stats_t *stats);
+void get_tcp_params(tcp_stats_t *stats);
 
 //PID Stats
-void initialize_pid_stats(PidStats *stats);
-int get_pid_stats(PidStats *stats);
-void collect_pid_stats(PidStats *stats);
+void initialize_pid_stats(pid_stats_t *stats);
+int get_pid_stats(pid_stats_t *stats);
+void collect_pid_stats(pid_stats_t *stats);
 
 //helper.h
 void log_message(const char *format, ...);

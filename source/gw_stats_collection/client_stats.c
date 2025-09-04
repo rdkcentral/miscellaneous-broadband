@@ -5,15 +5,15 @@
 #include <dirent.h>
 #include <errno.h>
 
-void initialize_client_stats(ClientStats *stats) {
-    memset(stats, 0, sizeof(ClientStats));
+void initialize_client_stats(client_stats_t *stats) {
+    memset(stats, 0, sizeof(client_stats_t));
     stats->timestamp_ms = 0;
     stats->clients = NULL;
     stats->client_count = 0;
     stats->next = NULL;
 }
 
-void get_all_clients(ClientStats *stats) {
+void get_all_clients(client_stats_t *stats) {
     static bool is_initialized = false;
     char command[256], output[128], mac_address[32];
     int host_count = 0;
@@ -37,7 +37,7 @@ void get_all_clients(ClientStats *stats) {
             continue;
         }
         // Check if client already exists
-        ClientDetails *client = NULL;
+        client_details_t *client = NULL;
         for (int j = 0; j < stats->client_count; j++) {
             if (strcasecmp(stats->clients[j].mac_address, mac_address) == 0) {
                 client = &stats->clients[j];
@@ -46,9 +46,9 @@ void get_all_clients(ClientStats *stats) {
         }
         if (!client) {
             // New client, allocate and set mac_address
-            stats->clients = realloc(stats->clients, (stats->client_count + 1) * sizeof(ClientDetails));
+            stats->clients = realloc(stats->clients, (stats->client_count + 1) * sizeof(client_details_t));
             client = &stats->clients[stats->client_count];
-            memset(client, 0, sizeof(ClientDetails));
+            memset(client, 0, sizeof(client_details_t));
             strncpy(client->mac_address, mac_address, sizeof(client->mac_address));
             stats->client_count++;
         }
@@ -64,7 +64,7 @@ void get_all_clients(ClientStats *stats) {
     }
 }
 
-void get_client_traffic_stats(ClientStats *stats) {
+void get_client_traffic_stats(client_stats_t *stats) {
     FILE *fp = popen("traffic_count -L", "r");
     if (!fp) {
         fprintf(stderr, "Failed to execute traffic_count command\n");
@@ -87,7 +87,7 @@ void get_client_traffic_stats(ClientStats *stats) {
 }
 
 // API to populate tcp_est_counts for each client
-void get_client_tcp_est_counts(ClientStats *stats) {
+void get_client_tcp_est_counts(client_stats_t *stats) {
     char command[256];
     char output[32];
     for (int i = 0; i < stats->client_count; i++) {
@@ -100,7 +100,7 @@ void get_client_tcp_est_counts(ClientStats *stats) {
     }
 }
 
-static void parse_latency_section(ClientStats *stats, const char *section, bool is_ipv6) {
+static void parse_latency_section(client_stats_t *stats, const char *section, bool is_ipv6) {
     if (!section) return;
 
     // Skip header (before first semicolon)
@@ -169,7 +169,7 @@ static void parse_latency_section(ClientStats *stats, const char *section, bool 
     free(dup);
 }
 
-void get_tcp_latency_for_clients(ClientStats *stats) {
+void get_tcp_latency_for_clients(client_stats_t *stats) {
     char output[8192];
     FILE *fp = popen("dmcli eRT retv Device.QOS.X_RDK_LatencyMeasure_TCP_Stats_Report", "r");
     if (!fp) {
@@ -189,7 +189,7 @@ void get_tcp_latency_for_clients(ClientStats *stats) {
 }
 
 
-void collect_client_stats(ClientStats *stats) {
+void collect_client_stats(client_stats_t *stats) {
     stats->timestamp_ms = get_timestamp_ms();
     get_all_clients(stats);
     get_client_traffic_stats(stats);

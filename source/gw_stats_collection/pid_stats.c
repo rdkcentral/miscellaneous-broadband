@@ -5,22 +5,22 @@
 #include <dirent.h>
 #include <errno.h>
 
-void initialize_pid_stats(PidStats *stats) {
-    memset(stats, 0, sizeof(PidStats));
+void initialize_pid_stats(pid_stats_t *stats) {
+    memset(stats, 0, sizeof(pid_stats_t));
     stats->timestamp_ms = 0;
     stats->count = 0;
     stats->pid_details = NULL;
     stats->next = NULL;
 }
 
-// API to collect PidStats for all running processes
-int get_pid_stats(PidStats *stats) {
+// API to collect pid_stats_t for all running processes
+int get_pid_stats(pid_stats_t *stats) {
     const char *proc_dirname = "/proc";
     DIR *proc_dir = NULL;
     struct dirent *dire;
     int num_allocated = 128;
     int num = 0;
-    pidDetails *details = malloc(num_allocated * sizeof(pidDetails));
+    pid_details_t *details = malloc(num_allocated * sizeof(pid_details_t));
     if (!details) return -1;
 
     proc_dir = opendir(proc_dirname);
@@ -89,7 +89,7 @@ int get_pid_stats(PidStats *stats) {
         num++;
         if (num == num_allocated) {
             num_allocated *= 2;
-            pidDetails *tmp = realloc(details, num_allocated * sizeof(pidDetails));
+            pid_details_t *tmp = realloc(details, num_allocated * sizeof(pid_details_t));
             if (!tmp) {
                 free(details);
                 closedir(proc_dir);
@@ -106,7 +106,7 @@ int get_pid_stats(PidStats *stats) {
     return 0;
 }
 
-void collect_pid_stats(PidStats *stats) {
+void collect_pid_stats(pid_stats_t *stats) {
     stats->timestamp_ms = get_timestamp_ms();
     get_pid_stats(stats);
 }

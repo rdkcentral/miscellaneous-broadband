@@ -8,8 +8,8 @@
 #define LAN_INTERFACE "brlan0"
 #define LEASES_FILE "/nvram/dnsmasq.leases"
 
-void initialize_lan_stats(LanStats *stats) {
-    memset(stats, 0, sizeof(LanStats));
+void initialize_lan_stats(lan_stats_t *stats) {
+    memset(stats, 0, sizeof(lan_stats_t));
     stats->timestamp_ms = 0;
     strncpy(stats->ipv4_address, "N/A", sizeof(stats->ipv4_address));
     strncpy(stats->ipv6_address, "N/A", sizeof(stats->ipv6_address));
@@ -48,7 +48,7 @@ void get_lan_ipv6_address(char *ipv6_address, size_t size) {
     }
 }
 
-void collect_lan_stats(LanStats *stats) {
+void collect_lan_stats(lan_stats_t *stats) {
     stats->timestamp_ms = get_timestamp_ms();
     char rx_bytes[64] = {0}, tx_bytes[64] = {0}, rx_dropped[64] = {0}, tx_dropped[64] = {0};
     get_lan_ipv4_address(stats->ipv4_address, sizeof(stats->ipv4_address));

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void initialize_tcp_stats(TcpStats *stats) {
+void initialize_tcp_stats(tcp_stats_t *stats) {
     stats->timestamp_ms = 0;
     memset(stats->TCPLostRetransmit, 0, sizeof(stats->TCPLostRetransmit));
     memset(stats->TCPRetransFail, 0, sizeof(stats->TCPRetransFail));
@@ -18,10 +18,10 @@ void initialize_tcp_stats(TcpStats *stats) {
 //High TCPTimeouts or TCPAbortOnTimeout may indicate poor connectivity, especially for external WAN routes.
 //High TCPLostRetransmit, TCPRetransFail, or TCPSackFailures = packet loss or network instability.
 
-void get_tcp_params(TcpStats *stats) {
+void get_tcp_params(tcp_stats_t *stats) {
     FILE *fp = fopen("/proc/net/netstat", "r");
     if (!fp) {
-        memset(stats, 0, sizeof(TcpStats));
+        memset(stats, 0, sizeof(tcp_stats_t));
         return;
     }
     char line[4096]; // Increased buffer size for long lines
@@ -43,7 +43,7 @@ void get_tcp_params(TcpStats *stats) {
     if (!fields || !values) {
         if (fields) free(fields);
         if (values) free(values);
-        memset(stats, 0, sizeof(TcpStats));
+        memset(stats, 0, sizeof(tcp_stats_t));
         return;
     }
     // Tokenize fields and values
@@ -87,7 +87,7 @@ void get_tcp_params(TcpStats *stats) {
     free(values);
 }
 
-void collect_tcp_stats(TcpStats *stats) {
+void collect_tcp_stats(tcp_stats_t *stats) {
     stats->timestamp_ms = get_timestamp_ms();
     get_tcp_params(stats);
 }

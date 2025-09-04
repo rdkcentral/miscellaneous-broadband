@@ -7,8 +7,8 @@
 #define WAN_INTERFACE "erouter0"
 
 // API to initialize WAN statistics
-void initialize_wan_stats(WanStats *stats) {
-    memset(stats, 0, sizeof(WanStats));
+void initialize_wan_stats(wan_stats_t *stats) {
+    memset(stats, 0, sizeof(wan_stats_t));
     stats->timestamp_ms = 0;
     strncpy(stats->interface_status, "N/A", sizeof(stats->interface_status));
     strncpy(stats->ipv4_address, "N/A", sizeof(stats->ipv4_address));
@@ -204,8 +204,8 @@ void get_wan_ipv6_lease(char *ipv6_lease, size_t size) {
     execute_command("ip -6 route show | grep default | cut -d' ' -f11 | sed 's/sec//'", ipv6_lease, size);
 }
 
-// API to collect WAN statistics using the WanStats structure
-void collect_wan_stats(WanStats *stats) {
+// API to collect WAN statistics using the wan_stats_t structure
+void collect_wan_stats(wan_stats_t *stats) {
     stats->timestamp_ms = get_timestamp_ms();
     check_wan_interface_status(stats->interface_status, sizeof(stats->interface_status));
     get_wan_ipv4_address(stats->ipv4_address, sizeof(stats->ipv4_address));

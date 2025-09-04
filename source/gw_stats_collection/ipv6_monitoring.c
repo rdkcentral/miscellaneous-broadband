@@ -1,8 +1,8 @@
 #include "gw_stats.h"
 
 // API to initialize IPv6 monitoring statistics
-void initialize_ipv6_monitoring_stats(IPv6MonitoringStats *stats) {
-    memset(stats, 0, sizeof(IPv6MonitoringStats));
+void initialize_ipv6_monitoring_stats(ipv6_mon_stats_t *stats) {
+    memset(stats, 0, sizeof(ipv6_mon_stats_t));
     stats->timestamp_ms = 0;
     strncpy(stats->global_ipv6_address, "N/A", sizeof(stats->global_ipv6_address));
     strncpy(stats->link_local_ipv6_address, "N/A", sizeof(stats->link_local_ipv6_address));
@@ -56,8 +56,8 @@ void compare_dual_stack_performance(const char *ipv4_site, const char *ipv6_site
     *ipv6_packet_loss = atof(output);
 }
 
-// Updated API to collect IPv6 monitoring statistics using the IPv6MonitoringStats structure
-void collect_ipv6_monitoring_stats(IPv6MonitoringStats *stats, const char *ipv4_site, const char *ipv6_site) {
+// Updated API to collect IPv6 monitoring statistics using the ipv6_mon_stats_t structure
+void collect_ipv6_monitoring_stats(ipv6_mon_stats_t *stats, const char *ipv4_site, const char *ipv6_site) {
     stats->timestamp_ms = get_timestamp_ms();
     // Collect IPv6 Address Assignment
     check_ipv6_address_assignment(stats->global_ipv6_address, sizeof(stats->global_ipv6_address),

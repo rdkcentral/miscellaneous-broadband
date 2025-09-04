@@ -39,10 +39,10 @@ int gw_stats_init() {
 }
 
 int gw_stats_collect() {
-    // SystemStats
-    SystemStats *new_ss = (SystemStats *)malloc(sizeof(SystemStats));
+    // system_stats_t
+    system_stats_t *new_ss = (system_stats_t *)malloc(sizeof(system_stats_t));
     if (new_ss == NULL) {
-        log_message("Failed to allocate memory for SystemStats.\n");
+        log_message("Failed to allocate memory for system_stats_t.\n");
         return -1;
     }
     initialize_system_stats(new_ss);
@@ -56,10 +56,10 @@ int gw_stats_collect() {
     }
     g_report.n_system_stats++;
 
-    // WanStats
-    WanStats *new_ws = (WanStats *)malloc(sizeof(WanStats));
+    // wan_stats_t
+    wan_stats_t *new_ws = (wan_stats_t *)malloc(sizeof(wan_stats_t));
     if (new_ws == NULL) {
-        log_message("Failed to allocate memory for WanStats.\n");
+        log_message("Failed to allocate memory for wan_stats_t.\n");
         return -1;
     }
     initialize_wan_stats(new_ws);
@@ -73,10 +73,10 @@ int gw_stats_collect() {
     }
     g_report.n_wan_stats++;
 
-    // LanStats
-    LanStats *new_ls = (LanStats *)malloc(sizeof(LanStats));
+    // lan_stats_t
+    lan_stats_t *new_ls = (lan_stats_t *)malloc(sizeof(lan_stats_t));
     if (new_ls == NULL) {
-        log_message("Failed to allocate memory for LanStats.\n");
+        log_message("Failed to allocate memory for lan_stats_t.\n");
         return -1;
     }
     initialize_lan_stats(new_ls);
@@ -90,10 +90,10 @@ int gw_stats_collect() {
     }
     g_report.n_lan_stats++;
 
-    // TcpStats
-    TcpStats *new_ts = (TcpStats *)malloc(sizeof(TcpStats));
+    // tcp_stats_t
+    tcp_stats_t *new_ts = (tcp_stats_t *)malloc(sizeof(tcp_stats_t));
     if (new_ts == NULL) {
-        log_message("Failed to allocate memory for TcpStats.\n");
+        log_message("Failed to allocate memory for tcp_stats_t.\n");
         return -1;
     }
     initialize_tcp_stats(new_ts);
@@ -107,10 +107,10 @@ int gw_stats_collect() {
     }
     g_report.n_tcp_stats++;
 
-    //IPv6MonitoringStats
-    IPv6MonitoringStats *new_ipv6s = (IPv6MonitoringStats *)malloc(sizeof(IPv6MonitoringStats));
+    //ipv6_mon_stats_t
+    ipv6_mon_stats_t *new_ipv6s = (ipv6_mon_stats_t *)malloc(sizeof(ipv6_mon_stats_t));
     if (new_ipv6s == NULL) {
-        log_message("Failed to allocate memory for IPv6MonitoringStats.\n");
+        log_message("Failed to allocate memory for ipv6_mon_stats_t.\n");
         return -1;
     }
     initialize_ipv6_monitoring_stats(new_ipv6s);
@@ -124,10 +124,10 @@ int gw_stats_collect() {
     }
     g_report.n_ipv6_stats++;
 
-    // ClientStats
-    ClientStats *new_cs = (ClientStats *)malloc(sizeof(ClientStats));
+    // client_stats_t
+    client_stats_t *new_cs = (client_stats_t *)malloc(sizeof(client_stats_t));
     if (new_cs == NULL) {
-        log_message("Failed to allocate memory for ClientStats.\n");
+        log_message("Failed to allocate memory for client_stats_t.\n");
         return -1;
     }
     initialize_client_stats(new_cs);
@@ -141,10 +141,10 @@ int gw_stats_collect() {
     }
     g_report.n_client_stats++;
 
-    // PidStats
-    PidStats *new_ps = (PidStats *)malloc(sizeof(PidStats));
+    // pid_stats_t
+    pid_stats_t *new_ps = (pid_stats_t *)malloc(sizeof(pid_stats_t));
     if (new_ps == NULL) {
-        log_message("Failed to allocate memory for PidStats.\n");
+        log_message("Failed to allocate memory for pid_stats_t.\n");
         return -1;
     }
     initialize_pid_stats(new_ps);
@@ -175,8 +175,8 @@ void save_to_text(const gw_stats_report *report) {
     char timestamp[64];
     get_current_timestamp(timestamp, sizeof(timestamp));
 
-    // SystemStats linked list
-    const SystemStats *system_stats = report->system_stats;
+    // system_stats_t linked list
+    const system_stats_t *system_stats = report->system_stats;
     while (system_stats) {
         fprintf(file, "system_params: %s|%llu|%s|%s|%s|%s|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%u|%u|%u|%u\n",
                 timestamp, system_stats->timestamp_ms, system_stats->model, system_stats->firmware, system_stats->cmac,
@@ -188,8 +188,8 @@ void save_to_text(const gw_stats_report *report) {
         system_stats = system_stats->next;
     }
 
-    // WanStats linked list
-    const WanStats *wan_stats = report->wan_stats;
+    // wan_stats_t linked list
+    const wan_stats_t *wan_stats = report->wan_stats;
     while (wan_stats) {
         fprintf(file, "wan: %s|%lld|%s|%s|%s|%s|%s|%s|%s|%s|%.3f|%.3f|%.3f|%.3f|%s|%s\n",
                 timestamp, wan_stats->timestamp_ms, wan_stats->gateway_status, wan_stats->interface_status, wan_stats->ipv4_address,
@@ -199,8 +199,8 @@ void save_to_text(const gw_stats_report *report) {
         wan_stats = wan_stats->next;
     }
 
-    // LanStats linked list
-    const LanStats *lan_stats = report->lan_stats;
+    // lan_stats_t linked list
+    const lan_stats_t *lan_stats = report->lan_stats;
     while (lan_stats) {
         fprintf(file, "lan: %s|%lld|%s|%s|%s|%s|%s|%s\n",
                 timestamp, lan_stats->timestamp_ms, lan_stats->ipv4_address, lan_stats->ipv6_address, lan_stats->rx_bytes,
@@ -208,11 +208,11 @@ void save_to_text(const gw_stats_report *report) {
         lan_stats = lan_stats->next;
     }
 
-    // ClientStats linked list
-    const ClientStats *client_stats = report->client_stats;
+    // client_stats_t linked list
+    const client_stats_t *client_stats = report->client_stats;
     while (client_stats) {
         for (int i = 0; i < client_stats->client_count; ++i) {
-            const ClientDetails *cd = &client_stats->clients[i];
+            const client_details_t *cd = &client_stats->clients[i];
             fprintf(file,
             "client: cnt: %d |%llu|%s|%s|%s|%s|%s|%s|%d|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u\n",
             client_stats->client_count, client_stats->timestamp_ms,
@@ -227,11 +227,11 @@ void save_to_text(const gw_stats_report *report) {
         client_stats = client_stats->next;
     }
 
-    // PidStats linked list
-    const PidStats *pid_stats = report->pid_stats;
+    // pid_stats_t linked list
+    const pid_stats_t *pid_stats = report->pid_stats;
     while (pid_stats) {
         for (int i = 0; i < pid_stats->count; ++i) {
-            const pidDetails *pd = &pid_stats->pid_details[i];
+            const pid_details_t *pd = &pid_stats->pid_details[i];
             fprintf(file, "pid_stats: %llu|%u|%s|%u|%u|%u|%u\n",
                     pid_stats->timestamp_ms, pd->pid, pd->pName, pd->rss,
                     pd->pss, pd->mem_util, pd->cpu_util);
@@ -239,8 +239,8 @@ void save_to_text(const gw_stats_report *report) {
         pid_stats = pid_stats->next;
     }
 
-    // TcpStats linked list
-    const TcpStats *tcp_stats = report->tcp_stats;
+    // tcp_stats_t linked list
+    const tcp_stats_t *tcp_stats = report->tcp_stats;
     while (tcp_stats) {
         fprintf(file, "tcp|%lld|%s|%s|%s|%s|%s|%s|%s\n",
             tcp_stats->timestamp_ms,
@@ -254,8 +254,8 @@ void save_to_text(const gw_stats_report *report) {
         tcp_stats = tcp_stats->next;
     }
 
-    // IPv6MonitoringStats linked list
-    const IPv6MonitoringStats *ipv6_stats = report->ipv6_stats;
+    // ipv6_mon_stats_t linked list
+    const ipv6_mon_stats_t *ipv6_stats = report->ipv6_stats;
     while (ipv6_stats) {
         fprintf(file, "ipv6_monitoring: %s|%lld|%s|%s|%s|%.3f|%.3f|%.3f|%.3f\n",
                 timestamp, ipv6_stats->timestamp_ms, ipv6_stats->ipv6_reachability, ipv6_stats->global_ipv6_address,
@@ -276,76 +276,76 @@ int gw_stats_save() {
 int gw_stats_reset() {
     log_message("Reset Gateway Statistics...\n");
 
-    // Free SystemStats linked list
-    SystemStats *ss = g_report.system_stats;
+    // Free system_stats_t linked list
+    system_stats_t *ss = g_report.system_stats;
     while (ss) {
-        SystemStats *next = ss->next;
+        system_stats_t *next = ss->next;
         free(ss);
         ss = next;
     }
     g_report.system_stats = NULL;
     g_report.n_system_stats = 0;
 
-    // Free WanStats linked list
-    WanStats *ws = g_report.wan_stats;
+    // Free wan_stats_t linked list
+    wan_stats_t *ws = g_report.wan_stats;
     while (ws) {
-        WanStats *next = ws->next;
+        wan_stats_t *next = ws->next;
         free(ws);
         ws = next;
     }
     g_report.wan_stats = NULL;
     g_report.n_wan_stats = 0;
 
-    // Free LanStats linked list
-    LanStats *ls = g_report.lan_stats;
+    // Free lan_stats_t linked list
+    lan_stats_t *ls = g_report.lan_stats;
     while (ls) {
-        LanStats *next = ls->next;
+        lan_stats_t *next = ls->next;
         free(ls);
         ls = next;
     }
     g_report.lan_stats = NULL;
     g_report.n_lan_stats = 0;
 
-    // Free IPv6MonitoringStats linked list
-    IPv6MonitoringStats *ipv6s = g_report.ipv6_stats;
+    // Free ipv6_mon_stats_t linked list
+    ipv6_mon_stats_t *ipv6s = g_report.ipv6_stats;
     while (ipv6s) {
-        IPv6MonitoringStats *next = ipv6s->next;
+        ipv6_mon_stats_t *next = ipv6s->next;
         free(ipv6s);
         ipv6s = next;
     }
     g_report.ipv6_stats = NULL;
     g_report.n_ipv6_stats = 0;
 
-    // Free TcpStats linked list
-    TcpStats *ts = g_report.tcp_stats;
+    // Free tcp_stats_t linked list
+    tcp_stats_t *ts = g_report.tcp_stats;
     while (ts) {
-        TcpStats *next = ts->next;
+        tcp_stats_t *next = ts->next;
         free(ts);
         ts = next;
     }
     g_report.tcp_stats = NULL;
     g_report.n_tcp_stats = 0;
 
-    // Free ClientStats linked list
-    ClientStats *cs = g_report.client_stats;
+    // Free client_stats_t linked list
+    client_stats_t *cs = g_report.client_stats;
     while (cs) {
         if (cs->clients) {
             free(cs->clients);
         }
-        ClientStats *next = cs->next;
+        client_stats_t *next = cs->next;
         free(cs);
         cs = next;
     }
     g_report.client_stats = NULL;
     g_report.n_client_stats = 0;
 
-    // Free PidStats linked list
-    PidStats *ps = g_report.pid_stats;
+    // Free pid_stats_t linked list
+    pid_stats_t *ps = g_report.pid_stats;
     while (ps) {
         if (ps->pid_details) {
             free(ps->pid_details);
         }
-        PidStats *next = ps->next;
+        pid_stats_t *next = ps->next;
         free(ps);
         ps = next;
     }
