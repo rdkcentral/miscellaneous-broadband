@@ -26,7 +26,7 @@
 
 
 // Structure to store system statistics
-typedef struct system_stats {
+typedef struct systemstats {
     uint64_t timestamp_ms;
     double cpu_usage;
     double free_memory;
@@ -41,17 +41,15 @@ typedef struct system_stats {
     uint32_t rootfs_total_kb;
     uint32_t tmpfs_used_kb;
     uint32_t tmpfs_total_kb;
-    int pid_stats_count;
-    pidStats* pid_stats;
     char model[64];
     char firmware[128];
     char cmac[32];
     char uptime[64];
-    struct system_stats *next;
+    struct systemstats *next;
 } SystemStats;
 
 //WAN stats
-typedef struct wan_stats {
+typedef struct wanstats {
     uint64_t timestamp_ms;
     double packet_loss;
     double latency;
@@ -67,7 +65,7 @@ typedef struct wan_stats {
     char rx_dropped[64];
     char tx_dropped[64];
     char ipv6_address[128];
-    struct wan_stats *next;
+    struct wanstats *next;
 } WanStats;
 
 // Structure to store client details
@@ -81,15 +79,15 @@ typedef struct {
     int  tcp_est_counts;
 } ClientDetails;
 
-typedef struct client_stats{
+typedef struct clientstats{
     uint64_t timestamp_ms;
     int client_count;
     ClientDetails *clients;
-    struct client_stats *next;
+    struct clientstats *next;
 } ClientStats;
 
 // Structure to store LAN statistics
-typedef struct lan_stats {
+typedef struct lanstats {
     uint64_t timestamp_ms;
     char ipv4_address[64];
     char ipv6_address[128];
@@ -97,7 +95,7 @@ typedef struct lan_stats {
     char tx_bytes[64];
     char rx_dropped[64];
     char tx_dropped[64];
-    struct lan_stats *next;
+    struct lanstats *next;
 } LanStats;
 
 //IPv6 Monitoring Stats
@@ -114,7 +112,7 @@ typedef struct ipv6_mon_stats {
 } IPv6MonitoringStats;
 
 //TCP Stats
-typedef struct tcp_stats {
+typedef struct tcpstats {
     uint64_t timestamp_ms;
     char TCPLostRetransmit[32];  //Retransmissions for packets that still didn’t get ACKed (true losses)
     char TCPRetransFail[32];     //Retransmissions that failed entirely (after all retries)
@@ -123,7 +121,7 @@ typedef struct tcp_stats {
     char TCPAbortOnTimeout[32];  //Connections aborted because of timeout
     char ListenOverflows[32];    //Times the socket backlog queue was full — client connections dropped
     char TCPOrigDataSent[32];    //Original bytes sent (useful for rate estimation)
-    struct tcp_stats *next;
+    struct tcpstats *next;
 }TcpStats;
 
 //Restart Count Stats
@@ -145,12 +143,12 @@ typedef struct
     uint32_t   cpu_util;
 } pidDetails;
 
-typedef struct pid_stats {
+typedef struct pidstats {
     uint64_t timestamp_ms;
     int count;
     pidDetails *pid_details;
-    struct pid_stats *next;
-} pidStats;
+    struct pidstats *next;
+} PidStats;
 
 // Function declarations
 //System params
@@ -194,6 +192,7 @@ void initialize_client_stats(ClientStats *stats);
 void get_client_tcp_est_counts(ClientStats *stats);
 void get_all_clients(ClientStats *stats);
 void get_client_traffic_stats(ClientStats *stats);
+void collect_client_stats(ClientStats *stats);
 
 //IPv6 Monitoring Stats
 void initialize_ipv6_monitoring_stats(IPv6MonitoringStats *stats);
@@ -209,9 +208,9 @@ void collect_tcp_stats(TcpStats *stats);
 void get_tcp_params(TcpStats *stats);
 
 //PID Stats
-void initialize_pid_stats(pidStats *stats);
-int get_pid_stats(pidStats *stats);
-void collect_pid_stats(pidStats *stats);
+void initialize_pid_stats(PidStats *stats);
+int get_pid_stats(PidStats *stats);
+void collect_pid_stats(PidStats *stats);
 
 //helper.h
 void log_message(const char *format, ...);

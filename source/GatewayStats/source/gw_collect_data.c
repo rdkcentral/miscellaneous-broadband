@@ -9,7 +9,7 @@ int gw_stats_init() {
     log_message("Gateway Stats Init\n");
     memset(&g_report, 0, sizeof(gw_stats_report));
 
-    g_report.system_stats = NULL;  // will build linked list dynamically
+    g_report.system_stats = NULL;
     g_report.n_system_stats = 0;
 
     g_report.wan_stats = NULL;
@@ -23,6 +23,12 @@ int gw_stats_init() {
 
     g_report.tcp_stats = NULL;
     g_report.n_tcp_stats = 0;
+
+    g_report.client_stats = NULL;
+    g_report.n_client_stats = 0;
+
+    g_report.pid_stats = NULL;
+    g_report.n_pid_stats = 0;
 
     g_report.restart_count_stats = NULL;
 
@@ -118,6 +124,40 @@ int gw_stats_collect() {
     }
     g_report.n_ipv6_stats++;
 
+    // ClientStats
+    ClientStats *new_cs = (ClientStats *)malloc(sizeof(ClientStats));
+    if (new_cs == NULL) {
+        log_message("Failed to allocate memory for ClientStats.\n");
+        return -1;
+    }
+    initialize_client_stats(new_cs);
+    collect_client_stats(new_cs);
+
+    if (g_report.n_client_stats == 0) {
+        g_report.client_stats = new_cs;
+    } else {
+        new_cs->next = g_report.client_stats;
+        g_report.client_stats = new_cs;
+    }
+    g_report.n_client_stats++;
+
+    // PidStats
+    PidStats *new_ps = (PidStats *)malloc(sizeof(PidStats));
+    if (new_ps == NULL) {
+        log_message("Failed to allocate memory for PidStats.\n");
+        return -1;
+    }
+    initialize_pid_stats(new_ps);
+    collect_pid_stats(new_ps);
+
+    if (g_report.n_pid_stats == 0) {
+        g_report.pid_stats = new_ps;
+    } else {
+        new_ps->next = g_report.pid_stats;
+        g_report.pid_stats = new_ps;
+    }
+    g_report.n_pid_stats++;
+
 
     log_message("Gateway Stats collected\n");
     return 0;
@@ -145,20 +185,6 @@ void save_to_text(const gw_stats_report *report) {
                 system_stats->loadavg_1min, system_stats->loadavg_5min, system_stats->loadavg_15min,
                 system_stats->rootfs_used_kb, system_stats->rootfs_total_kb,
                 system_stats->tmpfs_used_kb, system_stats->tmpfs_total_kb);
-
-        // PID stats
-        if (system_stats->pid_stats && system_stats->pid_stats_count > 0) {
-            for (int i = 0; i < system_stats->pid_stats_count; i++) {
-                fprintf(file, "pid_stats|%d|%s|%d|%d|%d|%d\n",
-                    system_stats->pid_stats[i].pid,
-                    system_stats->pid_stats[i].pName,
-                    system_stats->pid_stats[i].rss,
-                    system_stats->pid_stats[i].pss,
-                    system_stats->pid_stats[i].cpu_util,
-                    system_stats->pid_stats[i].mem_util
-                );
-            }
-        }
         system_stats = system_stats->next;
     }
 
@@ -176,22 +202,34 @@ void save_to_text(const gw_stats_report *report) {
     // LanStats linked list
     const LanStats *lan_stats = report->lan_stats;
     while (lan_stats) {
-        fprintf(file, "lan: %s|%lld|%s|%s|%s|%s|%s|%s|%d\n",
+        fprintf(file, "lan: %s|%lld|%s|%s|%s|%s|%s|%s\n",
                 timestamp, lan_stats->timestamp_ms, lan_stats->ipv4_address, lan_stats->ipv6_address, lan_stats->rx_bytes,
-                lan_stats->tx_bytes, lan_stats->rx_dropped, lan_stats->tx_dropped, lan_stats->client_count);
-
-        // LAN client details
-        for (int i = 0; i < lan_stats->client_count; i++) {
-            fprintf(file, "client|%s|%s|%s|%s|%s|%s|%d\n",
-                lan_stats->clients[i].mac_address,
-                lan_stats->clients[i].host_name,
-                lan_stats->clients[i].ip_addr,
-                lan_stats->clients[i].status,
-                lan_stats->clients[i].tx_bytes,
-                lan_stats->clients[i].rx_bytes,
-                lan_stats->clients[i].tcp_est_counts);
-        }
+                lan_stats->tx_bytes, lan_stats->rx_dropped, lan_stats->tx_dropped);
         lan_stats = lan_stats->next;
+    }
+
+    // ClientStats linked list
+    const ClientStats *client_stats = report->client_stats;
+    while (client_stats) {
+        for (int i = 0; i < client_stats->client_count; ++i) {
+            const ClientDetails *cd = &client_stats->clients[i];
+            fprintf(file, "client: cnt: %d |%llu|%s|%s|%s|%s|%s|%s|%d\n",
+                    client_stats->client_count, client_stats->timestamp_ms, cd->ip_addr, cd->host_name, cd->tx_bytes, cd->rx_bytes,
+                    cd->mac_address, cd->status, cd->tcp_est_counts);
+        }
+        client_stats = client_stats->next;
+    }
+
+    // PidStats linked list
+    const PidStats *pid_stats = report->pid_stats;
+    while (pid_stats) {
+        for (int i = 0; i < pid_stats->count; ++i) {
+            const pidDetails *pd = &pid_stats->pid_details[i];
+            fprintf(file, "pid_stats: %llu|%u|%s|%u|%u|%u|%u\n",
+                    pid_stats->timestamp_ms, pd->pid, pd->pName, pd->rss,
+                    pd->pss, pd->mem_util, pd->cpu_util);
+        }
+        pid_stats = pid_stats->next;
     }
 
     // TcpStats linked list
@@ -280,6 +318,32 @@ int gw_stats_reset() {
     }
     g_report.tcp_stats = NULL;
     g_report.n_tcp_stats = 0;
+
+    // Free ClientStats linked list
+    ClientStats *cs = g_report.client_stats;
+    while (cs) {
+        if (cs->clients) {
+            free(cs->clients);
+        }
+        ClientStats *next = cs->next;
+        free(cs);
+        cs = next;
+    }
+    g_report.client_stats = NULL;
+    g_report.n_client_stats = 0;
+
+    // Free PidStats linked list
+    PidStats *ps = g_report.pid_stats;
+    while (ps) {
+        if (ps->pid_details) {
+            free(ps->pid_details);
+        }
+        PidStats *next = ps->next;
+        free(ps);
+        ps = next;
+    }
+    g_report.pid_stats = NULL;
+    g_report.n_pid_stats = 0;
 
     // Free restart_count_stats if dynamically allocated (if applicable)
     if (g_report.restart_count_stats) {

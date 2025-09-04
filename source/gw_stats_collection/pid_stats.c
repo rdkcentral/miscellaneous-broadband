@@ -5,16 +5,16 @@
 #include <dirent.h>
 #include <errno.h>
 
-void initialize_pid_stats(pidStats *stats) {
-    memset(stats, 0, sizeof(pidStats));
+void initialize_pid_stats(PidStats *stats) {
+    memset(stats, 0, sizeof(PidStats));
     stats->timestamp_ms = 0;
     stats->count = 0;
     stats->pid_details = NULL;
     stats->next = NULL;
 }
 
-// API to collect pidStats for all running processes
-int get_pid_stats(pidStats *stats) {
+// API to collect PidStats for all running processes
+int get_pid_stats(PidStats *stats) {
     const char *proc_dirname = "/proc";
     DIR *proc_dir = NULL;
     struct dirent *dire;
@@ -106,7 +106,7 @@ int get_pid_stats(pidStats *stats) {
     return 0;
 }
 
-void collect_pid_stats(pidStats *stats) {
+void collect_pid_stats(PidStats *stats) {
     stats->timestamp_ms = get_timestamp_ms();
     get_pid_stats(stats);
 }

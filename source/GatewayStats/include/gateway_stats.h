@@ -35,6 +35,10 @@ typedef struct
     IPv6MonitoringStats *ipv6_stats;
     size_t n_tcp_stats;
     TcpStats *tcp_stats;
+    size_t n_client_stats;
+    ClientStats *client_stats;
+    size_t n_pid_stats;
+    PidStats *pid_stats;
     RestartCountStats *restart_count_stats;
 } gw_stats_report;
 

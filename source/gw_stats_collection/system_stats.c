@@ -30,8 +30,6 @@ void initialize_system_stats(SystemStats *stats) {
     stats->rootfs_total_kb = 0;
     stats->tmpfs_used_kb = 0;
     stats->tmpfs_total_kb = 0;
-    stats->pid_stats_count = 0;
-    stats->pid_stats = NULL;
     stats->next = NULL;
 }
 

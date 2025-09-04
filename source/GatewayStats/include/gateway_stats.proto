@@ -2,16 +2,6 @@ syntax = "proto3";
 
 package gwstats;
 
-// ===== PID Stats =====
-message PidStats {
-  uint32 pid = 1;
-  string pName = 2;
-  uint32 rss = 3;
-  uint32 pss = 4;
-  uint32 mem_util = 5;
-  uint32 cpu_util = 6;
-}
-
 // ===== System Stats =====
 message SystemStats {
   uint64 timestamp_ms = 1;
@@ -32,8 +22,6 @@ message SystemStats {
   uint32 rootfs_total_kb = 16;
   uint32 tmpfs_used_kb = 17;
   uint32 tmpfs_total_kb = 18;
-  int32 pid_stats_count = 19;
-  repeated PidStats pid_stats = 20;
 }
 
 // ===== WAN Stats =====
@@ -55,17 +43,6 @@ message WanStats {
   string ipv6_lease = 15;
 }
 
-// ===== LAN Client Details =====
-message ClientDetails {
-  string mac_address = 1;
-  string ip_addr = 2;
-  string host_name = 3;
-  string status = 4;
-  string tx_bytes = 5;
-  string rx_bytes = 6;
-  int32 tcp_est_counts = 7;
-}
-
 // ===== LAN Stats =====
 message LanStats {
   uint64 timestamp_ms = 1;
@@ -75,8 +52,6 @@ message LanStats {
   string tx_bytes = 5;
   string rx_dropped = 6;
   string tx_dropped = 7;
-  repeated ClientDetails clients = 8;
-  int32 client_count = 9;
 }
 
 // ===== IPv6 Monitoring Stats =====
@@ -111,6 +86,42 @@ message RestartCountStats {
   repeated string wan_restart_time = 4;
 }
 
+// ===== Client Details =====
+message ClientDetails {
+  string mac_address = 1;
+  string ip_addr = 2;
+  string host_name = 3;
+  string status = 4;
+  string tx_bytes = 5;
+  string rx_bytes = 6;
+  int32 tcp_est_counts = 7;
+}
+
+// ===== Client Stats =====
+message ClientStats {
+  uint64 timestamp_ms = 1;
+  int32 client_count = 2;
+  repeated ClientDetails client_details = 3;
+}
+
+// ===== PID Details =====
+message PidDetails {
+  uint32 pid = 1;
+  string pName = 2;
+  uint32 rss = 3;
+  uint32 pss = 4;
+  uint32 mem_util = 5;
+  uint32 cpu_util = 6;
+}
+
+// ===== PID Stats =====
+message PidStats {
+  uint64 timestamp_ms = 1;
+  int32 count = 2;
+  repeated PidDetails pid_details = 3;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Overall report that contain all individual stats reports
@@ -123,5 +134,7 @@ message GatewayStats {
   repeated LanStats lan = 4;
   repeated IPv6MonitoringStats ipv6_monitoring = 5;
   repeated TcpStats tcp = 6;
-  RestartCountStats restartCount = 7;
+  repeated ClientStats client = 7;
+  repeated PidStats pid = 8;
+  RestartCountStats restartCount = 9;
 }
