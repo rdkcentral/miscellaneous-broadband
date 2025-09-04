@@ -15,17 +15,17 @@ PROTOBUF_C__BEGIN_DECLS
 #endif
 
 
-typedef struct Gwstats__SystemStats Gwstats__SystemStats;
-typedef struct Gwstats__WanStats Gwstats__WanStats;
-typedef struct Gwstats__LanStats Gwstats__LanStats;
-typedef struct Gwstats__IPv6MonitoringStats Gwstats__IPv6MonitoringStats;
-typedef struct Gwstats__TcpStats Gwstats__TcpStats;
-typedef struct Gwstats__RestartCountStats Gwstats__RestartCountStats;
-typedef struct Gwstats__ClientDetails Gwstats__ClientDetails;
-typedef struct Gwstats__ClientStats Gwstats__ClientStats;
-typedef struct Gwstats__PidDetails Gwstats__PidDetails;
-typedef struct Gwstats__PidStats Gwstats__PidStats;
-typedef struct Gwstats__Report Gwstats__Report;
+typedef struct SystemStats SystemStats;
+typedef struct WanStats WanStats;
+typedef struct LanStats LanStats;
+typedef struct IPv6MonitoringStats IPv6MonitoringStats;
+typedef struct TcpStats TcpStats;
+typedef struct RestartCountStats RestartCountStats;
+typedef struct ClientDetails ClientDetails;
+typedef struct ClientStats ClientStats;
+typedef struct PidDetails PidDetails;
+typedef struct PidStats PidStats;
+typedef struct Report Report;
 
 
 /* --- enums --- */
@@ -36,7 +36,7 @@ typedef struct Gwstats__Report Gwstats__Report;
 /*
  * ===== System Stats =====
  */
-struct  Gwstats__SystemStats
+struct  SystemStats
 {
   ProtobufCMessage base;
   uint64_t timestamp_ms;
@@ -58,15 +58,15 @@ struct  Gwstats__SystemStats
   uint32_t tmpfs_used_kb;
   uint32_t tmpfs_total_kb;
 };
-#define GWSTATS__SYSTEM_STATS__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&gwstats__system_stats__descriptor) \
+#define SYSTEM_STATS__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&system_stats__descriptor) \
 , 0, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 
 
 /*
  * ===== WAN Stats =====
  */
-struct  Gwstats__WanStats
+struct  WanStats
 {
   ProtobufCMessage base;
   uint64_t timestamp_ms;
@@ -85,15 +85,15 @@ struct  Gwstats__WanStats
   char *ipv4_lease;
   char *ipv6_lease;
 };
-#define GWSTATS__WAN_STATS__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&gwstats__wan_stats__descriptor) \
+#define WAN_STATS__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&wan_stats__descriptor) \
 , 0, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, 0, 0, 0, 0, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string }
 
 
 /*
  * ===== LAN Stats =====
  */
-struct  Gwstats__LanStats
+struct  LanStats
 {
   ProtobufCMessage base;
   uint64_t timestamp_ms;
@@ -104,15 +104,15 @@ struct  Gwstats__LanStats
   char *rx_dropped;
   char *tx_dropped;
 };
-#define GWSTATS__LAN_STATS__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&gwstats__lan_stats__descriptor) \
+#define LAN_STATS__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&lan_stats__descriptor) \
 , 0, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string }
 
 
 /*
  * ===== IPv6 Monitoring Stats =====
  */
-struct  Gwstats__IPv6MonitoringStats
+struct  IPv6MonitoringStats
 {
   ProtobufCMessage base;
   uint64_t timestamp_ms;
@@ -124,15 +124,15 @@ struct  Gwstats__IPv6MonitoringStats
   double ipv4_packet_loss;
   double ipv6_packet_loss;
 };
-#define GWSTATS__IPV6_MONITORING_STATS__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&gwstats__ipv6_monitoring_stats__descriptor) \
+#define IPV6_MONITORING_STATS__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&ipv6_monitoring_stats__descriptor) \
 , 0, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, 0, 0, 0, 0 }
 
 
 /*
  * ===== TCP Stats =====
  */
-struct  Gwstats__TcpStats
+struct  TcpStats
 {
   ProtobufCMessage base;
   uint64_t timestamp_ms;
@@ -144,15 +144,15 @@ struct  Gwstats__TcpStats
   char *listenoverflows;
   char *tcporigdatasent;
 };
-#define GWSTATS__TCP_STATS__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&gwstats__tcp_stats__descriptor) \
+#define TCP_STATS__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&tcp_stats__descriptor) \
 , 0, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string }
 
 
 /*
  * ===== Restart Count Stats =====
  */
-struct  Gwstats__RestartCountStats
+struct  RestartCountStats
 {
   ProtobufCMessage base;
   int32_t fw_restart_count;
@@ -162,15 +162,15 @@ struct  Gwstats__RestartCountStats
   size_t n_wan_restart_time;
   char **wan_restart_time;
 };
-#define GWSTATS__RESTART_COUNT_STATS__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&gwstats__restart_count_stats__descriptor) \
+#define RESTART_COUNT_STATS__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&restart_count_stats__descriptor) \
 , 0, 0,NULL, 0, 0,NULL }
 
 
 /*
  * ===== Client Details =====
  */
-struct  Gwstats__ClientDetails
+struct  ClientDetails
 {
   ProtobufCMessage base;
   char *mac_address;
@@ -193,31 +193,31 @@ struct  Gwstats__ClientDetails
   uint32_t ipv6_ack_max_latency;
   uint32_t ipv6_ack_avg_latency;
 };
-#define GWSTATS__CLIENT_DETAILS__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&gwstats__client_details__descriptor) \
+#define CLIENT_DETAILS__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&client_details__descriptor) \
 , (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 
 
 /*
  * ===== Client Stats =====
  */
-struct  Gwstats__ClientStats
+struct  ClientStats
 {
   ProtobufCMessage base;
   uint64_t timestamp_ms;
   int32_t client_count;
   size_t n_client_details;
-  Gwstats__ClientDetails **client_details;
+  ClientDetails **client_details;
 };
-#define GWSTATS__CLIENT_STATS__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&gwstats__client_stats__descriptor) \
+#define CLIENT_STATS__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&client_stats__descriptor) \
 , 0, 0, 0,NULL }
 
 
 /*
  * ===== PID Details =====
  */
-struct  Gwstats__PidDetails
+struct  PidDetails
 {
   ProtobufCMessage base;
   uint32_t pid;
@@ -227,24 +227,24 @@ struct  Gwstats__PidDetails
   uint32_t mem_util;
   uint32_t cpu_util;
 };
-#define GWSTATS__PID_DETAILS__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&gwstats__pid_details__descriptor) \
+#define PID_DETAILS__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&pid_details__descriptor) \
 , 0, (char *)protobuf_c_empty_string, 0, 0, 0, 0 }
 
 
 /*
  * ===== PID Stats =====
  */
-struct  Gwstats__PidStats
+struct  PidStats
 {
   ProtobufCMessage base;
   uint64_t timestamp_ms;
   int32_t count;
   size_t n_pid_details;
-  Gwstats__PidDetails **pid_details;
+  PidDetails **pid_details;
 };
-#define GWSTATS__PID_STATS__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&gwstats__pid_stats__descriptor) \
+#define PID_STATS__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&pid_stats__descriptor) \
 , 0, 0, 0,NULL }
 
 
@@ -253,274 +253,274 @@ struct  Gwstats__PidStats
  * Overall report that contain all individual stats reports
  * //////////////////////////////////////////////////////////////////////////////
  */
-struct  Gwstats__Report
+struct  Report
 {
   ProtobufCMessage base;
   uint64_t timestamp_ms;
   size_t n_system;
-  Gwstats__SystemStats **system;
+  SystemStats **system;
   size_t n_wan;
-  Gwstats__WanStats **wan;
+  WanStats **wan;
   size_t n_lan;
-  Gwstats__LanStats **lan;
+  LanStats **lan;
   size_t n_ipv6_monitoring;
-  Gwstats__IPv6MonitoringStats **ipv6_monitoring;
+  IPv6MonitoringStats **ipv6_monitoring;
   size_t n_tcp;
-  Gwstats__TcpStats **tcp;
+  TcpStats **tcp;
   size_t n_client;
-  Gwstats__ClientStats **client;
+  ClientStats **client;
   size_t n_pid;
-  Gwstats__PidStats **pid;
-  Gwstats__RestartCountStats *restartcount;
+  PidStats **pid;
+  RestartCountStats *restartcount;
 };
-#define GWSTATS__REPORT__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&gwstats__report__descriptor) \
+#define REPORT__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&report__descriptor) \
 , 0, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, NULL }
 
 
-/* Gwstats__SystemStats methods */
-void   gwstats__system_stats__init
-                     (Gwstats__SystemStats         *message);
-size_t gwstats__system_stats__get_packed_size
-                     (const Gwstats__SystemStats   *message);
-size_t gwstats__system_stats__pack
-                     (const Gwstats__SystemStats   *message,
+/* SystemStats methods */
+void   system_stats__init
+                     (SystemStats         *message);
+size_t system_stats__get_packed_size
+                     (const SystemStats   *message);
+size_t system_stats__pack
+                     (const SystemStats   *message,
                       uint8_t             *out);
-size_t gwstats__system_stats__pack_to_buffer
-                     (const Gwstats__SystemStats   *message,
+size_t system_stats__pack_to_buffer
+                     (const SystemStats   *message,
                       ProtobufCBuffer     *buffer);
-Gwstats__SystemStats *
-       gwstats__system_stats__unpack
+SystemStats *
+       system_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   gwstats__system_stats__free_unpacked
-                     (Gwstats__SystemStats *message,
+void   system_stats__free_unpacked
+                     (SystemStats *message,
                       ProtobufCAllocator *allocator);
-/* Gwstats__WanStats methods */
-void   gwstats__wan_stats__init
-                     (Gwstats__WanStats         *message);
-size_t gwstats__wan_stats__get_packed_size
-                     (const Gwstats__WanStats   *message);
-size_t gwstats__wan_stats__pack
-                     (const Gwstats__WanStats   *message,
+/* WanStats methods */
+void   wan_stats__init
+                     (WanStats         *message);
+size_t wan_stats__get_packed_size
+                     (const WanStats   *message);
+size_t wan_stats__pack
+                     (const WanStats   *message,
                       uint8_t             *out);
-size_t gwstats__wan_stats__pack_to_buffer
-                     (const Gwstats__WanStats   *message,
+size_t wan_stats__pack_to_buffer
+                     (const WanStats   *message,
                       ProtobufCBuffer     *buffer);
-Gwstats__WanStats *
-       gwstats__wan_stats__unpack
+WanStats *
+       wan_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   gwstats__wan_stats__free_unpacked
-                     (Gwstats__WanStats *message,
+void   wan_stats__free_unpacked
+                     (WanStats *message,
                       ProtobufCAllocator *allocator);
-/* Gwstats__LanStats methods */
-void   gwstats__lan_stats__init
-                     (Gwstats__LanStats         *message);
-size_t gwstats__lan_stats__get_packed_size
-                     (const Gwstats__LanStats   *message);
-size_t gwstats__lan_stats__pack
-                     (const Gwstats__LanStats   *message,
+/* LanStats methods */
+void   lan_stats__init
+                     (LanStats         *message);
+size_t lan_stats__get_packed_size
+                     (const LanStats   *message);
+size_t lan_stats__pack
+                     (const LanStats   *message,
                       uint8_t             *out);
-size_t gwstats__lan_stats__pack_to_buffer
-                     (const Gwstats__LanStats   *message,
+size_t lan_stats__pack_to_buffer
+                     (const LanStats   *message,
                       ProtobufCBuffer     *buffer);
-Gwstats__LanStats *
-       gwstats__lan_stats__unpack
+LanStats *
+       lan_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   gwstats__lan_stats__free_unpacked
-                     (Gwstats__LanStats *message,
+void   lan_stats__free_unpacked
+                     (LanStats *message,
                       ProtobufCAllocator *allocator);
-/* Gwstats__IPv6MonitoringStats methods */
-void   gwstats__ipv6_monitoring_stats__init
-                     (Gwstats__IPv6MonitoringStats         *message);
-size_t gwstats__ipv6_monitoring_stats__get_packed_size
-                     (const Gwstats__IPv6MonitoringStats   *message);
-size_t gwstats__ipv6_monitoring_stats__pack
-                     (const Gwstats__IPv6MonitoringStats   *message,
+/* IPv6MonitoringStats methods */
+void   ipv6_monitoring_stats__init
+                     (IPv6MonitoringStats         *message);
+size_t ipv6_monitoring_stats__get_packed_size
+                     (const IPv6MonitoringStats   *message);
+size_t ipv6_monitoring_stats__pack
+                     (const IPv6MonitoringStats   *message,
                       uint8_t             *out);
-size_t gwstats__ipv6_monitoring_stats__pack_to_buffer
-                     (const Gwstats__IPv6MonitoringStats   *message,
+size_t ipv6_monitoring_stats__pack_to_buffer
+                     (const IPv6MonitoringStats   *message,
                       ProtobufCBuffer     *buffer);
-Gwstats__IPv6MonitoringStats *
-       gwstats__ipv6_monitoring_stats__unpack
+IPv6MonitoringStats *
+       ipv6_monitoring_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   gwstats__ipv6_monitoring_stats__free_unpacked
-                     (Gwstats__IPv6MonitoringStats *message,
+void   ipv6_monitoring_stats__free_unpacked
+                     (IPv6MonitoringStats *message,
                       ProtobufCAllocator *allocator);
-/* Gwstats__TcpStats methods */
-void   gwstats__tcp_stats__init
-                     (Gwstats__TcpStats         *message);
-size_t gwstats__tcp_stats__get_packed_size
-                     (const Gwstats__TcpStats   *message);
-size_t gwstats__tcp_stats__pack
-                     (const Gwstats__TcpStats   *message,
+/* TcpStats methods */
+void   tcp_stats__init
+                     (TcpStats         *message);
+size_t tcp_stats__get_packed_size
+                     (const TcpStats   *message);
+size_t tcp_stats__pack
+                     (const TcpStats   *message,
                       uint8_t             *out);
-size_t gwstats__tcp_stats__pack_to_buffer
-                     (const Gwstats__TcpStats   *message,
+size_t tcp_stats__pack_to_buffer
+                     (const TcpStats   *message,
                       ProtobufCBuffer     *buffer);
-Gwstats__TcpStats *
-       gwstats__tcp_stats__unpack
+TcpStats *
+       tcp_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   gwstats__tcp_stats__free_unpacked
-                     (Gwstats__TcpStats *message,
+void   tcp_stats__free_unpacked
+                     (TcpStats *message,
                       ProtobufCAllocator *allocator);
-/* Gwstats__RestartCountStats methods */
-void   gwstats__restart_count_stats__init
-                     (Gwstats__RestartCountStats         *message);
-size_t gwstats__restart_count_stats__get_packed_size
-                     (const Gwstats__RestartCountStats   *message);
-size_t gwstats__restart_count_stats__pack
-                     (const Gwstats__RestartCountStats   *message,
+/* RestartCountStats methods */
+void   restart_count_stats__init
+                     (RestartCountStats         *message);
+size_t restart_count_stats__get_packed_size
+                     (const RestartCountStats   *message);
+size_t restart_count_stats__pack
+                     (const RestartCountStats   *message,
                       uint8_t             *out);
-size_t gwstats__restart_count_stats__pack_to_buffer
-                     (const Gwstats__RestartCountStats   *message,
+size_t restart_count_stats__pack_to_buffer
+                     (const RestartCountStats   *message,
                       ProtobufCBuffer     *buffer);
-Gwstats__RestartCountStats *
-       gwstats__restart_count_stats__unpack
+RestartCountStats *
+       restart_count_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   gwstats__restart_count_stats__free_unpacked
-                     (Gwstats__RestartCountStats *message,
+void   restart_count_stats__free_unpacked
+                     (RestartCountStats *message,
                       ProtobufCAllocator *allocator);
-/* Gwstats__ClientDetails methods */
-void   gwstats__client_details__init
-                     (Gwstats__ClientDetails         *message);
-size_t gwstats__client_details__get_packed_size
-                     (const Gwstats__ClientDetails   *message);
-size_t gwstats__client_details__pack
-                     (const Gwstats__ClientDetails   *message,
+/* ClientDetails methods */
+void   client_details__init
+                     (ClientDetails         *message);
+size_t client_details__get_packed_size
+                     (const ClientDetails   *message);
+size_t client_details__pack
+                     (const ClientDetails   *message,
                       uint8_t             *out);
-size_t gwstats__client_details__pack_to_buffer
-                     (const Gwstats__ClientDetails   *message,
+size_t client_details__pack_to_buffer
+                     (const ClientDetails   *message,
                       ProtobufCBuffer     *buffer);
-Gwstats__ClientDetails *
-       gwstats__client_details__unpack
+ClientDetails *
+       client_details__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   gwstats__client_details__free_unpacked
-                     (Gwstats__ClientDetails *message,
+void   client_details__free_unpacked
+                     (ClientDetails *message,
                       ProtobufCAllocator *allocator);
-/* Gwstats__ClientStats methods */
-void   gwstats__client_stats__init
-                     (Gwstats__ClientStats         *message);
-size_t gwstats__client_stats__get_packed_size
-                     (const Gwstats__ClientStats   *message);
-size_t gwstats__client_stats__pack
-                     (const Gwstats__ClientStats   *message,
+/* ClientStats methods */
+void   client_stats__init
+                     (ClientStats         *message);
+size_t client_stats__get_packed_size
+                     (const ClientStats   *message);
+size_t client_stats__pack
+                     (const ClientStats   *message,
                       uint8_t             *out);
-size_t gwstats__client_stats__pack_to_buffer
-                     (const Gwstats__ClientStats   *message,
+size_t client_stats__pack_to_buffer
+                     (const ClientStats   *message,
                       ProtobufCBuffer     *buffer);
-Gwstats__ClientStats *
-       gwstats__client_stats__unpack
+ClientStats *
+       client_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   gwstats__client_stats__free_unpacked
-                     (Gwstats__ClientStats *message,
+void   client_stats__free_unpacked
+                     (ClientStats *message,
                       ProtobufCAllocator *allocator);
-/* Gwstats__PidDetails methods */
-void   gwstats__pid_details__init
-                     (Gwstats__PidDetails         *message);
-size_t gwstats__pid_details__get_packed_size
-                     (const Gwstats__PidDetails   *message);
-size_t gwstats__pid_details__pack
-                     (const Gwstats__PidDetails   *message,
+/* PidDetails methods */
+void   pid_details__init
+                     (PidDetails         *message);
+size_t pid_details__get_packed_size
+                     (const PidDetails   *message);
+size_t pid_details__pack
+                     (const PidDetails   *message,
                       uint8_t             *out);
-size_t gwstats__pid_details__pack_to_buffer
-                     (const Gwstats__PidDetails   *message,
+size_t pid_details__pack_to_buffer
+                     (const PidDetails   *message,
                       ProtobufCBuffer     *buffer);
-Gwstats__PidDetails *
-       gwstats__pid_details__unpack
+PidDetails *
+       pid_details__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   gwstats__pid_details__free_unpacked
-                     (Gwstats__PidDetails *message,
+void   pid_details__free_unpacked
+                     (PidDetails *message,
                       ProtobufCAllocator *allocator);
-/* Gwstats__PidStats methods */
-void   gwstats__pid_stats__init
-                     (Gwstats__PidStats         *message);
-size_t gwstats__pid_stats__get_packed_size
-                     (const Gwstats__PidStats   *message);
-size_t gwstats__pid_stats__pack
-                     (const Gwstats__PidStats   *message,
+/* PidStats methods */
+void   pid_stats__init
+                     (PidStats         *message);
+size_t pid_stats__get_packed_size
+                     (const PidStats   *message);
+size_t pid_stats__pack
+                     (const PidStats   *message,
                       uint8_t             *out);
-size_t gwstats__pid_stats__pack_to_buffer
-                     (const Gwstats__PidStats   *message,
+size_t pid_stats__pack_to_buffer
+                     (const PidStats   *message,
                       ProtobufCBuffer     *buffer);
-Gwstats__PidStats *
-       gwstats__pid_stats__unpack
+PidStats *
+       pid_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   gwstats__pid_stats__free_unpacked
-                     (Gwstats__PidStats *message,
+void   pid_stats__free_unpacked
+                     (PidStats *message,
                       ProtobufCAllocator *allocator);
-/* Gwstats__Report methods */
-void   gwstats__report__init
-                     (Gwstats__Report         *message);
-size_t gwstats__report__get_packed_size
-                     (const Gwstats__Report   *message);
-size_t gwstats__report__pack
-                     (const Gwstats__Report   *message,
+/* Report methods */
+void   report__init
+                     (Report         *message);
+size_t report__get_packed_size
+                     (const Report   *message);
+size_t report__pack
+                     (const Report   *message,
                       uint8_t             *out);
-size_t gwstats__report__pack_to_buffer
-                     (const Gwstats__Report   *message,
+size_t report__pack_to_buffer
+                     (const Report   *message,
                       ProtobufCBuffer     *buffer);
-Gwstats__Report *
-       gwstats__report__unpack
+Report *
+       report__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   gwstats__report__free_unpacked
-                     (Gwstats__Report *message,
+void   report__free_unpacked
+                     (Report *message,
                       ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
-typedef void (*Gwstats__SystemStats_Closure)
-                 (const Gwstats__SystemStats *message,
+typedef void (*SystemStats_Closure)
+                 (const SystemStats *message,
                   void *closure_data);
-typedef void (*Gwstats__WanStats_Closure)
-                 (const Gwstats__WanStats *message,
+typedef void (*WanStats_Closure)
+                 (const WanStats *message,
                   void *closure_data);
-typedef void (*Gwstats__LanStats_Closure)
-                 (const Gwstats__LanStats *message,
+typedef void (*LanStats_Closure)
+                 (const LanStats *message,
                   void *closure_data);
-typedef void (*Gwstats__IPv6MonitoringStats_Closure)
-                 (const Gwstats__IPv6MonitoringStats *message,
+typedef void (*IPv6MonitoringStats_Closure)
+                 (const IPv6MonitoringStats *message,
                   void *closure_data);
-typedef void (*Gwstats__TcpStats_Closure)
-                 (const Gwstats__TcpStats *message,
+typedef void (*TcpStats_Closure)
+                 (const TcpStats *message,
                   void *closure_data);
-typedef void (*Gwstats__RestartCountStats_Closure)
-                 (const Gwstats__RestartCountStats *message,
+typedef void (*RestartCountStats_Closure)
+                 (const RestartCountStats *message,
                   void *closure_data);
-typedef void (*Gwstats__ClientDetails_Closure)
-                 (const Gwstats__ClientDetails *message,
+typedef void (*ClientDetails_Closure)
+                 (const ClientDetails *message,
                   void *closure_data);
-typedef void (*Gwstats__ClientStats_Closure)
-                 (const Gwstats__ClientStats *message,
+typedef void (*ClientStats_Closure)
+                 (const ClientStats *message,
                   void *closure_data);
-typedef void (*Gwstats__PidDetails_Closure)
-                 (const Gwstats__PidDetails *message,
+typedef void (*PidDetails_Closure)
+                 (const PidDetails *message,
                   void *closure_data);
-typedef void (*Gwstats__PidStats_Closure)
-                 (const Gwstats__PidStats *message,
+typedef void (*PidStats_Closure)
+                 (const PidStats *message,
                   void *closure_data);
-typedef void (*Gwstats__Report_Closure)
-                 (const Gwstats__Report *message,
+typedef void (*Report_Closure)
+                 (const Report *message,
                   void *closure_data);
 
 /* --- services --- */
@@ -528,17 +528,17 @@ typedef void (*Gwstats__Report_Closure)
 
 /* --- descriptors --- */
 
-extern const ProtobufCMessageDescriptor gwstats__system_stats__descriptor;
-extern const ProtobufCMessageDescriptor gwstats__wan_stats__descriptor;
-extern const ProtobufCMessageDescriptor gwstats__lan_stats__descriptor;
-extern const ProtobufCMessageDescriptor gwstats__ipv6_monitoring_stats__descriptor;
-extern const ProtobufCMessageDescriptor gwstats__tcp_stats__descriptor;
-extern const ProtobufCMessageDescriptor gwstats__restart_count_stats__descriptor;
-extern const ProtobufCMessageDescriptor gwstats__client_details__descriptor;
-extern const ProtobufCMessageDescriptor gwstats__client_stats__descriptor;
-extern const ProtobufCMessageDescriptor gwstats__pid_details__descriptor;
-extern const ProtobufCMessageDescriptor gwstats__pid_stats__descriptor;
-extern const ProtobufCMessageDescriptor gwstats__report__descriptor;
+extern const ProtobufCMessageDescriptor system_stats__descriptor;
+extern const ProtobufCMessageDescriptor wan_stats__descriptor;
+extern const ProtobufCMessageDescriptor lan_stats__descriptor;
+extern const ProtobufCMessageDescriptor ipv6_monitoring_stats__descriptor;
+extern const ProtobufCMessageDescriptor tcp_stats__descriptor;
+extern const ProtobufCMessageDescriptor restart_count_stats__descriptor;
+extern const ProtobufCMessageDescriptor client_details__descriptor;
+extern const ProtobufCMessageDescriptor client_stats__descriptor;
+extern const ProtobufCMessageDescriptor pid_details__descriptor;
+extern const ProtobufCMessageDescriptor pid_stats__descriptor;
+extern const ProtobufCMessageDescriptor report__descriptor;
 
 PROTOBUF_C__END_DECLS
 

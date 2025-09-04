@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package gwstats;
-
 // ===== System Stats =====
 message SystemStats {
   uint64 timestamp_ms = 1;

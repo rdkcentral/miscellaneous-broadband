@@ -7,502 +7,502 @@
 #endif
 
 #include "gateway_stats.pb-c.h"
-void   gwstats__system_stats__init
-                     (Gwstats__SystemStats         *message)
+void   system_stats__init
+                     (SystemStats         *message)
 {
-  static const Gwstats__SystemStats init_value = GWSTATS__SYSTEM_STATS__INIT;
+  static const SystemStats init_value = SYSTEM_STATS__INIT;
   *message = init_value;
 }
-size_t gwstats__system_stats__get_packed_size
-                     (const Gwstats__SystemStats *message)
+size_t system_stats__get_packed_size
+                     (const SystemStats *message)
 {
-  assert(message->base.descriptor == &gwstats__system_stats__descriptor);
+  assert(message->base.descriptor == &system_stats__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t gwstats__system_stats__pack
-                     (const Gwstats__SystemStats *message,
+size_t system_stats__pack
+                     (const SystemStats *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &gwstats__system_stats__descriptor);
+  assert(message->base.descriptor == &system_stats__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t gwstats__system_stats__pack_to_buffer
-                     (const Gwstats__SystemStats *message,
+size_t system_stats__pack_to_buffer
+                     (const SystemStats *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &gwstats__system_stats__descriptor);
+  assert(message->base.descriptor == &system_stats__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Gwstats__SystemStats *
-       gwstats__system_stats__unpack
+SystemStats *
+       system_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Gwstats__SystemStats *)
-     protobuf_c_message_unpack (&gwstats__system_stats__descriptor,
+  return (SystemStats *)
+     protobuf_c_message_unpack (&system_stats__descriptor,
                                 allocator, len, data);
 }
-void   gwstats__system_stats__free_unpacked
-                     (Gwstats__SystemStats *message,
+void   system_stats__free_unpacked
+                     (SystemStats *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &gwstats__system_stats__descriptor);
+  assert(message->base.descriptor == &system_stats__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   gwstats__wan_stats__init
-                     (Gwstats__WanStats         *message)
+void   wan_stats__init
+                     (WanStats         *message)
 {
-  static const Gwstats__WanStats init_value = GWSTATS__WAN_STATS__INIT;
+  static const WanStats init_value = WAN_STATS__INIT;
   *message = init_value;
 }
-size_t gwstats__wan_stats__get_packed_size
-                     (const Gwstats__WanStats *message)
+size_t wan_stats__get_packed_size
+                     (const WanStats *message)
 {
-  assert(message->base.descriptor == &gwstats__wan_stats__descriptor);
+  assert(message->base.descriptor == &wan_stats__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t gwstats__wan_stats__pack
-                     (const Gwstats__WanStats *message,
+size_t wan_stats__pack
+                     (const WanStats *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &gwstats__wan_stats__descriptor);
+  assert(message->base.descriptor == &wan_stats__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t gwstats__wan_stats__pack_to_buffer
-                     (const Gwstats__WanStats *message,
+size_t wan_stats__pack_to_buffer
+                     (const WanStats *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &gwstats__wan_stats__descriptor);
+  assert(message->base.descriptor == &wan_stats__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Gwstats__WanStats *
-       gwstats__wan_stats__unpack
+WanStats *
+       wan_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Gwstats__WanStats *)
-     protobuf_c_message_unpack (&gwstats__wan_stats__descriptor,
+  return (WanStats *)
+     protobuf_c_message_unpack (&wan_stats__descriptor,
                                 allocator, len, data);
 }
-void   gwstats__wan_stats__free_unpacked
-                     (Gwstats__WanStats *message,
+void   wan_stats__free_unpacked
+                     (WanStats *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &gwstats__wan_stats__descriptor);
+  assert(message->base.descriptor == &wan_stats__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   gwstats__lan_stats__init
-                     (Gwstats__LanStats         *message)
+void   lan_stats__init
+                     (LanStats         *message)
 {
-  static const Gwstats__LanStats init_value = GWSTATS__LAN_STATS__INIT;
+  static const LanStats init_value = LAN_STATS__INIT;
   *message = init_value;
 }
-size_t gwstats__lan_stats__get_packed_size
-                     (const Gwstats__LanStats *message)
+size_t lan_stats__get_packed_size
+                     (const LanStats *message)
 {
-  assert(message->base.descriptor == &gwstats__lan_stats__descriptor);
+  assert(message->base.descriptor == &lan_stats__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t gwstats__lan_stats__pack
-                     (const Gwstats__LanStats *message,
+size_t lan_stats__pack
+                     (const LanStats *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &gwstats__lan_stats__descriptor);
+  assert(message->base.descriptor == &lan_stats__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t gwstats__lan_stats__pack_to_buffer
-                     (const Gwstats__LanStats *message,
+size_t lan_stats__pack_to_buffer
+                     (const LanStats *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &gwstats__lan_stats__descriptor);
+  assert(message->base.descriptor == &lan_stats__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Gwstats__LanStats *
-       gwstats__lan_stats__unpack
+LanStats *
+       lan_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Gwstats__LanStats *)
-     protobuf_c_message_unpack (&gwstats__lan_stats__descriptor,
+  return (LanStats *)
+     protobuf_c_message_unpack (&lan_stats__descriptor,
                                 allocator, len, data);
 }
-void   gwstats__lan_stats__free_unpacked
-                     (Gwstats__LanStats *message,
+void   lan_stats__free_unpacked
+                     (LanStats *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &gwstats__lan_stats__descriptor);
+  assert(message->base.descriptor == &lan_stats__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   gwstats__ipv6_monitoring_stats__init
-                     (Gwstats__IPv6MonitoringStats         *message)
+void   ipv6_monitoring_stats__init
+                     (IPv6MonitoringStats         *message)
 {
-  static const Gwstats__IPv6MonitoringStats init_value = GWSTATS__IPV6_MONITORING_STATS__INIT;
+  static const IPv6MonitoringStats init_value = IPV6_MONITORING_STATS__INIT;
   *message = init_value;
 }
-size_t gwstats__ipv6_monitoring_stats__get_packed_size
-                     (const Gwstats__IPv6MonitoringStats *message)
+size_t ipv6_monitoring_stats__get_packed_size
+                     (const IPv6MonitoringStats *message)
 {
-  assert(message->base.descriptor == &gwstats__ipv6_monitoring_stats__descriptor);
+  assert(message->base.descriptor == &ipv6_monitoring_stats__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t gwstats__ipv6_monitoring_stats__pack
-                     (const Gwstats__IPv6MonitoringStats *message,
+size_t ipv6_monitoring_stats__pack
+                     (const IPv6MonitoringStats *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &gwstats__ipv6_monitoring_stats__descriptor);
+  assert(message->base.descriptor == &ipv6_monitoring_stats__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t gwstats__ipv6_monitoring_stats__pack_to_buffer
-                     (const Gwstats__IPv6MonitoringStats *message,
+size_t ipv6_monitoring_stats__pack_to_buffer
+                     (const IPv6MonitoringStats *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &gwstats__ipv6_monitoring_stats__descriptor);
+  assert(message->base.descriptor == &ipv6_monitoring_stats__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Gwstats__IPv6MonitoringStats *
-       gwstats__ipv6_monitoring_stats__unpack
+IPv6MonitoringStats *
+       ipv6_monitoring_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Gwstats__IPv6MonitoringStats *)
-     protobuf_c_message_unpack (&gwstats__ipv6_monitoring_stats__descriptor,
+  return (IPv6MonitoringStats *)
+     protobuf_c_message_unpack (&ipv6_monitoring_stats__descriptor,
                                 allocator, len, data);
 }
-void   gwstats__ipv6_monitoring_stats__free_unpacked
-                     (Gwstats__IPv6MonitoringStats *message,
+void   ipv6_monitoring_stats__free_unpacked
+                     (IPv6MonitoringStats *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &gwstats__ipv6_monitoring_stats__descriptor);
+  assert(message->base.descriptor == &ipv6_monitoring_stats__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   gwstats__tcp_stats__init
-                     (Gwstats__TcpStats         *message)
+void   tcp_stats__init
+                     (TcpStats         *message)
 {
-  static const Gwstats__TcpStats init_value = GWSTATS__TCP_STATS__INIT;
+  static const TcpStats init_value = TCP_STATS__INIT;
   *message = init_value;
 }
-size_t gwstats__tcp_stats__get_packed_size
-                     (const Gwstats__TcpStats *message)
+size_t tcp_stats__get_packed_size
+                     (const TcpStats *message)
 {
-  assert(message->base.descriptor == &gwstats__tcp_stats__descriptor);
+  assert(message->base.descriptor == &tcp_stats__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t gwstats__tcp_stats__pack
-                     (const Gwstats__TcpStats *message,
+size_t tcp_stats__pack
+                     (const TcpStats *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &gwstats__tcp_stats__descriptor);
+  assert(message->base.descriptor == &tcp_stats__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t gwstats__tcp_stats__pack_to_buffer
-                     (const Gwstats__TcpStats *message,
+size_t tcp_stats__pack_to_buffer
+                     (const TcpStats *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &gwstats__tcp_stats__descriptor);
+  assert(message->base.descriptor == &tcp_stats__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Gwstats__TcpStats *
-       gwstats__tcp_stats__unpack
+TcpStats *
+       tcp_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Gwstats__TcpStats *)
-     protobuf_c_message_unpack (&gwstats__tcp_stats__descriptor,
+  return (TcpStats *)
+     protobuf_c_message_unpack (&tcp_stats__descriptor,
                                 allocator, len, data);
 }
-void   gwstats__tcp_stats__free_unpacked
-                     (Gwstats__TcpStats *message,
+void   tcp_stats__free_unpacked
+                     (TcpStats *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &gwstats__tcp_stats__descriptor);
+  assert(message->base.descriptor == &tcp_stats__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   gwstats__restart_count_stats__init
-                     (Gwstats__RestartCountStats         *message)
+void   restart_count_stats__init
+                     (RestartCountStats         *message)
 {
-  static const Gwstats__RestartCountStats init_value = GWSTATS__RESTART_COUNT_STATS__INIT;
+  static const RestartCountStats init_value = RESTART_COUNT_STATS__INIT;
   *message = init_value;
 }
-size_t gwstats__restart_count_stats__get_packed_size
-                     (const Gwstats__RestartCountStats *message)
+size_t restart_count_stats__get_packed_size
+                     (const RestartCountStats *message)
 {
-  assert(message->base.descriptor == &gwstats__restart_count_stats__descriptor);
+  assert(message->base.descriptor == &restart_count_stats__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t gwstats__restart_count_stats__pack
-                     (const Gwstats__RestartCountStats *message,
+size_t restart_count_stats__pack
+                     (const RestartCountStats *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &gwstats__restart_count_stats__descriptor);
+  assert(message->base.descriptor == &restart_count_stats__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t gwstats__restart_count_stats__pack_to_buffer
-                     (const Gwstats__RestartCountStats *message,
+size_t restart_count_stats__pack_to_buffer
+                     (const RestartCountStats *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &gwstats__restart_count_stats__descriptor);
+  assert(message->base.descriptor == &restart_count_stats__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Gwstats__RestartCountStats *
-       gwstats__restart_count_stats__unpack
+RestartCountStats *
+       restart_count_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Gwstats__RestartCountStats *)
-     protobuf_c_message_unpack (&gwstats__restart_count_stats__descriptor,
+  return (RestartCountStats *)
+     protobuf_c_message_unpack (&restart_count_stats__descriptor,
                                 allocator, len, data);
 }
-void   gwstats__restart_count_stats__free_unpacked
-                     (Gwstats__RestartCountStats *message,
+void   restart_count_stats__free_unpacked
+                     (RestartCountStats *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &gwstats__restart_count_stats__descriptor);
+  assert(message->base.descriptor == &restart_count_stats__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   gwstats__client_details__init
-                     (Gwstats__ClientDetails         *message)
+void   client_details__init
+                     (ClientDetails         *message)
 {
-  static const Gwstats__ClientDetails init_value = GWSTATS__CLIENT_DETAILS__INIT;
+  static const ClientDetails init_value = CLIENT_DETAILS__INIT;
   *message = init_value;
 }
-size_t gwstats__client_details__get_packed_size
-                     (const Gwstats__ClientDetails *message)
+size_t client_details__get_packed_size
+                     (const ClientDetails *message)
 {
-  assert(message->base.descriptor == &gwstats__client_details__descriptor);
+  assert(message->base.descriptor == &client_details__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t gwstats__client_details__pack
-                     (const Gwstats__ClientDetails *message,
+size_t client_details__pack
+                     (const ClientDetails *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &gwstats__client_details__descriptor);
+  assert(message->base.descriptor == &client_details__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t gwstats__client_details__pack_to_buffer
-                     (const Gwstats__ClientDetails *message,
+size_t client_details__pack_to_buffer
+                     (const ClientDetails *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &gwstats__client_details__descriptor);
+  assert(message->base.descriptor == &client_details__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Gwstats__ClientDetails *
-       gwstats__client_details__unpack
+ClientDetails *
+       client_details__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Gwstats__ClientDetails *)
-     protobuf_c_message_unpack (&gwstats__client_details__descriptor,
+  return (ClientDetails *)
+     protobuf_c_message_unpack (&client_details__descriptor,
                                 allocator, len, data);
 }
-void   gwstats__client_details__free_unpacked
-                     (Gwstats__ClientDetails *message,
+void   client_details__free_unpacked
+                     (ClientDetails *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &gwstats__client_details__descriptor);
+  assert(message->base.descriptor == &client_details__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   gwstats__client_stats__init
-                     (Gwstats__ClientStats         *message)
+void   client_stats__init
+                     (ClientStats         *message)
 {
-  static const Gwstats__ClientStats init_value = GWSTATS__CLIENT_STATS__INIT;
+  static const ClientStats init_value = CLIENT_STATS__INIT;
   *message = init_value;
 }
-size_t gwstats__client_stats__get_packed_size
-                     (const Gwstats__ClientStats *message)
+size_t client_stats__get_packed_size
+                     (const ClientStats *message)
 {
-  assert(message->base.descriptor == &gwstats__client_stats__descriptor);
+  assert(message->base.descriptor == &client_stats__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t gwstats__client_stats__pack
-                     (const Gwstats__ClientStats *message,
+size_t client_stats__pack
+                     (const ClientStats *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &gwstats__client_stats__descriptor);
+  assert(message->base.descriptor == &client_stats__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t gwstats__client_stats__pack_to_buffer
-                     (const Gwstats__ClientStats *message,
+size_t client_stats__pack_to_buffer
+                     (const ClientStats *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &gwstats__client_stats__descriptor);
+  assert(message->base.descriptor == &client_stats__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Gwstats__ClientStats *
-       gwstats__client_stats__unpack
+ClientStats *
+       client_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Gwstats__ClientStats *)
-     protobuf_c_message_unpack (&gwstats__client_stats__descriptor,
+  return (ClientStats *)
+     protobuf_c_message_unpack (&client_stats__descriptor,
                                 allocator, len, data);
 }
-void   gwstats__client_stats__free_unpacked
-                     (Gwstats__ClientStats *message,
+void   client_stats__free_unpacked
+                     (ClientStats *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &gwstats__client_stats__descriptor);
+  assert(message->base.descriptor == &client_stats__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   gwstats__pid_details__init
-                     (Gwstats__PidDetails         *message)
+void   pid_details__init
+                     (PidDetails         *message)
 {
-  static const Gwstats__PidDetails init_value = GWSTATS__PID_DETAILS__INIT;
+  static const PidDetails init_value = PID_DETAILS__INIT;
   *message = init_value;
 }
-size_t gwstats__pid_details__get_packed_size
-                     (const Gwstats__PidDetails *message)
+size_t pid_details__get_packed_size
+                     (const PidDetails *message)
 {
-  assert(message->base.descriptor == &gwstats__pid_details__descriptor);
+  assert(message->base.descriptor == &pid_details__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t gwstats__pid_details__pack
-                     (const Gwstats__PidDetails *message,
+size_t pid_details__pack
+                     (const PidDetails *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &gwstats__pid_details__descriptor);
+  assert(message->base.descriptor == &pid_details__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t gwstats__pid_details__pack_to_buffer
-                     (const Gwstats__PidDetails *message,
+size_t pid_details__pack_to_buffer
+                     (const PidDetails *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &gwstats__pid_details__descriptor);
+  assert(message->base.descriptor == &pid_details__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Gwstats__PidDetails *
-       gwstats__pid_details__unpack
+PidDetails *
+       pid_details__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Gwstats__PidDetails *)
-     protobuf_c_message_unpack (&gwstats__pid_details__descriptor,
+  return (PidDetails *)
+     protobuf_c_message_unpack (&pid_details__descriptor,
                                 allocator, len, data);
 }
-void   gwstats__pid_details__free_unpacked
-                     (Gwstats__PidDetails *message,
+void   pid_details__free_unpacked
+                     (PidDetails *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &gwstats__pid_details__descriptor);
+  assert(message->base.descriptor == &pid_details__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   gwstats__pid_stats__init
-                     (Gwstats__PidStats         *message)
+void   pid_stats__init
+                     (PidStats         *message)
 {
-  static const Gwstats__PidStats init_value = GWSTATS__PID_STATS__INIT;
+  static const PidStats init_value = PID_STATS__INIT;
   *message = init_value;
 }
-size_t gwstats__pid_stats__get_packed_size
-                     (const Gwstats__PidStats *message)
+size_t pid_stats__get_packed_size
+                     (const PidStats *message)
 {
-  assert(message->base.descriptor == &gwstats__pid_stats__descriptor);
+  assert(message->base.descriptor == &pid_stats__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t gwstats__pid_stats__pack
-                     (const Gwstats__PidStats *message,
+size_t pid_stats__pack
+                     (const PidStats *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &gwstats__pid_stats__descriptor);
+  assert(message->base.descriptor == &pid_stats__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t gwstats__pid_stats__pack_to_buffer
-                     (const Gwstats__PidStats *message,
+size_t pid_stats__pack_to_buffer
+                     (const PidStats *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &gwstats__pid_stats__descriptor);
+  assert(message->base.descriptor == &pid_stats__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Gwstats__PidStats *
-       gwstats__pid_stats__unpack
+PidStats *
+       pid_stats__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Gwstats__PidStats *)
-     protobuf_c_message_unpack (&gwstats__pid_stats__descriptor,
+  return (PidStats *)
+     protobuf_c_message_unpack (&pid_stats__descriptor,
                                 allocator, len, data);
 }
-void   gwstats__pid_stats__free_unpacked
-                     (Gwstats__PidStats *message,
+void   pid_stats__free_unpacked
+                     (PidStats *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &gwstats__pid_stats__descriptor);
+  assert(message->base.descriptor == &pid_stats__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   gwstats__report__init
-                     (Gwstats__Report         *message)
+void   report__init
+                     (Report         *message)
 {
-  static const Gwstats__Report init_value = GWSTATS__REPORT__INIT;
+  static const Report init_value = REPORT__INIT;
   *message = init_value;
 }
-size_t gwstats__report__get_packed_size
-                     (const Gwstats__Report *message)
+size_t report__get_packed_size
+                     (const Report *message)
 {
-  assert(message->base.descriptor == &gwstats__report__descriptor);
+  assert(message->base.descriptor == &report__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t gwstats__report__pack
-                     (const Gwstats__Report *message,
+size_t report__pack
+                     (const Report *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &gwstats__report__descriptor);
+  assert(message->base.descriptor == &report__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t gwstats__report__pack_to_buffer
-                     (const Gwstats__Report *message,
+size_t report__pack_to_buffer
+                     (const Report *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &gwstats__report__descriptor);
+  assert(message->base.descriptor == &report__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Gwstats__Report *
-       gwstats__report__unpack
+Report *
+       report__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Gwstats__Report *)
-     protobuf_c_message_unpack (&gwstats__report__descriptor,
+  return (Report *)
+     protobuf_c_message_unpack (&report__descriptor,
                                 allocator, len, data);
 }
-void   gwstats__report__free_unpacked
-                     (Gwstats__Report *message,
+void   report__free_unpacked
+                     (Report *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &gwstats__report__descriptor);
+  assert(message->base.descriptor == &report__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[18] =
+static const ProtobufCFieldDescriptor system_stats__field_descriptors[18] =
 {
   {
     "timestamp_ms",
@@ -510,7 +510,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT64,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, timestamp_ms),
+    offsetof(SystemStats, timestamp_ms),
     NULL,
     NULL,
     0,             /* flags */
@@ -522,7 +522,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, model),
+    offsetof(SystemStats, model),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -534,7 +534,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, firmware),
+    offsetof(SystemStats, firmware),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -546,7 +546,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, cmac),
+    offsetof(SystemStats, cmac),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -558,7 +558,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, uptime),
+    offsetof(SystemStats, uptime),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -570,7 +570,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, cpu_usage),
+    offsetof(SystemStats, cpu_usage),
     NULL,
     NULL,
     0,             /* flags */
@@ -582,7 +582,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, free_memory),
+    offsetof(SystemStats, free_memory),
     NULL,
     NULL,
     0,             /* flags */
@@ -594,7 +594,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, slab_memory),
+    offsetof(SystemStats, slab_memory),
     NULL,
     NULL,
     0,             /* flags */
@@ -606,7 +606,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, avail_memory),
+    offsetof(SystemStats, avail_memory),
     NULL,
     NULL,
     0,             /* flags */
@@ -618,7 +618,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, cached_mem),
+    offsetof(SystemStats, cached_mem),
     NULL,
     NULL,
     0,             /* flags */
@@ -630,7 +630,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, slab_unreclaim),
+    offsetof(SystemStats, slab_unreclaim),
     NULL,
     NULL,
     0,             /* flags */
@@ -642,7 +642,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, loadavg_1min),
+    offsetof(SystemStats, loadavg_1min),
     NULL,
     NULL,
     0,             /* flags */
@@ -654,7 +654,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, loadavg_5min),
+    offsetof(SystemStats, loadavg_5min),
     NULL,
     NULL,
     0,             /* flags */
@@ -666,7 +666,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, loadavg_15min),
+    offsetof(SystemStats, loadavg_15min),
     NULL,
     NULL,
     0,             /* flags */
@@ -678,7 +678,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, rootfs_used_kb),
+    offsetof(SystemStats, rootfs_used_kb),
     NULL,
     NULL,
     0,             /* flags */
@@ -690,7 +690,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, rootfs_total_kb),
+    offsetof(SystemStats, rootfs_total_kb),
     NULL,
     NULL,
     0,             /* flags */
@@ -702,7 +702,7 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, tmpfs_used_kb),
+    offsetof(SystemStats, tmpfs_used_kb),
     NULL,
     NULL,
     0,             /* flags */
@@ -714,14 +714,14 @@ static const ProtobufCFieldDescriptor gwstats__system_stats__field_descriptors[1
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__SystemStats, tmpfs_total_kb),
+    offsetof(SystemStats, tmpfs_total_kb),
     NULL,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned gwstats__system_stats__field_indices_by_name[] = {
+static const unsigned system_stats__field_indices_by_name[] = {
   8,   /* field[8] = avail_memory */
   9,   /* field[9] = cached_mem */
   3,   /* field[3] = cmac */
@@ -741,27 +741,27 @@ static const unsigned gwstats__system_stats__field_indices_by_name[] = {
   16,   /* field[16] = tmpfs_used_kb */
   4,   /* field[4] = uptime */
 };
-static const ProtobufCIntRange gwstats__system_stats__number_ranges[1 + 1] =
+static const ProtobufCIntRange system_stats__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 18 }
 };
-const ProtobufCMessageDescriptor gwstats__system_stats__descriptor =
+const ProtobufCMessageDescriptor system_stats__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "gwstats.SystemStats",
   "SystemStats",
-  "Gwstats__SystemStats",
-  "gwstats",
-  sizeof(Gwstats__SystemStats),
+  "SystemStats",
+  "SystemStats",
+  "",
+  sizeof(SystemStats),
   18,
-  gwstats__system_stats__field_descriptors,
-  gwstats__system_stats__field_indices_by_name,
-  1,  gwstats__system_stats__number_ranges,
-  (ProtobufCMessageInit) gwstats__system_stats__init,
+  system_stats__field_descriptors,
+  system_stats__field_indices_by_name,
+  1,  system_stats__number_ranges,
+  (ProtobufCMessageInit) system_stats__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] =
+static const ProtobufCFieldDescriptor wan_stats__field_descriptors[15] =
 {
   {
     "timestamp_ms",
@@ -769,7 +769,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT64,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, timestamp_ms),
+    offsetof(WanStats, timestamp_ms),
     NULL,
     NULL,
     0,             /* flags */
@@ -781,7 +781,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, interface_status),
+    offsetof(WanStats, interface_status),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -793,7 +793,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, ipv4_address),
+    offsetof(WanStats, ipv4_address),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -805,7 +805,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, ipv6_address),
+    offsetof(WanStats, ipv6_address),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -817,7 +817,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, gateway_status),
+    offsetof(WanStats, gateway_status),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -829,7 +829,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, packet_loss),
+    offsetof(WanStats, packet_loss),
     NULL,
     NULL,
     0,             /* flags */
@@ -841,7 +841,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, latency),
+    offsetof(WanStats, latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -853,7 +853,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, jitter),
+    offsetof(WanStats, jitter),
     NULL,
     NULL,
     0,             /* flags */
@@ -865,7 +865,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, dns_time),
+    offsetof(WanStats, dns_time),
     NULL,
     NULL,
     0,             /* flags */
@@ -877,7 +877,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, rx_bytes),
+    offsetof(WanStats, rx_bytes),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -889,7 +889,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, tx_bytes),
+    offsetof(WanStats, tx_bytes),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -901,7 +901,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, rx_dropped),
+    offsetof(WanStats, rx_dropped),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -913,7 +913,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, tx_dropped),
+    offsetof(WanStats, tx_dropped),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -925,7 +925,7 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, ipv4_lease),
+    offsetof(WanStats, ipv4_lease),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -937,14 +937,14 @@ static const ProtobufCFieldDescriptor gwstats__wan_stats__field_descriptors[15] 
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__WanStats, ipv6_lease),
+    offsetof(WanStats, ipv6_lease),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned gwstats__wan_stats__field_indices_by_name[] = {
+static const unsigned wan_stats__field_indices_by_name[] = {
   8,   /* field[8] = dns_time */
   4,   /* field[4] = gateway_status */
   1,   /* field[1] = interface_status */
@@ -961,27 +961,27 @@ static const unsigned gwstats__wan_stats__field_indices_by_name[] = {
   10,   /* field[10] = tx_bytes */
   12,   /* field[12] = tx_dropped */
 };
-static const ProtobufCIntRange gwstats__wan_stats__number_ranges[1 + 1] =
+static const ProtobufCIntRange wan_stats__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 15 }
 };
-const ProtobufCMessageDescriptor gwstats__wan_stats__descriptor =
+const ProtobufCMessageDescriptor wan_stats__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "gwstats.WanStats",
   "WanStats",
-  "Gwstats__WanStats",
-  "gwstats",
-  sizeof(Gwstats__WanStats),
+  "WanStats",
+  "WanStats",
+  "",
+  sizeof(WanStats),
   15,
-  gwstats__wan_stats__field_descriptors,
-  gwstats__wan_stats__field_indices_by_name,
-  1,  gwstats__wan_stats__number_ranges,
-  (ProtobufCMessageInit) gwstats__wan_stats__init,
+  wan_stats__field_descriptors,
+  wan_stats__field_indices_by_name,
+  1,  wan_stats__number_ranges,
+  (ProtobufCMessageInit) wan_stats__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor gwstats__lan_stats__field_descriptors[7] =
+static const ProtobufCFieldDescriptor lan_stats__field_descriptors[7] =
 {
   {
     "timestamp_ms",
@@ -989,7 +989,7 @@ static const ProtobufCFieldDescriptor gwstats__lan_stats__field_descriptors[7] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT64,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__LanStats, timestamp_ms),
+    offsetof(LanStats, timestamp_ms),
     NULL,
     NULL,
     0,             /* flags */
@@ -1001,7 +1001,7 @@ static const ProtobufCFieldDescriptor gwstats__lan_stats__field_descriptors[7] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__LanStats, ipv4_address),
+    offsetof(LanStats, ipv4_address),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1013,7 +1013,7 @@ static const ProtobufCFieldDescriptor gwstats__lan_stats__field_descriptors[7] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__LanStats, ipv6_address),
+    offsetof(LanStats, ipv6_address),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1025,7 +1025,7 @@ static const ProtobufCFieldDescriptor gwstats__lan_stats__field_descriptors[7] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__LanStats, rx_bytes),
+    offsetof(LanStats, rx_bytes),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1037,7 +1037,7 @@ static const ProtobufCFieldDescriptor gwstats__lan_stats__field_descriptors[7] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__LanStats, tx_bytes),
+    offsetof(LanStats, tx_bytes),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1049,7 +1049,7 @@ static const ProtobufCFieldDescriptor gwstats__lan_stats__field_descriptors[7] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__LanStats, rx_dropped),
+    offsetof(LanStats, rx_dropped),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1061,14 +1061,14 @@ static const ProtobufCFieldDescriptor gwstats__lan_stats__field_descriptors[7] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__LanStats, tx_dropped),
+    offsetof(LanStats, tx_dropped),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned gwstats__lan_stats__field_indices_by_name[] = {
+static const unsigned lan_stats__field_indices_by_name[] = {
   1,   /* field[1] = ipv4_address */
   2,   /* field[2] = ipv6_address */
   3,   /* field[3] = rx_bytes */
@@ -1077,27 +1077,27 @@ static const unsigned gwstats__lan_stats__field_indices_by_name[] = {
   4,   /* field[4] = tx_bytes */
   6,   /* field[6] = tx_dropped */
 };
-static const ProtobufCIntRange gwstats__lan_stats__number_ranges[1 + 1] =
+static const ProtobufCIntRange lan_stats__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 7 }
 };
-const ProtobufCMessageDescriptor gwstats__lan_stats__descriptor =
+const ProtobufCMessageDescriptor lan_stats__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "gwstats.LanStats",
   "LanStats",
-  "Gwstats__LanStats",
-  "gwstats",
-  sizeof(Gwstats__LanStats),
+  "LanStats",
+  "LanStats",
+  "",
+  sizeof(LanStats),
   7,
-  gwstats__lan_stats__field_descriptors,
-  gwstats__lan_stats__field_indices_by_name,
-  1,  gwstats__lan_stats__number_ranges,
-  (ProtobufCMessageInit) gwstats__lan_stats__init,
+  lan_stats__field_descriptors,
+  lan_stats__field_indices_by_name,
+  1,  lan_stats__number_ranges,
+  (ProtobufCMessageInit) lan_stats__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor gwstats__ipv6_monitoring_stats__field_descriptors[8] =
+static const ProtobufCFieldDescriptor ipv6_monitoring_stats__field_descriptors[8] =
 {
   {
     "timestamp_ms",
@@ -1105,7 +1105,7 @@ static const ProtobufCFieldDescriptor gwstats__ipv6_monitoring_stats__field_desc
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT64,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__IPv6MonitoringStats, timestamp_ms),
+    offsetof(IPv6MonitoringStats, timestamp_ms),
     NULL,
     NULL,
     0,             /* flags */
@@ -1117,7 +1117,7 @@ static const ProtobufCFieldDescriptor gwstats__ipv6_monitoring_stats__field_desc
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__IPv6MonitoringStats, global_ipv6_address),
+    offsetof(IPv6MonitoringStats, global_ipv6_address),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1129,7 +1129,7 @@ static const ProtobufCFieldDescriptor gwstats__ipv6_monitoring_stats__field_desc
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__IPv6MonitoringStats, link_local_ipv6_address),
+    offsetof(IPv6MonitoringStats, link_local_ipv6_address),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1141,7 +1141,7 @@ static const ProtobufCFieldDescriptor gwstats__ipv6_monitoring_stats__field_desc
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__IPv6MonitoringStats, ipv6_reachability),
+    offsetof(IPv6MonitoringStats, ipv6_reachability),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1153,7 +1153,7 @@ static const ProtobufCFieldDescriptor gwstats__ipv6_monitoring_stats__field_desc
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__IPv6MonitoringStats, ipv4_latency),
+    offsetof(IPv6MonitoringStats, ipv4_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1165,7 +1165,7 @@ static const ProtobufCFieldDescriptor gwstats__ipv6_monitoring_stats__field_desc
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__IPv6MonitoringStats, ipv6_latency),
+    offsetof(IPv6MonitoringStats, ipv6_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1177,7 +1177,7 @@ static const ProtobufCFieldDescriptor gwstats__ipv6_monitoring_stats__field_desc
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__IPv6MonitoringStats, ipv4_packet_loss),
+    offsetof(IPv6MonitoringStats, ipv4_packet_loss),
     NULL,
     NULL,
     0,             /* flags */
@@ -1189,14 +1189,14 @@ static const ProtobufCFieldDescriptor gwstats__ipv6_monitoring_stats__field_desc
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__IPv6MonitoringStats, ipv6_packet_loss),
+    offsetof(IPv6MonitoringStats, ipv6_packet_loss),
     NULL,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned gwstats__ipv6_monitoring_stats__field_indices_by_name[] = {
+static const unsigned ipv6_monitoring_stats__field_indices_by_name[] = {
   1,   /* field[1] = global_ipv6_address */
   4,   /* field[4] = ipv4_latency */
   6,   /* field[6] = ipv4_packet_loss */
@@ -1206,27 +1206,27 @@ static const unsigned gwstats__ipv6_monitoring_stats__field_indices_by_name[] = 
   2,   /* field[2] = link_local_ipv6_address */
   0,   /* field[0] = timestamp_ms */
 };
-static const ProtobufCIntRange gwstats__ipv6_monitoring_stats__number_ranges[1 + 1] =
+static const ProtobufCIntRange ipv6_monitoring_stats__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 8 }
 };
-const ProtobufCMessageDescriptor gwstats__ipv6_monitoring_stats__descriptor =
+const ProtobufCMessageDescriptor ipv6_monitoring_stats__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "gwstats.IPv6MonitoringStats",
   "IPv6MonitoringStats",
-  "Gwstats__IPv6MonitoringStats",
-  "gwstats",
-  sizeof(Gwstats__IPv6MonitoringStats),
+  "IPv6MonitoringStats",
+  "IPv6MonitoringStats",
+  "",
+  sizeof(IPv6MonitoringStats),
   8,
-  gwstats__ipv6_monitoring_stats__field_descriptors,
-  gwstats__ipv6_monitoring_stats__field_indices_by_name,
-  1,  gwstats__ipv6_monitoring_stats__number_ranges,
-  (ProtobufCMessageInit) gwstats__ipv6_monitoring_stats__init,
+  ipv6_monitoring_stats__field_descriptors,
+  ipv6_monitoring_stats__field_indices_by_name,
+  1,  ipv6_monitoring_stats__number_ranges,
+  (ProtobufCMessageInit) ipv6_monitoring_stats__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor gwstats__tcp_stats__field_descriptors[8] =
+static const ProtobufCFieldDescriptor tcp_stats__field_descriptors[8] =
 {
   {
     "timestamp_ms",
@@ -1234,7 +1234,7 @@ static const ProtobufCFieldDescriptor gwstats__tcp_stats__field_descriptors[8] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT64,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__TcpStats, timestamp_ms),
+    offsetof(TcpStats, timestamp_ms),
     NULL,
     NULL,
     0,             /* flags */
@@ -1246,7 +1246,7 @@ static const ProtobufCFieldDescriptor gwstats__tcp_stats__field_descriptors[8] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__TcpStats, tcplostretransmit),
+    offsetof(TcpStats, tcplostretransmit),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1258,7 +1258,7 @@ static const ProtobufCFieldDescriptor gwstats__tcp_stats__field_descriptors[8] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__TcpStats, tcpretransfail),
+    offsetof(TcpStats, tcpretransfail),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1270,7 +1270,7 @@ static const ProtobufCFieldDescriptor gwstats__tcp_stats__field_descriptors[8] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__TcpStats, tcpsackfailures),
+    offsetof(TcpStats, tcpsackfailures),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1282,7 +1282,7 @@ static const ProtobufCFieldDescriptor gwstats__tcp_stats__field_descriptors[8] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__TcpStats, tcptimeouts),
+    offsetof(TcpStats, tcptimeouts),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1294,7 +1294,7 @@ static const ProtobufCFieldDescriptor gwstats__tcp_stats__field_descriptors[8] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__TcpStats, tcpabortontimeout),
+    offsetof(TcpStats, tcpabortontimeout),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1306,7 +1306,7 @@ static const ProtobufCFieldDescriptor gwstats__tcp_stats__field_descriptors[8] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__TcpStats, listenoverflows),
+    offsetof(TcpStats, listenoverflows),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1318,14 +1318,14 @@ static const ProtobufCFieldDescriptor gwstats__tcp_stats__field_descriptors[8] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__TcpStats, tcporigdatasent),
+    offsetof(TcpStats, tcporigdatasent),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned gwstats__tcp_stats__field_indices_by_name[] = {
+static const unsigned tcp_stats__field_indices_by_name[] = {
   6,   /* field[6] = ListenOverflows */
   5,   /* field[5] = TCPAbortOnTimeout */
   1,   /* field[1] = TCPLostRetransmit */
@@ -1335,27 +1335,27 @@ static const unsigned gwstats__tcp_stats__field_indices_by_name[] = {
   4,   /* field[4] = TCPTimeouts */
   0,   /* field[0] = timestamp_ms */
 };
-static const ProtobufCIntRange gwstats__tcp_stats__number_ranges[1 + 1] =
+static const ProtobufCIntRange tcp_stats__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 8 }
 };
-const ProtobufCMessageDescriptor gwstats__tcp_stats__descriptor =
+const ProtobufCMessageDescriptor tcp_stats__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "gwstats.TcpStats",
   "TcpStats",
-  "Gwstats__TcpStats",
-  "gwstats",
-  sizeof(Gwstats__TcpStats),
+  "TcpStats",
+  "TcpStats",
+  "",
+  sizeof(TcpStats),
   8,
-  gwstats__tcp_stats__field_descriptors,
-  gwstats__tcp_stats__field_indices_by_name,
-  1,  gwstats__tcp_stats__number_ranges,
-  (ProtobufCMessageInit) gwstats__tcp_stats__init,
+  tcp_stats__field_descriptors,
+  tcp_stats__field_indices_by_name,
+  1,  tcp_stats__number_ranges,
+  (ProtobufCMessageInit) tcp_stats__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor gwstats__restart_count_stats__field_descriptors[4] =
+static const ProtobufCFieldDescriptor restart_count_stats__field_descriptors[4] =
 {
   {
     "fw_restart_count",
@@ -1363,7 +1363,7 @@ static const ProtobufCFieldDescriptor gwstats__restart_count_stats__field_descri
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__RestartCountStats, fw_restart_count),
+    offsetof(RestartCountStats, fw_restart_count),
     NULL,
     NULL,
     0,             /* flags */
@@ -1374,8 +1374,8 @@ static const ProtobufCFieldDescriptor gwstats__restart_count_stats__field_descri
     2,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_STRING,
-    offsetof(Gwstats__RestartCountStats, n_fw_restart_time),
-    offsetof(Gwstats__RestartCountStats, fw_restart_time),
+    offsetof(RestartCountStats, n_fw_restart_time),
+    offsetof(RestartCountStats, fw_restart_time),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1387,7 +1387,7 @@ static const ProtobufCFieldDescriptor gwstats__restart_count_stats__field_descri
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__RestartCountStats, wan_restart_count),
+    offsetof(RestartCountStats, wan_restart_count),
     NULL,
     NULL,
     0,             /* flags */
@@ -1398,41 +1398,41 @@ static const ProtobufCFieldDescriptor gwstats__restart_count_stats__field_descri
     4,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_STRING,
-    offsetof(Gwstats__RestartCountStats, n_wan_restart_time),
-    offsetof(Gwstats__RestartCountStats, wan_restart_time),
+    offsetof(RestartCountStats, n_wan_restart_time),
+    offsetof(RestartCountStats, wan_restart_time),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned gwstats__restart_count_stats__field_indices_by_name[] = {
+static const unsigned restart_count_stats__field_indices_by_name[] = {
   0,   /* field[0] = fw_restart_count */
   1,   /* field[1] = fw_restart_time */
   2,   /* field[2] = wan_restart_count */
   3,   /* field[3] = wan_restart_time */
 };
-static const ProtobufCIntRange gwstats__restart_count_stats__number_ranges[1 + 1] =
+static const ProtobufCIntRange restart_count_stats__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 4 }
 };
-const ProtobufCMessageDescriptor gwstats__restart_count_stats__descriptor =
+const ProtobufCMessageDescriptor restart_count_stats__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "gwstats.RestartCountStats",
   "RestartCountStats",
-  "Gwstats__RestartCountStats",
-  "gwstats",
-  sizeof(Gwstats__RestartCountStats),
+  "RestartCountStats",
+  "RestartCountStats",
+  "",
+  sizeof(RestartCountStats),
   4,
-  gwstats__restart_count_stats__field_descriptors,
-  gwstats__restart_count_stats__field_indices_by_name,
-  1,  gwstats__restart_count_stats__number_ranges,
-  (ProtobufCMessageInit) gwstats__restart_count_stats__init,
+  restart_count_stats__field_descriptors,
+  restart_count_stats__field_indices_by_name,
+  1,  restart_count_stats__number_ranges,
+  (ProtobufCMessageInit) restart_count_stats__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors[19] =
+static const ProtobufCFieldDescriptor client_details__field_descriptors[19] =
 {
   {
     "mac_address",
@@ -1440,7 +1440,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, mac_address),
+    offsetof(ClientDetails, mac_address),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1452,7 +1452,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ip_addr),
+    offsetof(ClientDetails, ip_addr),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1464,7 +1464,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, host_name),
+    offsetof(ClientDetails, host_name),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1476,7 +1476,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, status),
+    offsetof(ClientDetails, status),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1488,7 +1488,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, tx_bytes),
+    offsetof(ClientDetails, tx_bytes),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1500,7 +1500,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, rx_bytes),
+    offsetof(ClientDetails, rx_bytes),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1512,7 +1512,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, tcp_est_counts),
+    offsetof(ClientDetails, tcp_est_counts),
     NULL,
     NULL,
     0,             /* flags */
@@ -1524,7 +1524,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ipv4_synack_min_latency),
+    offsetof(ClientDetails, ipv4_synack_min_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1536,7 +1536,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ipv4_synack_max_latency),
+    offsetof(ClientDetails, ipv4_synack_max_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1548,7 +1548,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ipv4_synack_avg_latency),
+    offsetof(ClientDetails, ipv4_synack_avg_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1560,7 +1560,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ipv4_ack_min_latency),
+    offsetof(ClientDetails, ipv4_ack_min_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1572,7 +1572,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ipv4_ack_max_latency),
+    offsetof(ClientDetails, ipv4_ack_max_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1584,7 +1584,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ipv4_ack_avg_latency),
+    offsetof(ClientDetails, ipv4_ack_avg_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1596,7 +1596,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ipv6_synack_min_latency),
+    offsetof(ClientDetails, ipv6_synack_min_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1608,7 +1608,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ipv6_synack_max_latency),
+    offsetof(ClientDetails, ipv6_synack_max_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1620,7 +1620,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ipv6_synack_avg_latency),
+    offsetof(ClientDetails, ipv6_synack_avg_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1632,7 +1632,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ipv6_ack_min_latency),
+    offsetof(ClientDetails, ipv6_ack_min_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1644,7 +1644,7 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ipv6_ack_max_latency),
+    offsetof(ClientDetails, ipv6_ack_max_latency),
     NULL,
     NULL,
     0,             /* flags */
@@ -1656,14 +1656,14 @@ static const ProtobufCFieldDescriptor gwstats__client_details__field_descriptors
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientDetails, ipv6_ack_avg_latency),
+    offsetof(ClientDetails, ipv6_ack_avg_latency),
     NULL,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned gwstats__client_details__field_indices_by_name[] = {
+static const unsigned client_details__field_indices_by_name[] = {
   2,   /* field[2] = host_name */
   1,   /* field[1] = ip_addr */
   12,   /* field[12] = ipv4_ack_avg_latency */
@@ -1684,27 +1684,27 @@ static const unsigned gwstats__client_details__field_indices_by_name[] = {
   6,   /* field[6] = tcp_est_counts */
   4,   /* field[4] = tx_bytes */
 };
-static const ProtobufCIntRange gwstats__client_details__number_ranges[1 + 1] =
+static const ProtobufCIntRange client_details__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 19 }
 };
-const ProtobufCMessageDescriptor gwstats__client_details__descriptor =
+const ProtobufCMessageDescriptor client_details__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "gwstats.ClientDetails",
   "ClientDetails",
-  "Gwstats__ClientDetails",
-  "gwstats",
-  sizeof(Gwstats__ClientDetails),
+  "ClientDetails",
+  "ClientDetails",
+  "",
+  sizeof(ClientDetails),
   19,
-  gwstats__client_details__field_descriptors,
-  gwstats__client_details__field_indices_by_name,
-  1,  gwstats__client_details__number_ranges,
-  (ProtobufCMessageInit) gwstats__client_details__init,
+  client_details__field_descriptors,
+  client_details__field_indices_by_name,
+  1,  client_details__number_ranges,
+  (ProtobufCMessageInit) client_details__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor gwstats__client_stats__field_descriptors[3] =
+static const ProtobufCFieldDescriptor client_stats__field_descriptors[3] =
 {
   {
     "timestamp_ms",
@@ -1712,7 +1712,7 @@ static const ProtobufCFieldDescriptor gwstats__client_stats__field_descriptors[3
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT64,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientStats, timestamp_ms),
+    offsetof(ClientStats, timestamp_ms),
     NULL,
     NULL,
     0,             /* flags */
@@ -1724,7 +1724,7 @@ static const ProtobufCFieldDescriptor gwstats__client_stats__field_descriptors[3
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__ClientStats, client_count),
+    offsetof(ClientStats, client_count),
     NULL,
     NULL,
     0,             /* flags */
@@ -1735,40 +1735,40 @@ static const ProtobufCFieldDescriptor gwstats__client_stats__field_descriptors[3
     3,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Gwstats__ClientStats, n_client_details),
-    offsetof(Gwstats__ClientStats, client_details),
-    &gwstats__client_details__descriptor,
+    offsetof(ClientStats, n_client_details),
+    offsetof(ClientStats, client_details),
+    &client_details__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned gwstats__client_stats__field_indices_by_name[] = {
+static const unsigned client_stats__field_indices_by_name[] = {
   1,   /* field[1] = client_count */
   2,   /* field[2] = client_details */
   0,   /* field[0] = timestamp_ms */
 };
-static const ProtobufCIntRange gwstats__client_stats__number_ranges[1 + 1] =
+static const ProtobufCIntRange client_stats__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 3 }
 };
-const ProtobufCMessageDescriptor gwstats__client_stats__descriptor =
+const ProtobufCMessageDescriptor client_stats__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "gwstats.ClientStats",
   "ClientStats",
-  "Gwstats__ClientStats",
-  "gwstats",
-  sizeof(Gwstats__ClientStats),
+  "ClientStats",
+  "ClientStats",
+  "",
+  sizeof(ClientStats),
   3,
-  gwstats__client_stats__field_descriptors,
-  gwstats__client_stats__field_indices_by_name,
-  1,  gwstats__client_stats__number_ranges,
-  (ProtobufCMessageInit) gwstats__client_stats__init,
+  client_stats__field_descriptors,
+  client_stats__field_indices_by_name,
+  1,  client_stats__number_ranges,
+  (ProtobufCMessageInit) client_stats__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor gwstats__pid_details__field_descriptors[6] =
+static const ProtobufCFieldDescriptor pid_details__field_descriptors[6] =
 {
   {
     "pid",
@@ -1776,7 +1776,7 @@ static const ProtobufCFieldDescriptor gwstats__pid_details__field_descriptors[6]
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__PidDetails, pid),
+    offsetof(PidDetails, pid),
     NULL,
     NULL,
     0,             /* flags */
@@ -1788,7 +1788,7 @@ static const ProtobufCFieldDescriptor gwstats__pid_details__field_descriptors[6]
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__PidDetails, pname),
+    offsetof(PidDetails, pname),
     NULL,
     &protobuf_c_empty_string,
     0,             /* flags */
@@ -1800,7 +1800,7 @@ static const ProtobufCFieldDescriptor gwstats__pid_details__field_descriptors[6]
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__PidDetails, rss),
+    offsetof(PidDetails, rss),
     NULL,
     NULL,
     0,             /* flags */
@@ -1812,7 +1812,7 @@ static const ProtobufCFieldDescriptor gwstats__pid_details__field_descriptors[6]
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__PidDetails, pss),
+    offsetof(PidDetails, pss),
     NULL,
     NULL,
     0,             /* flags */
@@ -1824,7 +1824,7 @@ static const ProtobufCFieldDescriptor gwstats__pid_details__field_descriptors[6]
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__PidDetails, mem_util),
+    offsetof(PidDetails, mem_util),
     NULL,
     NULL,
     0,             /* flags */
@@ -1836,14 +1836,14 @@ static const ProtobufCFieldDescriptor gwstats__pid_details__field_descriptors[6]
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__PidDetails, cpu_util),
+    offsetof(PidDetails, cpu_util),
     NULL,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned gwstats__pid_details__field_indices_by_name[] = {
+static const unsigned pid_details__field_indices_by_name[] = {
   5,   /* field[5] = cpu_util */
   4,   /* field[4] = mem_util */
   1,   /* field[1] = pName */
@@ -1851,27 +1851,27 @@ static const unsigned gwstats__pid_details__field_indices_by_name[] = {
   3,   /* field[3] = pss */
   2,   /* field[2] = rss */
 };
-static const ProtobufCIntRange gwstats__pid_details__number_ranges[1 + 1] =
+static const ProtobufCIntRange pid_details__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 6 }
 };
-const ProtobufCMessageDescriptor gwstats__pid_details__descriptor =
+const ProtobufCMessageDescriptor pid_details__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "gwstats.PidDetails",
   "PidDetails",
-  "Gwstats__PidDetails",
-  "gwstats",
-  sizeof(Gwstats__PidDetails),
+  "PidDetails",
+  "PidDetails",
+  "",
+  sizeof(PidDetails),
   6,
-  gwstats__pid_details__field_descriptors,
-  gwstats__pid_details__field_indices_by_name,
-  1,  gwstats__pid_details__number_ranges,
-  (ProtobufCMessageInit) gwstats__pid_details__init,
+  pid_details__field_descriptors,
+  pid_details__field_indices_by_name,
+  1,  pid_details__number_ranges,
+  (ProtobufCMessageInit) pid_details__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor gwstats__pid_stats__field_descriptors[3] =
+static const ProtobufCFieldDescriptor pid_stats__field_descriptors[3] =
 {
   {
     "timestamp_ms",
@@ -1879,7 +1879,7 @@ static const ProtobufCFieldDescriptor gwstats__pid_stats__field_descriptors[3] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT64,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__PidStats, timestamp_ms),
+    offsetof(PidStats, timestamp_ms),
     NULL,
     NULL,
     0,             /* flags */
@@ -1891,7 +1891,7 @@ static const ProtobufCFieldDescriptor gwstats__pid_stats__field_descriptors[3] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__PidStats, count),
+    offsetof(PidStats, count),
     NULL,
     NULL,
     0,             /* flags */
@@ -1902,40 +1902,40 @@ static const ProtobufCFieldDescriptor gwstats__pid_stats__field_descriptors[3] =
     3,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Gwstats__PidStats, n_pid_details),
-    offsetof(Gwstats__PidStats, pid_details),
-    &gwstats__pid_details__descriptor,
+    offsetof(PidStats, n_pid_details),
+    offsetof(PidStats, pid_details),
+    &pid_details__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned gwstats__pid_stats__field_indices_by_name[] = {
+static const unsigned pid_stats__field_indices_by_name[] = {
   1,   /* field[1] = count */
   2,   /* field[2] = pid_details */
   0,   /* field[0] = timestamp_ms */
 };
-static const ProtobufCIntRange gwstats__pid_stats__number_ranges[1 + 1] =
+static const ProtobufCIntRange pid_stats__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 3 }
 };
-const ProtobufCMessageDescriptor gwstats__pid_stats__descriptor =
+const ProtobufCMessageDescriptor pid_stats__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "gwstats.PidStats",
   "PidStats",
-  "Gwstats__PidStats",
-  "gwstats",
-  sizeof(Gwstats__PidStats),
+  "PidStats",
+  "PidStats",
+  "",
+  sizeof(PidStats),
   3,
-  gwstats__pid_stats__field_descriptors,
-  gwstats__pid_stats__field_indices_by_name,
-  1,  gwstats__pid_stats__number_ranges,
-  (ProtobufCMessageInit) gwstats__pid_stats__init,
+  pid_stats__field_descriptors,
+  pid_stats__field_indices_by_name,
+  1,  pid_stats__number_ranges,
+  (ProtobufCMessageInit) pid_stats__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor gwstats__report__field_descriptors[9] =
+static const ProtobufCFieldDescriptor report__field_descriptors[9] =
 {
   {
     "timestamp_ms",
@@ -1943,7 +1943,7 @@ static const ProtobufCFieldDescriptor gwstats__report__field_descriptors[9] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT64,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__Report, timestamp_ms),
+    offsetof(Report, timestamp_ms),
     NULL,
     NULL,
     0,             /* flags */
@@ -1954,9 +1954,9 @@ static const ProtobufCFieldDescriptor gwstats__report__field_descriptors[9] =
     2,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Gwstats__Report, n_system),
-    offsetof(Gwstats__Report, system),
-    &gwstats__system_stats__descriptor,
+    offsetof(Report, n_system),
+    offsetof(Report, system),
+    &system_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
@@ -1966,9 +1966,9 @@ static const ProtobufCFieldDescriptor gwstats__report__field_descriptors[9] =
     3,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Gwstats__Report, n_wan),
-    offsetof(Gwstats__Report, wan),
-    &gwstats__wan_stats__descriptor,
+    offsetof(Report, n_wan),
+    offsetof(Report, wan),
+    &wan_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
@@ -1978,9 +1978,9 @@ static const ProtobufCFieldDescriptor gwstats__report__field_descriptors[9] =
     4,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Gwstats__Report, n_lan),
-    offsetof(Gwstats__Report, lan),
-    &gwstats__lan_stats__descriptor,
+    offsetof(Report, n_lan),
+    offsetof(Report, lan),
+    &lan_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
@@ -1990,9 +1990,9 @@ static const ProtobufCFieldDescriptor gwstats__report__field_descriptors[9] =
     5,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Gwstats__Report, n_ipv6_monitoring),
-    offsetof(Gwstats__Report, ipv6_monitoring),
-    &gwstats__ipv6_monitoring_stats__descriptor,
+    offsetof(Report, n_ipv6_monitoring),
+    offsetof(Report, ipv6_monitoring),
+    &ipv6_monitoring_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
@@ -2002,9 +2002,9 @@ static const ProtobufCFieldDescriptor gwstats__report__field_descriptors[9] =
     6,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Gwstats__Report, n_tcp),
-    offsetof(Gwstats__Report, tcp),
-    &gwstats__tcp_stats__descriptor,
+    offsetof(Report, n_tcp),
+    offsetof(Report, tcp),
+    &tcp_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
@@ -2014,9 +2014,9 @@ static const ProtobufCFieldDescriptor gwstats__report__field_descriptors[9] =
     7,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Gwstats__Report, n_client),
-    offsetof(Gwstats__Report, client),
-    &gwstats__client_stats__descriptor,
+    offsetof(Report, n_client),
+    offsetof(Report, client),
+    &client_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
@@ -2026,9 +2026,9 @@ static const ProtobufCFieldDescriptor gwstats__report__field_descriptors[9] =
     8,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Gwstats__Report, n_pid),
-    offsetof(Gwstats__Report, pid),
-    &gwstats__pid_stats__descriptor,
+    offsetof(Report, n_pid),
+    offsetof(Report, pid),
+    &pid_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
@@ -2039,14 +2039,14 @@ static const ProtobufCFieldDescriptor gwstats__report__field_descriptors[9] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_MESSAGE,
     0,   /* quantifier_offset */
-    offsetof(Gwstats__Report, restartcount),
-    &gwstats__restart_count_stats__descriptor,
+    offsetof(Report, restartcount),
+    &restart_count_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned gwstats__report__field_indices_by_name[] = {
+static const unsigned report__field_indices_by_name[] = {
   6,   /* field[6] = client */
   4,   /* field[4] = ipv6_monitoring */
   3,   /* field[3] = lan */
@@ -2057,23 +2057,23 @@ static const unsigned gwstats__report__field_indices_by_name[] = {
   0,   /* field[0] = timestamp_ms */
   2,   /* field[2] = wan */
 };
-static const ProtobufCIntRange gwstats__report__number_ranges[1 + 1] =
+static const ProtobufCIntRange report__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 9 }
 };
-const ProtobufCMessageDescriptor gwstats__report__descriptor =
+const ProtobufCMessageDescriptor report__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "gwstats.Report",
   "Report",
-  "Gwstats__Report",
-  "gwstats",
-  sizeof(Gwstats__Report),
+  "Report",
+  "Report",
+  "",
+  sizeof(Report),
   9,
-  gwstats__report__field_descriptors,
-  gwstats__report__field_indices_by_name,
-  1,  gwstats__report__number_ranges,
-  (ProtobufCMessageInit) gwstats__report__init,
+  report__field_descriptors,
+  report__field_indices_by_name,
+  1,  report__number_ranges,
+  (ProtobufCMessageInit) report__init,
   NULL,NULL,NULL    /* reserved[123] */
 };

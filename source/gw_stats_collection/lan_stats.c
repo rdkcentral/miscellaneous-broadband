@@ -49,7 +49,6 @@ void get_lan_ipv6_address(char *ipv6_address, size_t size) {
 }
 
 void collect_lan_stats(LanStats *stats) {
-    log_message("collect_lan_stats started\n");
     stats->timestamp_ms = get_timestamp_ms();
     char rx_bytes[64] = {0}, tx_bytes[64] = {0}, rx_dropped[64] = {0}, tx_dropped[64] = {0};
     get_lan_ipv4_address(stats->ipv4_address, sizeof(stats->ipv4_address));
@@ -59,5 +58,4 @@ void collect_lan_stats(LanStats *stats) {
     strncpy(stats->tx_bytes, tx_bytes, sizeof(stats->tx_bytes));
     strncpy(stats->rx_dropped, rx_dropped, sizeof(stats->rx_dropped));
     strncpy(stats->tx_dropped, tx_dropped, sizeof(stats->tx_dropped));
-    log_message("collect_lan_stats completed\n");
 }

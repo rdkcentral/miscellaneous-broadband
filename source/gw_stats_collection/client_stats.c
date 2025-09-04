@@ -25,7 +25,6 @@ void get_all_clients(ClientStats *stats) {
         pclose(fp);
     }
     if (!is_initialized) {
-        log_message("Using new clients structure\n");
         stats->clients = NULL;
         stats->client_count = 0;
         is_initialized = true;
@@ -191,11 +190,9 @@ void get_tcp_latency_for_clients(ClientStats *stats) {
 
 
 void collect_client_stats(ClientStats *stats) {
-    log_message("collect_client_stats started\n");
     stats->timestamp_ms = get_timestamp_ms();
     get_all_clients(stats);
     get_client_traffic_stats(stats);
     get_client_tcp_est_counts(stats);
     get_tcp_latency_for_clients(stats);
-    log_message("collect_client_stats completed\n");
 }
