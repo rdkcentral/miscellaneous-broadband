@@ -213,9 +213,16 @@ void save_to_text(const gw_stats_report *report) {
     while (client_stats) {
         for (int i = 0; i < client_stats->client_count; ++i) {
             const ClientDetails *cd = &client_stats->clients[i];
-            fprintf(file, "client: cnt: %d |%llu|%s|%s|%s|%s|%s|%s|%d\n",
-                    client_stats->client_count, client_stats->timestamp_ms, cd->ip_addr, cd->host_name, cd->tx_bytes, cd->rx_bytes,
-                    cd->mac_address, cd->status, cd->tcp_est_counts);
+            fprintf(file,
+            "client: cnt: %d |%llu|%s|%s|%s|%s|%s|%s|%d|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u\n",
+            client_stats->client_count, client_stats->timestamp_ms,
+            cd->ip_addr, cd->host_name, cd->tx_bytes, cd->rx_bytes,
+            cd->mac_address, cd->status, cd->tcp_est_counts,
+            cd->ipv4_synack_min_latency, cd->ipv4_synack_max_latency, cd->ipv4_synack_avg_latency,
+            cd->ipv4_ack_min_latency, cd->ipv4_ack_max_latency, cd->ipv4_ack_avg_latency,
+            cd->ipv6_synack_min_latency, cd->ipv6_synack_max_latency, cd->ipv6_synack_avg_latency,
+            cd->ipv6_ack_min_latency, cd->ipv6_ack_max_latency, cd->ipv6_ack_avg_latency
+            );
         }
         client_stats = client_stats->next;
     }

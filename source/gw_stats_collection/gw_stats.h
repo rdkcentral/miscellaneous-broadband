@@ -72,11 +72,23 @@ typedef struct wanstats {
 typedef struct {
     char ip_addr[64];
     char host_name[64];
-    char tx_bytes[64];
-    char rx_bytes[64];
+    char tx_bytes[32];
+    char rx_bytes[32];
     char mac_address[32];
     char status[16];
     int  tcp_est_counts;
+    uint32_t ipv4_synack_min_latency;
+    uint32_t ipv4_synack_max_latency;
+    uint32_t ipv4_synack_avg_latency;
+    uint32_t ipv4_ack_min_latency;
+    uint32_t ipv4_ack_max_latency;
+    uint32_t ipv4_ack_avg_latency;
+    uint32_t ipv6_synack_min_latency;
+    uint32_t ipv6_synack_max_latency;
+    uint32_t ipv6_synack_avg_latency;
+    uint32_t ipv6_ack_min_latency;
+    uint32_t ipv6_ack_max_latency;
+    uint32_t ipv6_ack_avg_latency;
 } ClientDetails;
 
 typedef struct clientstats{
@@ -189,9 +201,10 @@ void get_lan_ipv6_address(char *ipv6_address, size_t size);
 
 //Client Stats
 void initialize_client_stats(ClientStats *stats);
-void get_client_tcp_est_counts(ClientStats *stats);
 void get_all_clients(ClientStats *stats);
 void get_client_traffic_stats(ClientStats *stats);
+void get_client_tcp_est_counts(ClientStats *stats);
+void get_tcp_latency_for_clients(ClientStats *stats);
 void collect_client_stats(ClientStats *stats);
 
 //IPv6 Monitoring Stats

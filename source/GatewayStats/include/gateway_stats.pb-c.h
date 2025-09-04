@@ -25,7 +25,7 @@ typedef struct Gwstats__ClientDetails Gwstats__ClientDetails;
 typedef struct Gwstats__ClientStats Gwstats__ClientStats;
 typedef struct Gwstats__PidDetails Gwstats__PidDetails;
 typedef struct Gwstats__PidStats Gwstats__PidStats;
-typedef struct Gwstats__GatewayStats Gwstats__GatewayStats;
+typedef struct Gwstats__Report Gwstats__Report;
 
 
 /* --- enums --- */
@@ -180,10 +180,22 @@ struct  Gwstats__ClientDetails
   char *tx_bytes;
   char *rx_bytes;
   int32_t tcp_est_counts;
+  uint32_t ipv4_synack_min_latency;
+  uint32_t ipv4_synack_max_latency;
+  uint32_t ipv4_synack_avg_latency;
+  uint32_t ipv4_ack_min_latency;
+  uint32_t ipv4_ack_max_latency;
+  uint32_t ipv4_ack_avg_latency;
+  uint32_t ipv6_synack_min_latency;
+  uint32_t ipv6_synack_max_latency;
+  uint32_t ipv6_synack_avg_latency;
+  uint32_t ipv6_ack_min_latency;
+  uint32_t ipv6_ack_max_latency;
+  uint32_t ipv6_ack_avg_latency;
 };
 #define GWSTATS__CLIENT_DETAILS__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&gwstats__client_details__descriptor) \
-, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, 0 }
+, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 
 
 /*
@@ -241,7 +253,7 @@ struct  Gwstats__PidStats
  * Overall report that contain all individual stats reports
  * //////////////////////////////////////////////////////////////////////////////
  */
-struct  Gwstats__GatewayStats
+struct  Gwstats__Report
 {
   ProtobufCMessage base;
   uint64_t timestamp_ms;
@@ -261,8 +273,8 @@ struct  Gwstats__GatewayStats
   Gwstats__PidStats **pid;
   Gwstats__RestartCountStats *restartcount;
 };
-#define GWSTATS__GATEWAY_STATS__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&gwstats__gateway_stats__descriptor) \
+#define GWSTATS__REPORT__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&gwstats__report__descriptor) \
 , 0, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, NULL }
 
 
@@ -456,24 +468,24 @@ Gwstats__PidStats *
 void   gwstats__pid_stats__free_unpacked
                      (Gwstats__PidStats *message,
                       ProtobufCAllocator *allocator);
-/* Gwstats__GatewayStats methods */
-void   gwstats__gateway_stats__init
-                     (Gwstats__GatewayStats         *message);
-size_t gwstats__gateway_stats__get_packed_size
-                     (const Gwstats__GatewayStats   *message);
-size_t gwstats__gateway_stats__pack
-                     (const Gwstats__GatewayStats   *message,
+/* Gwstats__Report methods */
+void   gwstats__report__init
+                     (Gwstats__Report         *message);
+size_t gwstats__report__get_packed_size
+                     (const Gwstats__Report   *message);
+size_t gwstats__report__pack
+                     (const Gwstats__Report   *message,
                       uint8_t             *out);
-size_t gwstats__gateway_stats__pack_to_buffer
-                     (const Gwstats__GatewayStats   *message,
+size_t gwstats__report__pack_to_buffer
+                     (const Gwstats__Report   *message,
                       ProtobufCBuffer     *buffer);
-Gwstats__GatewayStats *
-       gwstats__gateway_stats__unpack
+Gwstats__Report *
+       gwstats__report__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   gwstats__gateway_stats__free_unpacked
-                     (Gwstats__GatewayStats *message,
+void   gwstats__report__free_unpacked
+                     (Gwstats__Report *message,
                       ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
@@ -507,8 +519,8 @@ typedef void (*Gwstats__PidDetails_Closure)
 typedef void (*Gwstats__PidStats_Closure)
                  (const Gwstats__PidStats *message,
                   void *closure_data);
-typedef void (*Gwstats__GatewayStats_Closure)
-                 (const Gwstats__GatewayStats *message,
+typedef void (*Gwstats__Report_Closure)
+                 (const Gwstats__Report *message,
                   void *closure_data);
 
 /* --- services --- */
@@ -526,7 +538,7 @@ extern const ProtobufCMessageDescriptor gwstats__client_details__descriptor;
 extern const ProtobufCMessageDescriptor gwstats__client_stats__descriptor;
 extern const ProtobufCMessageDescriptor gwstats__pid_details__descriptor;
 extern const ProtobufCMessageDescriptor gwstats__pid_stats__descriptor;
-extern const ProtobufCMessageDescriptor gwstats__gateway_stats__descriptor;
+extern const ProtobufCMessageDescriptor gwstats__report__descriptor;
 
 PROTOBUF_C__END_DECLS
 

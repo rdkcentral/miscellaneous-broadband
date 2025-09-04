@@ -95,6 +95,18 @@ message ClientDetails {
   string tx_bytes = 5;
   string rx_bytes = 6;
   int32 tcp_est_counts = 7;
+  uint32 ipv4_synack_min_latency = 8;
+  uint32 ipv4_synack_max_latency = 9;
+  uint32 ipv4_synack_avg_latency = 10;
+  uint32 ipv4_ack_min_latency = 11;
+  uint32 ipv4_ack_max_latency = 12;
+  uint32 ipv4_ack_avg_latency = 13;
+  uint32 ipv6_synack_min_latency = 14;
+  uint32 ipv6_synack_max_latency = 15;
+  uint32 ipv6_synack_avg_latency = 16;
+  uint32 ipv6_ack_min_latency = 17;
+  uint32 ipv6_ack_max_latency = 18;
+  uint32 ipv6_ack_avg_latency = 19;
 }
 
 // ===== Client Stats =====
@@ -127,7 +139,7 @@ message PidStats {
 // Overall report that contain all individual stats reports
 //
 ////////////////////////////////////////////////////////////////////////////////
-message GatewayStats {
+message Report {
   uint64 timestamp_ms = 1;
   repeated SystemStats system = 2;
   repeated WanStats wan = 3;

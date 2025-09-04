@@ -101,11 +101,101 @@ void get_client_tcp_est_counts(ClientStats *stats) {
     }
 }
 
+static void parse_latency_section(ClientStats *stats, const char *section, bool is_ipv6) {
+    if (!section) return;
+
+    // Skip header (before first semicolon)
+    const char *data = strchr(section, ';');
+    if (!data) return;
+    data++; // move after first semicolon
+
+    char *dup = strdup(data);
+    if (!dup) return;
+
+    char *saveptr = NULL;
+    char *entry = strtok_r(dup, ";", &saveptr);
+
+    while (entry) {
+        char mac[32] = {0};
+        char metrics[256] = {0};
+        char ports[128] = {0};
+
+        // First token: MAC
+        strncpy(mac, entry, sizeof(mac) - 1);
+
+        // Metrics
+        char *metrics_str = strtok_r(NULL, ";", &saveptr);
+        if (!metrics_str) break;
+        strncpy(metrics, metrics_str, sizeof(metrics) - 1);
+
+        // Ports
+        char *ports_str = strtok_r(NULL, ";", &saveptr);
+        if (!ports_str) break;
+        strncpy(ports, ports_str, sizeof(ports) - 1);
+
+        // Parse metrics
+        unsigned int count;
+        unsigned int syn_min, syn_max, syn_avg, syn_99;
+        unsigned int ack_min, ack_max, ack_avg, ack_99;
+        if (sscanf(metrics,
+                   "%u,%u,%u,%u,%u,%u,%u,%u,%u",
+                   &count,
+                   &syn_min, &syn_max, &syn_avg, &syn_99,
+                   &ack_min, &ack_max, &ack_avg, &ack_99) == 9) {
+
+            for (int i = 0; i < stats->client_count; i++) {
+                if (strcasecmp(stats->clients[i].mac_address, mac) == 0) {
+                    if (!is_ipv6) {
+                        stats->clients[i].ipv4_synack_min_latency = syn_min;
+                        stats->clients[i].ipv4_synack_max_latency = syn_max;
+                        stats->clients[i].ipv4_synack_avg_latency = syn_avg;
+                        stats->clients[i].ipv4_ack_min_latency = ack_min;
+                        stats->clients[i].ipv4_ack_max_latency = ack_max;
+                        stats->clients[i].ipv4_ack_avg_latency = ack_avg;
+                    } else {
+                        stats->clients[i].ipv6_synack_min_latency = syn_min;
+                        stats->clients[i].ipv6_synack_max_latency = syn_max;
+                        stats->clients[i].ipv6_synack_avg_latency = syn_avg;
+                        stats->clients[i].ipv6_ack_min_latency = ack_min;
+                        stats->clients[i].ipv6_ack_max_latency = ack_max;
+                        stats->clients[i].ipv6_ack_avg_latency = ack_avg;
+                    }
+                }
+            }
+        }
+
+        entry = strtok_r(NULL, ";", &saveptr);
+    }
+
+    free(dup);
+}
+
+void get_tcp_latency_for_clients(ClientStats *stats) {
+    char output[8192];
+    FILE *fp = popen("dmcli eRT retv Device.QOS.X_RDK_LatencyMeasure_TCP_Stats_Report", "r");
+    if (!fp) {
+        log_message("Failed to run dmcli for TCP latency stats\n");
+        return;
+    }
+    size_t len = fread(output, 1, sizeof(output) - 1, fp);
+    pclose(fp);
+    if (len <= 0) return;
+    output[len] = '\0';
+
+    char *ipv4_part = strtok(output, "|");
+    char *ipv6_part = strtok(NULL, "|");
+
+    parse_latency_section(stats, ipv4_part, false);
+    parse_latency_section(stats, ipv6_part, true);
+}
+
+
 void collect_client_stats(ClientStats *stats) {
     log_message("collect_client_stats started\n");
     stats->timestamp_ms = get_timestamp_ms();
     get_all_clients(stats);
     get_client_traffic_stats(stats);
     get_client_tcp_est_counts(stats);
+    get_tcp_latency_for_clients(stats);
     log_message("collect_client_stats completed\n");
 }
