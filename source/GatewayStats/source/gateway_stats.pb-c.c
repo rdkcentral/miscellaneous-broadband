@@ -1950,96 +1950,96 @@ static const ProtobufCFieldDescriptor report__field_descriptors[9] =
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "system",
+    "systemStats",
     2,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Report, n_system),
-    offsetof(Report, system),
+    offsetof(Report, n_systemstats),
+    offsetof(Report, systemstats),
     &system_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "wan",
+    "wanStats",
     3,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Report, n_wan),
-    offsetof(Report, wan),
+    offsetof(Report, n_wanstats),
+    offsetof(Report, wanstats),
     &wan_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "lan",
+    "lanStats",
     4,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Report, n_lan),
-    offsetof(Report, lan),
+    offsetof(Report, n_lanstats),
+    offsetof(Report, lanstats),
     &lan_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "ipv6_monitoring",
+    "ipv6MonStats",
     5,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Report, n_ipv6_monitoring),
-    offsetof(Report, ipv6_monitoring),
+    offsetof(Report, n_ipv6monstats),
+    offsetof(Report, ipv6monstats),
     &ipv6_monitoring_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "tcp",
+    "tcpStats",
     6,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Report, n_tcp),
-    offsetof(Report, tcp),
+    offsetof(Report, n_tcpstats),
+    offsetof(Report, tcpstats),
     &tcp_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "client",
+    "clientStats",
     7,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Report, n_client),
-    offsetof(Report, client),
+    offsetof(Report, n_clientstats),
+    offsetof(Report, clientstats),
     &client_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "pid",
+    "pidStats",
     8,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(Report, n_pid),
-    offsetof(Report, pid),
+    offsetof(Report, n_pidstats),
+    offsetof(Report, pidstats),
     &pid_stats__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "restartCount",
+    "restartCountStats",
     9,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_MESSAGE,
     0,   /* quantifier_offset */
-    offsetof(Report, restartcount),
+    offsetof(Report, restartcountstats),
     &restart_count_stats__descriptor,
     NULL,
     0,             /* flags */
@@ -2047,15 +2047,15 @@ static const ProtobufCFieldDescriptor report__field_descriptors[9] =
   },
 };
 static const unsigned report__field_indices_by_name[] = {
-  6,   /* field[6] = client */
-  4,   /* field[4] = ipv6_monitoring */
-  3,   /* field[3] = lan */
-  7,   /* field[7] = pid */
-  8,   /* field[8] = restartCount */
-  1,   /* field[1] = system */
-  5,   /* field[5] = tcp */
+  6,   /* field[6] = clientStats */
+  4,   /* field[4] = ipv6MonStats */
+  3,   /* field[3] = lanStats */
+  7,   /* field[7] = pidStats */
+  8,   /* field[8] = restartCountStats */
+  1,   /* field[1] = systemStats */
+  5,   /* field[5] = tcpStats */
   0,   /* field[0] = timestamp_ms */
-  2,   /* field[2] = wan */
+  2,   /* field[2] = wanStats */
 };
 static const ProtobufCIntRange report__number_ranges[1 + 1] =
 {

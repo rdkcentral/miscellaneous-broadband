@@ -139,12 +139,12 @@ message PidStats {
 ////////////////////////////////////////////////////////////////////////////////
 message Report {
   uint64 timestamp_ms = 1;
-  repeated SystemStats system = 2;
-  repeated WanStats wan = 3;
-  repeated LanStats lan = 4;
-  repeated IPv6MonitoringStats ipv6_monitoring = 5;
-  repeated TcpStats tcp = 6;
-  repeated ClientStats client = 7;
-  repeated PidStats pid = 8;
-  RestartCountStats restartCount = 9;
+  repeated SystemStats systemStats = 2;
+  repeated WanStats wanStats = 3;
+  repeated LanStats lanStats = 4;
+  repeated IPv6MonitoringStats ipv6MonStats = 5;
+  repeated TcpStats tcpStats = 6;
+  repeated ClientStats clientStats = 7;
+  repeated PidStats pidStats = 8;
+  RestartCountStats restartCountStats = 9;
 }

@@ -264,6 +264,24 @@ void save_to_text(const gw_stats_report *report) {
         ipv6_stats = ipv6_stats->next;
     }
 
+    // restart_count_stats_t
+    const restart_count_stats_t *rc_stats = report->restart_count_stats;
+    if (rc_stats) {
+        fprintf(file, "restart_count_stats: fw_restart_count=%d, wan_restart_count=%d\n",
+                rc_stats->fw_restart_count, rc_stats->wan_restart_count);
+
+        for (int i = 0; i < rc_stats->fw_restart_count; ++i) {
+            if (rc_stats->fw_restart_time && rc_stats->fw_restart_time[i]) {
+                fprintf(file, "fw_restart_time[%d]: %s\n", i, rc_stats->fw_restart_time[i]);
+            }
+        }
+        for (int i = 0; i < rc_stats->wan_restart_count; ++i) {
+            if (rc_stats->wan_restart_time && rc_stats->wan_restart_time[i]) {
+                fprintf(file, "wan_restart_time[%d]: %s\n", i, rc_stats->wan_restart_time[i]);
+            }
+        }
+    }
+
     fclose(file);
     log_message("save_to_text done!\n");
 }

@@ -26,7 +26,8 @@ GatewayStats_CPPFLAGS = -I$(top_srcdir)/source/gw_stats_collection \
                         -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/ccsp \
                         -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus
 
-GatewayStats_SOURCES = source/gateway_stats.pb-c.c source/gw_collect_data.c source/main.c
+GatewayStats_SOURCES = source/gateway_stats.pb-c.c source/gw_collect_data.c source/gw_stats_encoder.c \
+                       source/gw_collect_restart_counts.c source/main.c
 
 GatewayStats_LDADD = ../gw_stats_collection/libgw_stats.la
 GatewayStats_DEPENDENCIES = $(GatewayStats_LDADD)

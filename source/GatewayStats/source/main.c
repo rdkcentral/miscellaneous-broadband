@@ -5,6 +5,7 @@
 #include <ev.h> 
 
 #include "gateway_stats.h"
+#include "gw_stats_encoder.h"
 
 gw_stats_report g_report;
 uint32_t sampling_interval;
@@ -30,17 +31,26 @@ static void report_cb(EV_P_ ev_timer *w, int revents) {
     (void)w;
     (void)revents;
     log_message("Reporting stats...\n");
+    size_t len = 0;
 
     pthread_mutex_lock(&g_report_lock);
     gw_stats_save();
+    char *buffer =  (char *)encode_report(&g_report, &len);
+    if (!buffer) {
+        log_message("report_cb: encoder_get_buffer failed\n");
+    }
+    log_message("Encoded report size: %zu bytes\n", len);
     gw_stats_reset();
     pthread_mutex_unlock(&g_report_lock);
+    SAFE_FREE(&buffer);
 }
 
 int main() {
     log_message("Starting Gateway statistics App...\n");
 
     gw_stats_init();
+
+    // RestartCountStats_StartThread();
 
     // Initialize event loop
     struct ev_loop *loop = EV_DEFAULT;
@@ -62,6 +72,9 @@ int main() {
     gw_stats_free_buffer(&g_report);
     pthread_mutex_unlock(&g_report_lock);
 
+    // RestartCountStats_StopThread();
+
+    ev_loop_destroy(loop);
     pthread_mutex_destroy(&g_report_lock);
     printf("Gateway statistics collection completed.\n");
     return 0;

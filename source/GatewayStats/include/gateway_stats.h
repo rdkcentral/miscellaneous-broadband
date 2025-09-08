@@ -12,6 +12,7 @@
 #include <time.h>
 #include <signal.h>
 #include <errno.h>
+#include "ansc_platform.h"
 
 #include "gw_stats.h"
 
@@ -21,6 +22,14 @@
 #define SAMPLING_INTERVAL   90
 #define REPORTING_INTERVAL  180
 
+
+#define SAFE_FREE(pptr) \
+    do { \
+        if ((pptr) != NULL && *(pptr) != NULL) { \
+            free(*(pptr)); \
+            *(pptr) = NULL; \
+        } \
+    } while (0)
 
 typedef struct
 {
@@ -47,6 +56,9 @@ int gw_stats_init();
 int gw_stats_collect();
 int gw_stats_save();
 int gw_stats_reset();
+int RestartCountStats_StartThread();
+int RestartCountStats_StopThread();
 int gw_stats_free_buffer(gw_stats_report *report);
+
 
 #endif //GATEWAY_STATS_H

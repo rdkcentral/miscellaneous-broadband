@@ -257,21 +257,21 @@ struct  Report
 {
   ProtobufCMessage base;
   uint64_t timestamp_ms;
-  size_t n_system;
-  SystemStats **system;
-  size_t n_wan;
-  WanStats **wan;
-  size_t n_lan;
-  LanStats **lan;
-  size_t n_ipv6_monitoring;
-  IPv6MonitoringStats **ipv6_monitoring;
-  size_t n_tcp;
-  TcpStats **tcp;
-  size_t n_client;
-  ClientStats **client;
-  size_t n_pid;
-  PidStats **pid;
-  RestartCountStats *restartcount;
+  size_t n_systemstats;
+  SystemStats **systemstats;
+  size_t n_wanstats;
+  WanStats **wanstats;
+  size_t n_lanstats;
+  LanStats **lanstats;
+  size_t n_ipv6monstats;
+  IPv6MonitoringStats **ipv6monstats;
+  size_t n_tcpstats;
+  TcpStats **tcpstats;
+  size_t n_clientstats;
+  ClientStats **clientstats;
+  size_t n_pidstats;
+  PidStats **pidstats;
+  RestartCountStats *restartcountstats;
 };
 #define REPORT__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&report__descriptor) \
