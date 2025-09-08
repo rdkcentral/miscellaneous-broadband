@@ -42,7 +42,6 @@ static void* fw_restart_time_thread_func(void *arg) {
         }
         else
         {
-            log_message("Received sysevent notification: %s = %s\n", name, val);
             if (strcmp(name, "firewall-restart") == 0) {
                 log_message("Firewall restart event received.\n");
                 // Add timestamp to fw_restart_time in g_report.restart_count_stats
@@ -51,7 +50,7 @@ static void* fw_restart_time_thread_func(void *arg) {
                 restart_count_stats_t *stats = g_report.restart_count_stats;
 
                 // Ensure fw_restart_time is initialized
-                if (stats->fw_restart_time == NULL) {
+                if (stats && stats->fw_restart_time == NULL) {
                     stats->fw_restart_time = calloc(1, sizeof(char *));
                     if (stats->fw_restart_time == NULL) {
                         log_message("Failed to allocate initial memory for fw_restart_time\n");
@@ -106,8 +105,9 @@ static void* wan_restart_time_thread_func(void *arg) {
         if(err) {
             log_message("WAN sysevent_getnotification failed with error: %d\n", err);
             sleep(2);
-        } else {
-            log_message("Received WAN sysevent notification: %s = %s\n", name, val);
+        }
+        else
+        {
             if (strcmp(name, "wan-restart") == 0) {
                 log_message("WAN restart event received.\n");
                 // Add timestamp to wan_restart_time in g_report.restart_count_stats

@@ -50,7 +50,7 @@ int main() {
 
     gw_stats_init();
 
-    // RestartCountStats_StartThread();
+    RestartCountStats_StartThread();
 
     // Initialize event loop
     struct ev_loop *loop = EV_DEFAULT;
@@ -72,7 +72,7 @@ int main() {
     gw_stats_free_buffer(&g_report);
     pthread_mutex_unlock(&g_report_lock);
 
-    // RestartCountStats_StopThread();
+    RestartCountStats_StopThread();
 
     ev_loop_destroy(loop);
     pthread_mutex_destroy(&g_report_lock);

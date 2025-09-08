@@ -30,7 +30,13 @@ int gw_stats_init() {
     g_report.pid_stats = NULL;
     g_report.n_pid_stats = 0;
 
-    g_report.restart_count_stats = NULL;
+    g_report.restart_count_stats = (restart_count_stats_t *)malloc(sizeof(restart_count_stats_t));
+    if (g_report.restart_count_stats) {
+        g_report.restart_count_stats->fw_restart_count = 0;
+        g_report.restart_count_stats->fw_restart_time = NULL;
+        g_report.restart_count_stats->wan_restart_count = 0;
+        g_report.restart_count_stats->wan_restart_time = NULL;
+    }
 
     sampling_interval = SAMPLING_INTERVAL;
     reporting_interval = REPORTING_INTERVAL;
@@ -270,16 +276,25 @@ void save_to_text(const gw_stats_report *report) {
         fprintf(file, "restart_count_stats: fw_restart_count=%d, wan_restart_count=%d\n",
                 rc_stats->fw_restart_count, rc_stats->wan_restart_count);
 
+        fprintf(file, "fw_restart_time:");
         for (int i = 0; i < rc_stats->fw_restart_count; ++i) {
             if (rc_stats->fw_restart_time && rc_stats->fw_restart_time[i]) {
-                fprintf(file, "fw_restart_time[%d]: %s\n", i, rc_stats->fw_restart_time[i]);
+                fprintf(file, "%s", rc_stats->fw_restart_time[i]);
+                if (i < rc_stats->fw_restart_count - 1) {
+                    fprintf(file, "|");
+                }
             }
         }
+        fprintf(file, "\n");
         for (int i = 0; i < rc_stats->wan_restart_count; ++i) {
             if (rc_stats->wan_restart_time && rc_stats->wan_restart_time[i]) {
-                fprintf(file, "wan_restart_time[%d]: %s\n", i, rc_stats->wan_restart_time[i]);
+                fprintf(file, "%s", rc_stats->wan_restart_time[i]);
+                if (i < rc_stats->wan_restart_count - 1) {
+                    fprintf(file, "|");
+                }
             }
         }
+        fprintf(file, "\n");
     }
 
     fclose(file);
@@ -370,11 +385,29 @@ int gw_stats_reset() {
     g_report.pid_stats = NULL;
     g_report.n_pid_stats = 0;
 
-    // Free restart_count_stats if dynamically allocated (if applicable)
+    // Free and reinitialize restart_count_stats as in init function
     if (g_report.restart_count_stats) {
+        // Free fw_restart_time array if allocated
+        if (g_report.restart_count_stats->fw_restart_time) {
+            free(g_report.restart_count_stats->fw_restart_time);
+            g_report.restart_count_stats->fw_restart_time = NULL;
+        }
+        // Free wan_restart_time array if allocated
+        if (g_report.restart_count_stats->wan_restart_time) {
+            free(g_report.restart_count_stats->wan_restart_time);
+            g_report.restart_count_stats->wan_restart_time = NULL;
+        }
         free(g_report.restart_count_stats);
         g_report.restart_count_stats = NULL;
     }
+    g_report.restart_count_stats = (restart_count_stats_t *)malloc(sizeof(restart_count_stats_t));
+    if (g_report.restart_count_stats) {
+        g_report.restart_count_stats->fw_restart_count = 0;
+        g_report.restart_count_stats->fw_restart_time = NULL;
+        g_report.restart_count_stats->wan_restart_count = 0;
+        g_report.restart_count_stats->wan_restart_time = NULL;
+    }
+
 
     log_message("Gateway Statistics Reset completed.\n");
     return 0;
