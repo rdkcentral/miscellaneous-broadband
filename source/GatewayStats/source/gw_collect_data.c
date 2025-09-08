@@ -286,6 +286,7 @@ void save_to_text(const gw_stats_report *report) {
             }
         }
         fprintf(file, "\n");
+        fprintf(file, "wan_restart_time:");
         for (int i = 0; i < rc_stats->wan_restart_count; ++i) {
             if (rc_stats->wan_restart_time && rc_stats->wan_restart_time[i]) {
                 fprintf(file, "%s", rc_stats->wan_restart_time[i]);
