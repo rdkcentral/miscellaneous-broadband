@@ -34,19 +34,38 @@ static struct ev_loop *loop = NULL;
 static ev_stat whitelist_watcher;
 static pthread_t watcher_thread;
 
-// Debug logging macro
-static int debug_enabled = 0;
-static pthread_once_t debug_once_control = PTHREAD_ONCE_INIT;
+// Logging file pointer and logic for log redirection
+static FILE *interceptor_log_fp = NULL;
+static pthread_once_t log_fp_once_control = PTHREAD_ONCE_INIT;
 
-static void check_debug_env() {
-    const char *env = getenv("RDKB_INTERCEPTOR_DEBUG");
-    debug_enabled = (env && strcmp(env, "1") == 0);
+static void init_log_fp() {
+    const char *logfile = getenv("RDKB_INTERCEPTOR_LOGFILE");
+    if (logfile && *logfile) {
+        interceptor_log_fp = fopen(logfile, "a");
+        if (!interceptor_log_fp) {
+            interceptor_log_fp = stderr;
+        }
+    } else {
+        interceptor_log_fp = stderr;
+    }
 }
 
-static bool is_debug_enabled() {
-    pthread_once(&debug_once_control, check_debug_env);
-    return debug_enabled;
+static FILE *get_log_fp() {
+    pthread_once(&log_fp_once_control, init_log_fp);
+    return interceptor_log_fp;
 }
+
+// Macro for logging
+#define INTERCEPTOR_LOG(fmt, ...) \
+    do { \
+        FILE *fp = get_log_fp(); \
+        if ((fmt)[strlen(fmt) - 1] == '\n') { \
+            fprintf(fp, fmt, ##__VA_ARGS__); \
+        } else { \
+            fprintf(fp, fmt "\n", ##__VA_ARGS__); \
+        } \
+        fflush(fp); \
+    } while(0)
 
 // Load whitelist from JSON file using cJSON
 // Now expects JSON like:

@@ -20,17 +20,6 @@ typedef int (*syscfg_commit_func_t)(void);
 #define MAX_WHITELISTED_NAMES 256
 #define MAX_API_NAME_LEN 128
 
-#define INTERCEPTOR_LOG(fmt, ...) \
-    do { \
-        if (is_debug_enabled()) { \
-            if ((fmt)[strlen(fmt) - 1] == '\n') { \
-                fprintf(stderr, fmt, ##__VA_ARGS__); \
-            } else { \
-                fprintf(stderr, fmt "\n", ##__VA_ARGS__); \
-            } \
-        } \
-    } while(0)
-
 rbusError_t rbus_get(rbusHandle_t handle, const char* name, rbusValue_t* value);
 rbusError_t rbus_set(rbusHandle_t handle, const char* name, rbusValue_t value, rbusSetOptions_t* opts);
 
