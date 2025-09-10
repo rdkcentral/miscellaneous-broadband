@@ -8,6 +8,9 @@
 #include "gw_stats_encoder.h"
 
 gw_stats_report g_report;
+char* encoded_buffer;
+size_t encoded_buffer_len;
+
 uint32_t sampling_interval;
 uint32_t reporting_interval;
 
@@ -31,18 +34,16 @@ static void report_cb(EV_P_ ev_timer *w, int revents) {
     (void)w;
     (void)revents;
     log_message("Reporting stats...\n");
-    size_t len = 0;
 
     pthread_mutex_lock(&g_report_lock);
     gw_stats_save();
-    char *buffer =  (char *)encode_report(&g_report, &len);
-    if (!buffer) {
+    encoded_buffer =  (char *)encode_report(&g_report, &encoded_buffer_len);
+    if (!encoded_buffer) {
         log_message("report_cb: encoder_get_buffer failed\n");
     }
-    log_message("Encoded report size: %zu bytes\n", len);
+    log_message("Encoded report size: %zu bytes\n", encoded_buffer_len);
     gw_stats_reset();
     pthread_mutex_unlock(&g_report_lock);
-    SAFE_FREE(&buffer);
 }
 
 int main() {
