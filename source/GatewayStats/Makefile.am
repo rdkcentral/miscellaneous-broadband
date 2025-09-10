@@ -25,8 +25,7 @@ GatewayStats_CPPFLAGS = -I$(top_srcdir)/source/gw_stats_collection \
                         -I$(top_srcdir)/source/mosqev/inc \
                         -I$(top_srcdir)/source/GatewayStats/include \
                         -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/ccsp \
-                        -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus \
-                        -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/opensync
+                        -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus
 
 GatewayStats_SOURCES = source/gateway_stats.pb-c.c source/gw_collect_data.c source/gw_stats_encoder.c \
                        source/gw_collect_restart_counts.c source/gw_stats_publisher.c source/main.c
@@ -36,5 +35,4 @@ GatewayStats_DEPENDENCIES = $(GatewayStats_LDADD)
 
 GatewayStats_LDFLAGS = -L${PKG_CONFIG_SYSROOT_DIR}/usr/lib \
                        -lccsp_common -lsysevent -lsecure_wrapper \
-                       -lpthread -lrbus -lpcap -lprotobuf-c -lev \
-                       -lopenssl_config_lib -lmosqev
+                       -lpthread -lrbus -lpcap -lprotobuf-c -lev -lmosquitto

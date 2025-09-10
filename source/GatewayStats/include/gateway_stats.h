@@ -59,6 +59,6 @@ int gw_stats_reset();
 int RestartCountStats_StartThread();
 int RestartCountStats_StopThread();
 int gw_stats_free_buffer(gw_stats_report *report);
-
+bool gw_stats_publish_data(void *data, long data_len);
 
 #endif //GATEWAY_STATS_H

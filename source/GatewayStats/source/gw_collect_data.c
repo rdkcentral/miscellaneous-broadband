@@ -4,8 +4,8 @@ extern uint32_t sampling_interval;
 extern uint32_t reporting_interval;
 
 extern gw_stats_report g_report;
-extern char* encoded_buffer;
-extern size_t encoded_buffer_len;
+extern char* encoded_data;
+extern size_t encoded_data_len;
 
 int gw_stats_init() {
     log_message("Gateway Stats Init\n");
@@ -411,8 +411,8 @@ int gw_stats_reset() {
         g_report.restart_count_stats->wan_restart_time = NULL;
     }
 
-    SAFE_FREE(&encoded_buffer);
-    encoded_buffer_len = 0;
+    SAFE_FREE(&encoded_data);
+    encoded_data_len = 0;
 
     log_message("Gateway Statistics Reset completed.\n");
     return 0;

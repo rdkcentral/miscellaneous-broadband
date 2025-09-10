@@ -8,8 +8,8 @@
 #include "gw_stats_encoder.h"
 
 gw_stats_report g_report;
-char* encoded_buffer;
-size_t encoded_buffer_len;
+char* encoded_data;
+size_t encoded_data_len;
 
 uint32_t sampling_interval;
 uint32_t reporting_interval;
@@ -33,16 +33,32 @@ static void report_cb(EV_P_ ev_timer *w, int revents) {
     (void)loop;
     (void)w;
     (void)revents;
+    bool res = false;
     log_message("Reporting stats...\n");
 
     pthread_mutex_lock(&g_report_lock);
     gw_stats_save();
-    encoded_buffer =  (char *)encode_report(&g_report, &encoded_buffer_len);
-    if (!encoded_buffer) {
-        log_message("report_cb: encoder_get_buffer failed\n");
+
+    //Encode the collected data to protobuf format
+    encoded_data =  (char *)encode_report(&g_report, &encoded_data_len);
+    if (!encoded_data) {
+        log_message("report_cb: encode_report failed\n");
     }
-    log_message("Encoded report size: %zu bytes\n", encoded_buffer_len);
-    gw_stats_reset();
+    log_message("Encoded report size: %zu bytes\n", encoded_data_len);
+
+    //Publish the encoded data to MQTT broker
+    res = gw_stats_publish_data((void *)encoded_data, encoded_data_len);
+    if (res) {
+        log_message("report_cb: gw_stats_publish_data SUCCESS\n");
+
+        //Reset g_report after successful publish
+        //Don't reset g_report if publish fails, to avoid data loss
+        gw_stats_reset();
+    }
+    else {
+        log_message("report_cb: gw_stats_publish_data FAILED\n");
+    }
+
     pthread_mutex_unlock(&g_report_lock);
 }
 
