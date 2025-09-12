@@ -21,7 +21,7 @@
 AM_CFLAGS = -Wall -Werror
 AM_CPPFLAGS = -Wall -Werror
 
-lib_LTLIBRARIES = librdkb_interceptor.la
-librdkb_interceptor_la_SOURCES = rdkb_interceptor.c
-librdkb_interceptor_la_CPPFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus
-librdkb_interceptor_la_LDFLAGS = -shared -fPIC -lrbus -lsyscfg -lsysevent -lev -lpthread -lcjson
+lib_LTLIBRARIES = librdkb_acl.la
+librdkb_acl_la_SOURCES = rdkb_acl.c
+librdkb_acl_la_CPPFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus
+librdkb_acl_la_LDFLAGS = -shared -fPIC -lrbus -lsyscfg -lsysevent -lev -lpthread -lcjson

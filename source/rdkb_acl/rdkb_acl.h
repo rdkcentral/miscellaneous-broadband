@@ -14,10 +14,17 @@ typedef int (*syscfg_set_ns_u_func_t)(const char *, const char *, unsigned long)
 typedef int (*syscfg_set_nns_u_func_t)(const char *, unsigned long);
 typedef int (*syscfg_commit_func_t)(void);
 
+typedef enum {
+    MODE_ALLOW_ALL,
+    MODE_DENY_ALL,
+    MODE_ALLOW_WITH_SELECTIVE_BLOCKLIST,
+    MODE_DENY_WITH_SELECTIVE_WHITELIST
+} acl_mode_t;
+
 // Macro for dlsym casting
 #define DLSYM_FN(type, sym) ((type)dlsym(RTLD_NEXT, sym))
 
-#define MAX_WHITELISTED_NAMES 256
+#define MAX_ACL_NAMES 256
 #define MAX_API_NAME_LEN 128
 
 rbusError_t rbus_get(rbusHandle_t handle, const char* name, rbusValue_t* value);
