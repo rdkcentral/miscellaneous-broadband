@@ -15,22 +15,23 @@
 
 static acl_mode_t acl_mode = MODE_DENY_ALL;
 
-static char syscfg_get_list[MAX_ACL_NAMES][MAX_API_NAME_LEN];
+static char syscfg_get_list[MAX_ACL_NAMES][MAX_API_NAME_LEN] = {0};
 static int syscfg_get_count = 0;
-static char syscfg_set_list[MAX_ACL_NAMES][MAX_API_NAME_LEN];
+static char syscfg_set_list[MAX_ACL_NAMES][MAX_API_NAME_LEN] = {0};
 static int syscfg_set_count = 0;
 
-static char sysevent_get_list[MAX_ACL_NAMES][MAX_API_NAME_LEN];
+static char sysevent_get_list[MAX_ACL_NAMES][MAX_API_NAME_LEN] = {0};
 static int sysevent_get_count = 0;
-static char sysevent_set_list[MAX_ACL_NAMES][MAX_API_NAME_LEN];
+static char sysevent_set_list[MAX_ACL_NAMES][MAX_API_NAME_LEN] = {0};
 static int sysevent_set_count = 0;
 
-static char rbus_get_list[MAX_ACL_NAMES][MAX_API_NAME_LEN];
+static char rbus_get_list[MAX_ACL_NAMES][MAX_API_NAME_LEN] = {0};
 static int rbus_get_count = 0;
-static char rbus_set_list[MAX_ACL_NAMES][MAX_API_NAME_LEN];
+static char rbus_set_list[MAX_ACL_NAMES][MAX_API_NAME_LEN] = {0};
 static int rbus_set_count = 0;
 
 static char acl_filename[512] = {0};
+static pthread_mutex_t reload_acllist_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static rbus_get_func_t real_rbus_get = NULL;
 static rbus_set_func_t real_rbus_set = NULL;
@@ -108,7 +109,6 @@ const char* acl_mode_to_string(acl_mode_t mode) {
     }
 }
 
-
 static void reload_acllist() {
     ACL_LOG("Inside %s\n", __FUNCTION__);
     if (acl_filename[0] == '\0') {
@@ -156,6 +156,12 @@ static void reload_acllist() {
     sysevent_get_count = sysevent_set_count = 0;
     rbus_get_count = rbus_set_count = 0;
     acl_mode = MODE_DENY_ALL;
+    memset(syscfg_get_list, 0, sizeof(syscfg_get_list));
+    memset(syscfg_set_list, 0, sizeof(syscfg_set_list));
+    memset(sysevent_get_list, 0, sizeof(sysevent_get_list));
+    memset(sysevent_set_list, 0, sizeof(sysevent_set_list));
+    memset(rbus_get_list, 0, sizeof(rbus_get_list));
+    memset(rbus_set_list, 0, sizeof(rbus_set_list));
 
     cJSON *mode_item = cJSON_GetObjectItem(parsed_json, "mode");
     acl_mode = parse_acl_mode(cJSON_IsString(mode_item) ? mode_item->valuestring : NULL);
@@ -254,14 +260,6 @@ static void reload_acllist() {
         }
     }
     cJSON_Delete(parsed_json);
-}
-
-// libev callback for file changes
-static void acllist_cb(EV_P_ ev_stat *w, int revents) {
-    ACL_LOG("Inside %s\n", __FUNCTION__);
-    UNUSED_PARAMETER(w);
-    UNUSED_PARAMETER(revents);
-    reload_acllist();
     ACL_LOG("mode: %s\n", acl_mode_to_string(acl_mode));
     if (acl_mode == MODE_ALLOW_WITH_SELECTIVE_BLOCKLIST || acl_mode == MODE_DENY_WITH_SELECTIVE_WHITELIST) {
         ACL_LOG(
@@ -273,36 +271,33 @@ static void acllist_cb(EV_P_ ev_stat *w, int revents) {
     }
 }
 
+// libev callback for file changes
+static void acllist_cb(EV_P_ ev_stat *w, int revents) {
+    ACL_LOG("Inside %s\n", __FUNCTION__);
+    UNUSED_PARAMETER(w);
+    UNUSED_PARAMETER(revents);
+    pthread_mutex_lock(&reload_acllist_mutex);
+    reload_acllist();
+    pthread_mutex_unlock(&reload_acllist_mutex);
+}
+
 // Thread function to run the libev event loop
 static void* acllist_watcher_thread(void* arg) {
     UNUSED_PARAMETER(arg);
     pthread_detach(pthread_self());
     ACL_LOG("Inside %s\n", __FUNCTION__);
     struct ev_loop *loop = ev_loop_new(0);
+    if (!loop) {
+        ACL_LOG("Failed to create event loop\n");
+        return NULL;
+    }
     ev_stat acllist_watcher;
-
-    // Use ACL_FILE environment variable for ACL list file path
-    const char *env = getenv("ACL_FILE");
-    if (!env) {
-        fprintf(stderr, "ACL_FILE env variable not set\n");
-        return NULL;
-    }
-    if (strlen(env) >= sizeof(acl_filename) - 1) {
-        ACL_LOG("Error: ACL_FILE path too long (%zu bytes). Maximum allowed length is %zu bytes. Initialization aborted.\n", strlen(env), sizeof(acl_filename)-1);
-        return NULL;
-    }
-    strncpy(acl_filename, env, sizeof(acl_filename)-1);
-    acl_filename[sizeof(acl_filename)-1] = '\0';
-
-    // Initial load of the acllist
-    reload_acllist();
 
     // Initialize and start the ev_stat watcher for the acllist file
     ev_stat_init(&acllist_watcher, acllist_cb, acl_filename, 0.);
     ev_stat_start(loop, &acllist_watcher);
 
     ev_run(loop, 0);
-    ev_loop_destroy(loop);
     return NULL;
 }
 
@@ -317,19 +312,37 @@ void acllist_watcher_once(void) {
     }
 }
 
-static bool lib_inited = false;
+pthread_once_t acllist_once = PTHREAD_ONCE_INIT;
 __attribute__((constructor))
 void init_library() {
     ACL_LOG("Inside %s\n", __FUNCTION__);
     ACL_LOG("PID %d\n", getpid());
-    if (!lib_inited) {
-        lib_inited = true;
-        acllist_watcher_once();
-        pthread_atfork(NULL, NULL, acllist_watcher_once);
+    // Use ACL_FILE environment variable for ACL list file path
+    const char *env = getenv("ACL_FILE");
+    if (!env) {
+        fprintf(stderr, "ACL_FILE env variable not set\n");
+        return;
     }
+    if (strlen(env) >= sizeof(acl_filename) - 1) {
+        ACL_LOG("Error: ACL_FILE path too long (%zu bytes). Maximum allowed length is %zu bytes. Initialization aborted.\n", strlen(env), sizeof(acl_filename)-1);
+        return;
+    }
+    strncpy(acl_filename, env, sizeof(acl_filename)-1);
+    acl_filename[sizeof(acl_filename)-1] = '\0';
+
+    // Initial load of the acllist
+    pthread_mutex_lock(&reload_acllist_mutex);
+    reload_acllist();
+    pthread_mutex_unlock(&reload_acllist_mutex);
+
+    pthread_once(&acllist_once, acllist_watcher_once);
+    pthread_atfork(NULL, NULL, acllist_watcher_once);
 }
 
 static bool is_api_allowed(const char *name, char list[][MAX_API_NAME_LEN], int count) {
+    // Block access while reloading the ACL list
+    pthread_mutex_lock(&reload_acllist_mutex);
+    pthread_mutex_unlock(&reload_acllist_mutex);
     switch (acl_mode) {
         case MODE_ALLOW_ALL:
             return true;
