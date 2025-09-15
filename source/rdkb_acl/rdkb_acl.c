@@ -46,33 +46,15 @@ static syscfg_set_ns_u_func_t real_syscfg_set_ns_u = NULL;
 static syscfg_set_nns_u_func_t real_syscfg_set_nns_u = NULL;
 static syscfg_set_ns_u_func_t real_syscfg_set_ns_u_commit = NULL;
 static syscfg_set_nns_u_func_t real_syscfg_set_nns_u_commit = NULL;
-static syscfg_commit_func_t real_syscfg_commit = NULL;
 
-static bool log_fp_initialized = false;
 static FILE *acl_log_fp = NULL;
-static FILE *get_log_fp() {
-    if (!log_fp_initialized) {
-        const char *logfile = getenv("RDKB_ACL_LOGFILE");
-        if (logfile && *logfile) {
-            acl_log_fp = fopen(logfile, "a");
-            if (!acl_log_fp) {
-                acl_log_fp = stderr;
-            }
-        } else {
-            acl_log_fp = stderr;
-        }
-        log_fp_initialized = true;
-    }
-    return acl_log_fp;
-}
 
 // Macro for logging
 #define ACL_LOG(fmt, ...) \
     do { \
-        FILE *fp = get_log_fp(); \
-        if (fp) { \
-            fprintf(fp, fmt, ##__VA_ARGS__); \
-            fflush(fp); \
+        if (acl_log_fp) { \
+            fprintf(acl_log_fp, fmt, ##__VA_ARGS__); \
+            fflush(acl_log_fp); \
         } \
     } while(0)
 
@@ -312,9 +294,22 @@ void acllist_watcher_once(void) {
     }
 }
 
-pthread_once_t acllist_once = PTHREAD_ONCE_INIT;
+static pthread_once_t acllist_once = PTHREAD_ONCE_INIT;
+static bool log_fp_initialized = false;
 __attribute__((constructor))
 void init_library() {
+    if (!log_fp_initialized) {
+        const char *logfile = getenv("RDKB_ACL_LOGFILE");
+        if (logfile) {
+            acl_log_fp = fopen(logfile, "a");
+            if (!acl_log_fp) {
+                acl_log_fp = stderr;
+            }
+        } else {
+            acl_log_fp = stderr;
+        }
+        log_fp_initialized = true;
+    }
     ACL_LOG("Inside %s\n", __FUNCTION__);
     ACL_LOG("PID %d\n", getpid());
     // Use ACL_FILE environment variable for ACL list file path
@@ -341,24 +336,30 @@ void init_library() {
 
 static bool is_api_allowed(const char *name, char list[][MAX_API_NAME_LEN], int count) {
     // Block access while reloading the ACL list
-    pthread_mutex_lock(&reload_acllist_mutex);
-    pthread_mutex_unlock(&reload_acllist_mutex);
     switch (acl_mode) {
         case MODE_ALLOW_ALL:
             return true;
         case MODE_DENY_ALL:
             return false;
         case MODE_ALLOW_WITH_SELECTIVE_BLOCKLIST:
+            pthread_mutex_lock(&reload_acllist_mutex);
             for (int i = 0; i < count; ++i) {
-                if (strcmp(name, list[i]) == 0)
+                if (strcmp(name, list[i]) == 0) {
+                    pthread_mutex_unlock(&reload_acllist_mutex);
                     return false;
+                }
             }
+            pthread_mutex_unlock(&reload_acllist_mutex);
             return true;
         case MODE_DENY_WITH_SELECTIVE_WHITELIST:
+            pthread_mutex_lock(&reload_acllist_mutex);
             for (int i = 0; i < count; ++i) {
-                if (strcmp(name, list[i]) == 0)
+                if (strcmp(name, list[i]) == 0) {
+                    pthread_mutex_unlock(&reload_acllist_mutex);
                     return true;
+                }
             }
+            pthread_mutex_unlock(&reload_acllist_mutex);
             return false;
         default:
             return false;
@@ -603,19 +604,5 @@ int syscfg_set_nns_u_commit(const char *name, unsigned long value)
     }
     ACL_LOG("[Intercepted] syscfg_set_nns_u_commit called with name: %s, value: %lu\n", name, value);
     int result = real_syscfg_set_nns_u_commit(name, value);
-    return result;
-}
-
-int syscfg_commit(void)
-{
-    if (!real_syscfg_commit) {
-        real_syscfg_commit = DLSYM_FN(syscfg_commit_func_t, "syscfg_commit");
-        if (!real_syscfg_commit) {
-            fprintf(stderr, "Error resolving original syscfg_commit\n");
-            return -1;
-        }
-    }
-    ACL_LOG("[Intercepted] syscfg_commit called\n");
-    int result = real_syscfg_commit();
     return result;
 }

@@ -12,7 +12,6 @@ typedef int (*syscfg_set_ns_func_t)(const char *, const char *, const char *);
 typedef int (*syscfg_set_nns_func_t)(const char *, const char *);
 typedef int (*syscfg_set_ns_u_func_t)(const char *, const char *, unsigned long);
 typedef int (*syscfg_set_nns_u_func_t)(const char *, unsigned long);
-typedef int (*syscfg_commit_func_t)(void);
 
 typedef enum {
     MODE_ALLOW_ALL,
@@ -42,4 +41,3 @@ int syscfg_set_ns_u(const char *ns, const char *name, unsigned long value);
 int syscfg_set_nns_u(const char *name, unsigned long value);
 int syscfg_set_ns_u_commit(const char *ns, const char *name, unsigned long value);
 int syscfg_set_nns_u_commit(const char *name, unsigned long value);
-int syscfg_commit(void);
