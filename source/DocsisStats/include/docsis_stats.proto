@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+
+// ===== Downstream Channel Stats =====
+message DsChannelStats {
+    uint64 timestamp_ms = 1;
+    uint32 ds_channel_count = 2;
+    uint64 channel_id = 3;
+    string frequency = 4;
+    string power_level = 5;
+    string snr_level = 6;
+    string modulation = 7;
+    uint64 octets = 8;
+    uint64 correcteds = 9;
+    uint64 uncorrectables = 10;
+    string lock_status = 11;
+}
+
+// ===== Upstream Channel Stats =====
+message UsChannelStats {
+    uint64 timestamp_ms = 1;
+    uint32 us_channel_count = 2;
+    uint64 channel_id = 3;
+    string frequency = 4;
+    string power_level = 5;
+    string channel_type = 6;
+    string symbol_rate = 7;
+    string modulation = 8;
+    string lock_status = 9;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Overall report that contain all individual stats reports
+//
+////////////////////////////////////////////////////////////////////////////////
+message Report {
+    repeated DsChannelStats dsChannelData = 1;
+    repeated UsChannelStats usChannelData = 2;
+}

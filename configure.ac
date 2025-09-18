@@ -169,6 +169,8 @@ AC_CONFIG_FILES(
 	source/dhcp_client_utils/Makefile
 	source/msgq_util/Makefile
   source/FwBankInfo/Makefile
+  source/docsis_stats_collection/Makefile
+  source/DocsisStats/Makefile
 	Makefile
 )
 
