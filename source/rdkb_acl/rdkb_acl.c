@@ -30,7 +30,7 @@ static int rbus_get_count = 0;
 static char rbus_set_list[MAX_ACL_NAMES][MAX_API_NAME_LEN] = {0};
 static int rbus_set_count = 0;
 
-static char acl_filename[512] = {0};
+static char acl_json_filename[512] = {0};
 static pthread_mutex_t reload_acllist_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static rbus_get_func_t real_rbus_get = NULL;
@@ -46,6 +46,7 @@ static syscfg_set_ns_u_func_t real_syscfg_set_ns_u = NULL;
 static syscfg_set_nns_u_func_t real_syscfg_set_nns_u = NULL;
 static syscfg_set_ns_u_func_t real_syscfg_set_ns_u_commit = NULL;
 static syscfg_set_nns_u_func_t real_syscfg_set_nns_u_commit = NULL;
+static rbus_getExt_func_t real_rbus_getExt = NULL;
 
 static FILE *acl_log_fp = NULL;
 
@@ -93,13 +94,13 @@ const char* acl_mode_to_string(acl_mode_t mode) {
 
 static void reload_acllist() {
     ACL_LOG("Inside %s\n", __FUNCTION__);
-    if (acl_filename[0] == '\0') {
+    if (acl_json_filename[0] == '\0') {
         fprintf(stderr, "acllist filename is empty, cannot open file.\n");
         return;
     }
-    FILE *fp = fopen(acl_filename, "r");
+    FILE *fp = fopen(acl_json_filename, "r");
     if (!fp) {
-        fprintf(stderr, "Failed to open acllist file: %s\n", acl_filename);
+        fprintf(stderr, "Failed to open acllist file: %s\n", acl_json_filename);
         return;
     }
     fseek(fp, 0, SEEK_END);
@@ -126,11 +127,11 @@ static void reload_acllist() {
     cJSON *parsed_json = cJSON_Parse(json_data);
     if (!parsed_json) {
         const char *error_ptr = cJSON_GetErrorPtr();
-        ACL_LOG("Failed to parse acllist JSON file: %s. Error at: %s\n", acl_filename, error_ptr ? error_ptr : "unknown location");
+        ACL_LOG("Failed to parse acllist JSON file: %s. Error at: %s\n", acl_json_filename, error_ptr ? error_ptr : "unknown location");
         free(json_data);
         return;
     }
-    ACL_LOG("Successfully parsed acllist JSON file: %s\n", acl_filename);
+    ACL_LOG("Successfully parsed acllist JSON file: %s\n", acl_json_filename);
     free(json_data);
 
     // Reset all
@@ -276,7 +277,7 @@ static void* acllist_watcher_thread(void* arg) {
     ev_stat acllist_watcher;
 
     // Initialize and start the ev_stat watcher for the acllist file
-    ev_stat_init(&acllist_watcher, acllist_cb, acl_filename, 0.);
+    ev_stat_init(&acllist_watcher, acllist_cb, acl_json_filename, 0.);
     ev_stat_start(loop, &acllist_watcher);
 
     ev_run(loop, 0);
@@ -312,18 +313,18 @@ void init_library() {
     }
     ACL_LOG("Inside %s\n", __FUNCTION__);
     ACL_LOG("PID %d\n", getpid());
-    // Use ACL_FILE environment variable for ACL list file path
-    const char *env = getenv("ACL_FILE");
+    // Use RDKB_ACL_JSON environment variable for ACL list file path
+    const char *env = getenv("RDKB_ACL_JSON");
     if (!env) {
-        fprintf(stderr, "ACL_FILE env variable not set\n");
+        fprintf(stderr, "RDKB_ACL_JSON env variable not set\n");
         return;
     }
-    if (strlen(env) >= sizeof(acl_filename) - 1) {
-        ACL_LOG("Error: ACL_FILE path too long (%zu bytes). Maximum allowed length is %zu bytes. Initialization aborted.\n", strlen(env), sizeof(acl_filename)-1);
+    if (strlen(env) >= sizeof(acl_json_filename) - 1) {
+        ACL_LOG("Error: RDKB_ACL_JSON path too long (%zu bytes). Maximum allowed length is %zu bytes. Initialization aborted.\n", strlen(env), sizeof(acl_json_filename)-1);
         return;
     }
-    strncpy(acl_filename, env, sizeof(acl_filename)-1);
-    acl_filename[sizeof(acl_filename)-1] = '\0';
+    strncpy(acl_json_filename, env, sizeof(acl_json_filename)-1);
+    acl_json_filename[sizeof(acl_json_filename)-1] = '\0';
 
     // Initial load of the acllist
     pthread_mutex_lock(&reload_acllist_mutex);
@@ -334,7 +335,7 @@ void init_library() {
     pthread_atfork(NULL, NULL, acllist_watcher_once);
 }
 
-static bool is_api_allowed(const char *name, char list[][MAX_API_NAME_LEN], int count) {
+static bool is_api_allowed(const char *name, char list[][MAX_API_NAME_LEN], int count, bool is_rbus) {
     // Block access while reloading the ACL list
     switch (acl_mode) {
         case MODE_ALLOW_ALL:
@@ -344,9 +345,16 @@ static bool is_api_allowed(const char *name, char list[][MAX_API_NAME_LEN], int 
         case MODE_ALLOW_WITH_SELECTIVE_BLOCKLIST:
             pthread_mutex_lock(&reload_acllist_mutex);
             for (int i = 0; i < count; ++i) {
-                if (strcmp(name, list[i]) == 0) {
-                    pthread_mutex_unlock(&reload_acllist_mutex);
-                    return false;
+                if (is_rbus) {
+                    if (strstr(name, list[i]) != NULL) {
+                        pthread_mutex_unlock(&reload_acllist_mutex);
+                        return false;
+                    }
+                } else {
+                    if (strcmp(name, list[i]) == 0) {
+                        pthread_mutex_unlock(&reload_acllist_mutex);
+                        return false;
+                    }
                 }
             }
             pthread_mutex_unlock(&reload_acllist_mutex);
@@ -354,9 +362,16 @@ static bool is_api_allowed(const char *name, char list[][MAX_API_NAME_LEN], int 
         case MODE_DENY_WITH_SELECTIVE_WHITELIST:
             pthread_mutex_lock(&reload_acllist_mutex);
             for (int i = 0; i < count; ++i) {
-                if (strcmp(name, list[i]) == 0) {
-                    pthread_mutex_unlock(&reload_acllist_mutex);
-                    return true;
+                if (is_rbus) {
+                    if (strstr(name, list[i]) != NULL) {
+                        pthread_mutex_unlock(&reload_acllist_mutex);
+                        return true;
+                    }
+                } else {
+                    if (strcmp(name, list[i]) == 0) {
+                        pthread_mutex_unlock(&reload_acllist_mutex);
+                        return true;
+                    }
                 }
             }
             pthread_mutex_unlock(&reload_acllist_mutex);
@@ -366,12 +381,12 @@ static bool is_api_allowed(const char *name, char list[][MAX_API_NAME_LEN], int 
     }
 }
 
-#define IS_SYSCFG_GET_ALLOWED(name) is_api_allowed(name, syscfg_get_list, syscfg_get_count)
-#define IS_SYSCFG_SET_ALLOWED(name) is_api_allowed(name, syscfg_set_list, syscfg_set_count)
-#define IS_SYSEVENT_GET_ALLOWED(name) is_api_allowed(name, sysevent_get_list, sysevent_get_count)
-#define IS_SYSEVENT_SET_ALLOWED(name) is_api_allowed(name, sysevent_set_list, sysevent_set_count)
-#define IS_RBUS_GET_ALLOWED(name) is_api_allowed(name, rbus_get_list, rbus_get_count)
-#define IS_RBUS_SET_ALLOWED(name) is_api_allowed(name, rbus_set_list, rbus_set_count)
+#define IS_SYSCFG_GET_ALLOWED(name) is_api_allowed(name, syscfg_get_list, syscfg_get_count, false)
+#define IS_SYSCFG_SET_ALLOWED(name) is_api_allowed(name, syscfg_set_list, syscfg_set_count, false)
+#define IS_SYSEVENT_GET_ALLOWED(name) is_api_allowed(name, sysevent_get_list, sysevent_get_count, false)
+#define IS_SYSEVENT_SET_ALLOWED(name) is_api_allowed(name, sysevent_set_list, sysevent_set_count, false)
+#define IS_RBUS_GET_ALLOWED(name) is_api_allowed(name, rbus_get_list, rbus_get_count, true)
+#define IS_RBUS_SET_ALLOWED(name) is_api_allowed(name, rbus_set_list, rbus_set_count, true)
 
 rbusError_t rbus_get(rbusHandle_t handle, const char* name, rbusValue_t* value)
 {
@@ -605,4 +620,24 @@ int syscfg_set_nns_u_commit(const char *name, unsigned long value)
     ACL_LOG("[Intercepted] syscfg_set_nns_u_commit called with name: %s, value: %lu\n", name, value);
     int result = real_syscfg_set_nns_u_commit(name, value);
     return result;
+}
+
+rbusError_t rbus_getExt(rbusHandle_t handle, int numParams, const char** params, int* resCount, rbusProperty_t* props)
+{
+    // Check ACL for each param
+    for (int i = 0; i < numParams; ++i) {
+        if (!IS_RBUS_GET_ALLOWED(params[i])) {
+            ACL_LOG("[Denied] rbus_getExt denied for param: %s (not allowed by mode).\n", params[i]);
+            return RBUS_ERROR_BUS_ERROR;
+        }
+    }
+    if (!real_rbus_getExt) {
+        real_rbus_getExt = DLSYM_FN(rbus_getExt_func_t, "rbus_getExt");
+        if (!real_rbus_getExt) {
+            fprintf(stderr, "Error resolving original rbus_getExt\n");
+            return RBUS_ERROR_BUS_ERROR;
+        }
+    }
+    ACL_LOG("[Intercepted] rbus_getExt called with numParams: %d\n", numParams);
+    return real_rbus_getExt(handle, numParams, params, resCount, props);
 }

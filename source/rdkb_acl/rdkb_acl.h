@@ -3,6 +3,7 @@
 // Typedefs for function pointers
 typedef rbusError_t (*rbus_get_func_t)(rbusHandle_t, const char*, rbusValue_t*);
 typedef rbusError_t (*rbus_set_func_t)(rbusHandle_t, const char*, rbusValue_t, rbusSetOptions_t*);
+typedef rbusError_t (*rbus_getExt_func_t)(rbusHandle_t, int, const char**, int*, rbusProperty_t*);
 
 typedef int (*sysevent_get_func_t)(const int, const token_t, const char *, char *, int);
 typedef int (*sysevent_set_func_t)(const int, const token_t, const char *, const char *, int);
@@ -28,6 +29,7 @@ typedef enum {
 
 rbusError_t rbus_get(rbusHandle_t handle, const char* name, rbusValue_t* value);
 rbusError_t rbus_set(rbusHandle_t handle, const char* name, rbusValue_t value, rbusSetOptions_t* opts);
+rbusError_t rbus_getExt(rbusHandle_t handle, int numParams, const char** params, int* resCount, rbusProperty_t* props);
 
 int sysevent_get(const int fd, const token_t token, const char *inbuf, char *outbuf, int outbytes);
 int sysevent_set(const int fd, const token_t token, const char *name, const char *value,  int conf_req);
