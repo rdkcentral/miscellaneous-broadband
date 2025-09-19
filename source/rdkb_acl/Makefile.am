@@ -24,4 +24,5 @@ AM_CPPFLAGS = -Wall -Werror
 lib_LTLIBRARIES = librdkb_acl.la
 librdkb_acl_la_SOURCES = rdkb_acl.c
 librdkb_acl_la_CPPFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus
+librdkb_acl_la_CPPFLAGS += -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rtmessage
 librdkb_acl_la_LDFLAGS = -shared -fPIC -lrbus -lsyscfg -lsysevent -lev -lpthread -lcjson

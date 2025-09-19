@@ -8,10 +8,59 @@
 #include <pthread.h>
 #include <ev.h>
 #include <rbus/rbus.h>
+#include <rbus/rbuscore_message.h>
 #include <sysevent/sysevent.h>
 #include <syscfg/syscfg.h>
 #include <cjson/cJSON.h>
 #include "rdkb_acl.h"
+
+static rbusError_t CCSPError_to_rbusError(rtError e)
+{
+  rbusError_t err;
+  switch (e)
+  {
+    case RBUS_LEGACY_ERR_SUCCESS:
+      err = RBUS_ERROR_SUCCESS;
+      break;
+    case RBUS_LEGACY_ERR_MEMORY_ALLOC_FAIL:
+      err = RBUS_ERROR_OUT_OF_RESOURCES;
+      break;
+    case RBUS_LEGACY_ERR_FAILURE:
+      err = RBUS_ERROR_BUS_ERROR;
+      break;
+    case RBUS_LEGACY_ERR_NOT_CONNECT:
+      err = RBUS_ERROR_OUT_OF_RESOURCES;
+      break;
+    case RBUS_LEGACY_ERR_TIMEOUT:
+      err = RBUS_ERROR_TIMEOUT;
+      break;
+    case RBUS_LEGACY_ERR_NOT_EXIST:
+      err = RBUS_ERROR_DESTINATION_NOT_FOUND;
+      break;
+    case RBUS_LEGACY_ERR_NOT_SUPPORT:
+      err = RBUS_ERROR_BUS_ERROR;
+      break;
+    case RBUS_LEGACY_ERR_RESOURCE_EXCEEDED:
+      err = RBUS_ERROR_OUT_OF_RESOURCES;
+      break;
+    case RBUS_LEGACY_ERR_INVALID_PARAMETER_NAME:
+      err = RBUS_ERROR_INVALID_NAMESPACE;
+      break;
+    case RBUS_LEGACY_ERR_INVALID_PARAMETER_TYPE:
+      err = RBUS_ERROR_INVALID_PARAMETER_TYPE;
+      break;
+    case RBUS_LEGACY_ERR_INVALID_PARAMETER_VALUE:
+     err = RBUS_ERROR_INVALID_PARAMETER_VALUE;
+     break;
+    case RBUS_LEGACY_ERR_NOT_WRITABLE:
+     err = RBUS_ERROR_NOT_WRITABLE;
+     break;
+    default:
+      err = RBUS_ERROR_BUS_ERROR;
+      break;
+  }
+  return err;
+}
 
 static acl_mode_t acl_mode = MODE_DENY_ALL;
 
@@ -392,7 +441,7 @@ rbusError_t rbus_get(rbusHandle_t handle, const char* name, rbusValue_t* value)
 {
     if (!IS_RBUS_GET_ALLOWED(name)) {
         ACL_LOG("[Denied] rbus_get denied for name: %s (not allowed by mode).\n", name);
-        return RBUS_ERROR_BUS_ERROR;
+        return RBUS_ERROR_ACCESS_NOT_ALLOWED;
     }
     if (!real_rbus_get) {
         real_rbus_get = DLSYM_FN(rbus_get_func_t, "rbus_get");
@@ -410,7 +459,7 @@ rbusError_t rbus_set(rbusHandle_t handle, const char* name, rbusValue_t value, r
 {
     if (!IS_RBUS_SET_ALLOWED(name)) {
         ACL_LOG("[Denied] rbus_set denied for name: %s (not allowed by mode).\n", name);
-        return RBUS_ERROR_BUS_ERROR;
+        return RBUS_ERROR_ACCESS_NOT_ALLOWED;
     }
     if (!real_rbus_set) {
         real_rbus_set = DLSYM_FN(rbus_set_func_t, "rbus_set");
@@ -422,6 +471,124 @@ rbusError_t rbus_set(rbusHandle_t handle, const char* name, rbusValue_t value, r
     ACL_LOG("[Intercepted] rbus_set called with name: %s\n", name);
     rbusError_t result = real_rbus_set(handle, name, value, opts);
     return result;
+}
+
+rbusError_t rbus_getExt(rbusHandle_t handle, int numParams, const char** params, int* resCount, rbusProperty_t* props)
+{
+    // Check ACL for each param
+    for (int i = 0; i < numParams; ++i) {
+        if (!IS_RBUS_GET_ALLOWED(params[i])) {
+            ACL_LOG("[Denied] rbus_getExt denied for param: %s (not allowed by mode).\n", params[i]);
+            return RBUS_ERROR_ACCESS_NOT_ALLOWED;
+        }
+    }
+    if (!real_rbus_getExt) {
+        real_rbus_getExt = DLSYM_FN(rbus_getExt_func_t, "rbus_getExt");
+        if (!real_rbus_getExt) {
+            fprintf(stderr, "Error resolving original rbus_getExt\n");
+            return RBUS_ERROR_BUS_ERROR;
+        }
+    }
+    ACL_LOG("[Intercepted] rbus_getExt called with numParams: %d\n", numParams);
+    return real_rbus_getExt(handle, numParams, params, resCount, props);
+}
+
+rbusError_t rbusProperty_initFromMessage(rbusProperty_t* property, rbusMessage msg)
+{
+    char const* name;
+    rbusValue_t value;
+    rbusError_t err = RBUS_ERROR_SUCCESS;
+
+    rbusMessage_GetString(msg, (char const**) &name);
+    if (!IS_RBUS_GET_ALLOWED(name)) {
+        ACL_LOG("[Denied] rbusProperty_initFromMessage denied for name: %s (not allowed by mode).\n", name);
+        rbusProperty_Init(property, name, NULL);
+        rbusValue_initFromMessage(&value, msg);
+        rbusProperty_SetValue(*property, NULL);
+        rbusValue_Release(value);
+        return RBUS_ERROR_ACCESS_NOT_ALLOWED;
+    }
+    else {
+        ACL_LOG("[Intercepted] rbusProperty_initFromMessage for name: %s\n", name);
+    }
+
+    if (!property)
+    {
+        return RBUS_ERROR_INVALID_INPUT;
+    }
+
+    rbusProperty_Init(property, name, NULL);
+    err= rbusValue_initFromMessage(&value, msg);
+    rbusProperty_SetValue(*property, value);
+    rbusValue_Release(value);
+    return err;
+}
+
+rbusError_t _getExt_response_parser(rbusMessage response, int *numValues, rbusProperty_t* retProperties)
+{
+    rbusError_t errorcode = RBUS_ERROR_SUCCESS;
+    rbusLegacyReturn_t legacyRetCode = RBUS_LEGACY_ERR_FAILURE;
+    int numOfVals = 0;
+    int ret = -1;
+    int i = 0;
+    int j = 0;
+
+    rbusMessage_GetInt32(response, &ret);
+
+    errorcode = (rbusError_t) ret;
+    legacyRetCode = (rbusLegacyReturn_t) ret;
+
+    *numValues = 0;
+    if((errorcode == RBUS_ERROR_SUCCESS) || (legacyRetCode == RBUS_LEGACY_ERR_SUCCESS))
+    {
+        errorcode = RBUS_ERROR_SUCCESS;
+        rbusMessage_GetInt32(response, &numOfVals);
+
+        if(numOfVals)
+        {
+            rbusProperty_t last;
+            for(i = 0; i < numOfVals; i++)
+            {
+                /* For the first instance, lets use the given pointer */
+                if (0 == j)
+                {
+                    errorcode = rbusProperty_initFromMessage(retProperties, response);
+                    if (errorcode == RBUS_ERROR_SUCCESS)
+                    {
+                        j++;
+                        last = *retProperties;
+                    }
+                }
+                else
+                {
+                    rbusProperty_t tmpProperties;
+                    errorcode = rbusProperty_initFromMessage(&tmpProperties, response);
+                    if (errorcode == RBUS_ERROR_SUCCESS)
+                    {
+                        j++;
+                        rbusProperty_SetNext(last, tmpProperties);
+                        rbusProperty_Release(tmpProperties);
+                        last = tmpProperties;
+                    }
+                    else
+                    {
+                        rbusProperty_Release(tmpProperties);
+                    }
+                }
+            }
+        }
+        *numValues = j;
+    }
+    else
+    {
+        if(legacyRetCode > RBUS_LEGACY_ERR_SUCCESS)
+        {
+            errorcode = CCSPError_to_rbusError(legacyRetCode);
+        }
+    }
+    rbusMessage_Release(response);
+
+    return errorcode;
 }
 
 int sysevent_get(const int fd, const token_t token, const char *inbuf, char *outbuf, int outbytes)
@@ -620,24 +787,4 @@ int syscfg_set_nns_u_commit(const char *name, unsigned long value)
     ACL_LOG("[Intercepted] syscfg_set_nns_u_commit called with name: %s, value: %lu\n", name, value);
     int result = real_syscfg_set_nns_u_commit(name, value);
     return result;
-}
-
-rbusError_t rbus_getExt(rbusHandle_t handle, int numParams, const char** params, int* resCount, rbusProperty_t* props)
-{
-    // Check ACL for each param
-    for (int i = 0; i < numParams; ++i) {
-        if (!IS_RBUS_GET_ALLOWED(params[i])) {
-            ACL_LOG("[Denied] rbus_getExt denied for param: %s (not allowed by mode).\n", params[i]);
-            return RBUS_ERROR_BUS_ERROR;
-        }
-    }
-    if (!real_rbus_getExt) {
-        real_rbus_getExt = DLSYM_FN(rbus_getExt_func_t, "rbus_getExt");
-        if (!real_rbus_getExt) {
-            fprintf(stderr, "Error resolving original rbus_getExt\n");
-            return RBUS_ERROR_BUS_ERROR;
-        }
-    }
-    ACL_LOG("[Intercepted] rbus_getExt called with numParams: %d\n", numParams);
-    return real_rbus_getExt(handle, numParams, params, resCount, props);
 }

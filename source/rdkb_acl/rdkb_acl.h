@@ -27,19 +27,19 @@ typedef enum {
 #define MAX_ACL_NAMES 256
 #define MAX_API_NAME_LEN 128
 
-rbusError_t rbus_get(rbusHandle_t handle, const char* name, rbusValue_t* value);
-rbusError_t rbus_set(rbusHandle_t handle, const char* name, rbusValue_t value, rbusSetOptions_t* opts);
-rbusError_t rbus_getExt(rbusHandle_t handle, int numParams, const char** params, int* resCount, rbusProperty_t* props);
+rbusError_t rbusValue_initFromMessage(rbusValue_t* value, rbusMessage msg);
 
-int sysevent_get(const int fd, const token_t token, const char *inbuf, char *outbuf, int outbytes);
-int sysevent_set(const int fd, const token_t token, const char *name, const char *value,  int conf_req);
-
-int syscfg_get(const char *ns, const char *name, char *out_val, int outbufsz);
-int syscfg_set_ns(const char *ns, const char *name, const char *value);
-int syscfg_set_nns (const char *name, const char *value);
-int syscfg_set_ns_commit(const char *ns, const char *name, const char *value);
-int syscfg_set_nns_commit(const char *name, const char *value);
-int syscfg_set_ns_u(const char *ns, const char *name, unsigned long value);
-int syscfg_set_nns_u(const char *name, unsigned long value);
-int syscfg_set_ns_u_commit(const char *ns, const char *name, unsigned long value);
-int syscfg_set_nns_u_commit(const char *name, unsigned long value);
+typedef enum _rbus_legacy_returns {
+    RBUS_LEGACY_ERR_SUCCESS = 100,
+    RBUS_LEGACY_ERR_MEMORY_ALLOC_FAIL = 101,
+    RBUS_LEGACY_ERR_FAILURE = 102,
+    RBUS_LEGACY_ERR_NOT_CONNECT = 190,
+    RBUS_LEGACY_ERR_TIMEOUT = 191,
+    RBUS_LEGACY_ERR_NOT_EXIST = 192,
+    RBUS_LEGACY_ERR_NOT_SUPPORT = 193,
+    RBUS_LEGACY_ERR_RESOURCE_EXCEEDED = 9004,
+    RBUS_LEGACY_ERR_INVALID_PARAMETER_NAME = 9005,
+    RBUS_LEGACY_ERR_INVALID_PARAMETER_TYPE = 9006,
+    RBUS_LEGACY_ERR_INVALID_PARAMETER_VALUE = 9007,
+    RBUS_LEGACY_ERR_NOT_WRITABLE = 9008,
+} rbusLegacyReturn_t;
