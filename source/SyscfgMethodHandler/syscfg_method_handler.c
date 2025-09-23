@@ -15,6 +15,28 @@ static volatile sig_atomic_t signal_received = 0;
 
 rbusError_t syscfg_unreg_elements(void);
 
+static void daemonize(void)
+{
+    switch (fork())
+    {
+        case 0:
+            break;
+        case -1:
+            // Error
+            printf("Error daemonizing (fork)! %d - %s\n", errno, strerror(errno));
+            exit(0);
+            break;
+        default:
+            _exit(0);
+    }
+
+    if (setsid() < 0)
+    {
+        printf("Error demonizing (setsid)! %d - %s\n", errno, strerror(errno));
+        exit(0);
+    }
+}
+
 void cleanup_and_exit(int code)
 {
     syscfg_unreg_elements(); // Unregister elements on exit
@@ -217,6 +239,7 @@ rbusError_t syscfg_commit_rbus(rbusHandle_t handle, char const* methodName, rbus
 
 int main()
 {
+    daemonize();
     syscfg_init();
     rbusError_t rc = syscfg_RbusInit();
     if (rc != RBUS_ERROR_SUCCESS)
