@@ -26,19 +26,29 @@ void log_message(const char *format, ...) {
     }
 }
 
+/* initialize functions are fine but check channel_count >= 0, return NULL when 0 may be acceptable */
 dsChannelStats_t* initialize_dsChannel_stats(int channel_count)
 {
+    if (channel_count < 0) return NULL;
     log_message("Initializing dsChannelStats with channel_count: %d\n", channel_count);
-    dsChannelStats_t *stats = (dsChannelStats_t *)calloc(1, sizeof(dsChannelStats_t));
+
+    dsChannelStats_t *stats = calloc(1, sizeof(dsChannelStats_t));
     if (!stats) {
+        log_message("calloc failed for dsChannelStats_t\n");
         return NULL;
     }
+
     stats->ds_channel_count = channel_count;
     stats->timestamp_ms = 0;
-    stats->ds_channel_stats = (PCMMGMT_CM_DS_CHANNEL)calloc(channel_count, sizeof(*stats->ds_channel_stats));
-    if (!stats->ds_channel_stats) {
-        free(stats);
-        return NULL;
+    if (channel_count > 0) {
+        stats->ds_channel_stats = calloc((size_t)channel_count, sizeof(*stats->ds_channel_stats));
+        if (!stats->ds_channel_stats) {
+            free(stats);
+            log_message("calloc failed for ds_channel_stats array\n");
+            return NULL;
+        }
+    } else {
+        stats->ds_channel_stats = NULL;
     }
     stats->next = NULL;
     return stats;
@@ -46,17 +56,26 @@ dsChannelStats_t* initialize_dsChannel_stats(int channel_count)
 
 usChannelStats_t* initialize_usChannel_stats(int channel_count)
 {
+    if (channel_count < 0) return NULL;
     log_message("Initializing usChannelStats with channel_count: %d\n", channel_count);
-    usChannelStats_t *stats = (usChannelStats_t *)calloc(1, sizeof(usChannelStats_t));
+
+    usChannelStats_t *stats = calloc(1, sizeof(usChannelStats_t));
     if (!stats) {
+        log_message("calloc failed for usChannelStats_t\n");
         return NULL;
     }
+
     stats->us_channel_count = channel_count;
     stats->timestamp_ms = 0;
-    stats->us_channel_stats = (PCMMGMT_CM_US_CHANNEL)calloc(channel_count, sizeof(*stats->us_channel_stats));
-    if (!stats->us_channel_stats) {
-        free(stats);
-        return NULL;
+    if (channel_count > 0) {
+        stats->us_channel_stats = calloc((size_t)channel_count, sizeof(*stats->us_channel_stats));
+        if (!stats->us_channel_stats) {
+            free(stats);
+            log_message("calloc failed for us_channel_stats array\n");
+            return NULL;
+        }
+    } else {
+        stats->us_channel_stats = NULL;
     }
     stats->next = NULL;
     return stats;
@@ -66,10 +85,8 @@ void free_dsChannel_stats(dsChannelStats_t *head)
 {
     log_message("Freeing dsChannelStats\n");
     dsChannelStats_t *current = head;
-    dsChannelStats_t *next;
-
     while (current != NULL) {
-        next = current->next;
+        dsChannelStats_t *next = current->next;
         if (current->ds_channel_stats) {
             free(current->ds_channel_stats);
             current->ds_channel_stats = NULL;
@@ -83,10 +100,8 @@ void free_usChannel_stats(usChannelStats_t *head)
 {
     log_message("Freeing usChannelStats\n");
     usChannelStats_t *current = head;
-    usChannelStats_t *next;
-
     while (current != NULL) {
-        next = current->next;
+        usChannelStats_t *next = current->next;
         if (current->us_channel_stats) {
             free(current->us_channel_stats);
             current->us_channel_stats = NULL;
@@ -96,25 +111,39 @@ void free_usChannel_stats(usChannelStats_t *head)
     }
 }
 
+/* get_* functions: check array count and string fields before reading index 0 */
 int get_ds_channel_stats(dsChannelStats_t *dsChannelStats)
 {
     int res;
 
     log_message("Getting DS Channel Stats\n");
-    if (!dsChannelStats || !dsChannelStats->ds_channel_stats) {
-        log_message("Invalid dsChannelStats pointer\n");
+    if (!dsChannelStats) {
+        log_message("Invalid dsChannelStats pointer (NULL)\n");
         return -1;
     }
+    if (!dsChannelStats->ds_channel_stats) {
+        log_message("ds_channel_stats array is NULL\n");
+        return -1;
+    }
+
     dsChannelStats->timestamp_ms = get_timestamp_ms();
 
     res = docsis_GetDSChannel(&(dsChannelStats->ds_channel_stats));
-
     if (res != 0) {
         log_message("docsis_GetDSChannel failed with error code: %d\n", res);
         return res;
     }
+
     log_message("Successfully retrieved DS Channel Stats\n");
-    log_message("freq: %s\n", dsChannelStats->ds_channel_stats[0].Frequency);
+    if (dsChannelStats->ds_channel_count > 0) {
+        if (dsChannelStats->ds_channel_stats[0].Frequency) {
+            log_message("freq: %s\n", dsChannelStats->ds_channel_stats[0].Frequency);
+        } else {
+            log_message("freq: (null)\n");
+        }
+    } else {
+        log_message("ds_channel_count == 0, nothing to print\n");
+    }
 
     return 0;
 }
@@ -124,20 +153,33 @@ int get_us_channel_stats(usChannelStats_t *usChannelStats)
     int res;
 
     log_message("Getting US Channel Stats\n");
-    if (!usChannelStats || !usChannelStats->us_channel_stats) {
-        log_message("Invalid usChannelStats pointer\n");
+    if (!usChannelStats) {
+        log_message("Invalid usChannelStats pointer (NULL)\n");
         return -1;
     }
+    if (!usChannelStats->us_channel_stats) {
+        log_message("us_channel_stats array is NULL\n");
+        return -1;
+    }
+
     usChannelStats->timestamp_ms = get_timestamp_ms();
 
     res = docsis_GetUSChannel(&(usChannelStats->us_channel_stats));
-
     if (res != 0) {
         log_message("docsis_GetUSChannel failed with error code: %d\n", res);
         return res;
     }
+
     log_message("Successfully retrieved US Channel Stats\n");
-    log_message("freq: %s\n", usChannelStats->us_channel_stats[0].Frequency);
+    if (usChannelStats->us_channel_count > 0) {
+        if (usChannelStats->us_channel_stats[0].Frequency) {
+            log_message("freq: %s\n", usChannelStats->us_channel_stats[0].Frequency);
+        } else {
+            log_message("freq: (null)\n");
+        }
+    } else {
+        log_message("us_channel_count == 0, nothing to print\n");
+    }
 
     return 0;
 }
