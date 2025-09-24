@@ -70,11 +70,9 @@ static DsChannelStats** dsChannelStats_struct_create(dsChannelStats_t *ds_stats,
 
             ind++;
         }
-        printf("%s 1 ind: %d, cnt:%d\n", __FUNCTION__, ind, total_cnt);
         ds_stats = ds_stats->next;
     }
 
-    printf("%s: 2 ind: %d, total_cnt: %d\n", __FUNCTION__, ind, total_cnt);
     *out_count = total_cnt;
     return dsChannelStatsArray;
 }
@@ -132,7 +130,6 @@ static UsChannelStats** usChannelStats_struct_create(usChannelStats_t *us_stats,
         us_stats = us_stats->next;
     }
 
-    printf("%s: ind: %d, total_cnt: %d\n", __FUNCTION__, ind, total_cnt);
     *out_count = total_cnt;
     return usChannelStatsArray;
 }
