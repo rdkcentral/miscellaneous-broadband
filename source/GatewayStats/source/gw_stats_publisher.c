@@ -5,8 +5,8 @@
 
 #define MQTT_LOCAL_MQTT_BROKER_IP_ADDR "192.168.245.254"
 #define MQTT_LOCAL_MQTT_BROKER_PORT_VAL 1883
-#define MQTT_GATEWAY_STATS_TOPIC  "local/device_optimizer_stats"
-// #define MQTT_GATEWAY_STATS_TOPIC "local/gateway_stats"
+// #define MQTT_GATEWAY_STATS_TOPIC  "local/device_optimizer_stats"
+#define MQTT_GATEWAY_STATS_TOPIC "local/gateway_stats"
 
 bool gw_stats_publish_data(void *data, long data_len) {
     int rc, mid;
