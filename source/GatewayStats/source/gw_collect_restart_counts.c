@@ -44,21 +44,25 @@ static void* fw_restart_time_thread_func(void *arg) {
         {
             if (strcmp(name, "firewall-restart") == 0) {
                 log_message("Firewall restart event received.\n");
-                // Add timestamp to fw_restart_time in g_report.restart_count_stats
                 char timestamp[64];
                 get_current_timestamp(timestamp, sizeof(timestamp));
+                pthread_mutex_lock(&stats_mutex);
                 restart_count_stats_t *stats = g_report.restart_count_stats;
-
+                if (!stats) {
+                    log_message("g_report.restart_count_stats is NULL!\n");
+                    pthread_mutex_unlock(&stats_mutex);
+                    continue;
+                }
                 // Ensure fw_restart_time is initialized
-                if (stats && stats->fw_restart_time == NULL) {
+                if (stats->fw_restart_time == NULL) {
                     stats->fw_restart_time = calloc(1, sizeof(char *));
                     if (stats->fw_restart_time == NULL) {
                         log_message("Failed to allocate initial memory for fw_restart_time\n");
+                        pthread_mutex_unlock(&stats_mutex);
                         continue;
                     }
                     stats->fw_restart_count = 0;
                 }
-
                 char **new_times = realloc(stats->fw_restart_time, (stats->fw_restart_count + 1) * sizeof(char *));
                 if (new_times) {
                     stats->fw_restart_time = new_times;
@@ -72,6 +76,7 @@ static void* fw_restart_time_thread_func(void *arg) {
                 } else {
                     log_message("Failed to allocate memory for fw_restart_time\n");
                 }
+                pthread_mutex_unlock(&stats_mutex);
             }
         }
     }
@@ -110,21 +115,25 @@ static void* wan_restart_time_thread_func(void *arg) {
         {
             if (strcmp(name, "wan-restart") == 0) {
                 log_message("WAN restart event received.\n");
-                // Add timestamp to wan_restart_time in g_report.restart_count_stats
                 char timestamp[64];
                 get_current_timestamp(timestamp, sizeof(timestamp));
+                pthread_mutex_lock(&stats_mutex);
                 restart_count_stats_t *stats = g_report.restart_count_stats;
-
+                if (!stats) {
+                    log_message("g_report.restart_count_stats is NULL!\n");
+                    pthread_mutex_unlock(&stats_mutex);
+                    continue;
+                }
                 // Ensure wan_restart_time is initialized
                 if (stats->wan_restart_time == NULL) {
                     stats->wan_restart_time = calloc(1, sizeof(char *));
                     if (stats->wan_restart_time == NULL) {
                         log_message("Failed to allocate initial memory for wan_restart_time\n");
+                        pthread_mutex_unlock(&stats_mutex);
                         continue;
                     }
                     stats->wan_restart_count = 0;
                 }
-
                 char **new_times = realloc(stats->wan_restart_time, (stats->wan_restart_count + 1) * sizeof(char *));
                 if (new_times) {
                     stats->wan_restart_time = new_times;
@@ -138,6 +147,7 @@ static void* wan_restart_time_thread_func(void *arg) {
                 } else {
                     log_message("Failed to allocate memory for wan_restart_time\n");
                 }
+                pthread_mutex_unlock(&stats_mutex);
             }
         }
     }

@@ -41,8 +41,10 @@ static void report_cb(EV_P_ ev_timer *w, int revents) {
 
     //Encode the collected data to protobuf format
     encoded_data =  (char *)encode_report(&g_report, &encoded_data_len);
-    if (!encoded_data) {
+    if (!encoded_data || encoded_data_len == 0) {
         log_message("report_cb: encode_report failed\n");
+        pthread_mutex_unlock(&g_report_lock);
+        return;
     }
     log_message("Encoded report size: %zu bytes\n", encoded_data_len);
 
@@ -50,7 +52,6 @@ static void report_cb(EV_P_ ev_timer *w, int revents) {
     res = gw_stats_publish_data((void *)encoded_data, encoded_data_len);
     if (res) {
         log_message("report_cb: gw_stats_publish_data SUCCESS\n");
-
         //Reset g_report after successful publish
         //Don't reset g_report if publish fails, to avoid data loss
         gw_stats_reset();
@@ -71,6 +72,10 @@ int main() {
 
     // Initialize event loop
     struct ev_loop *loop = EV_DEFAULT;
+    if (!loop) {
+        log_message("Failed to initialize event loop. Exiting.\n");
+        return 1;
+    }
 
     // Timer watcher for periodic collection
     ev_timer collect_timer;

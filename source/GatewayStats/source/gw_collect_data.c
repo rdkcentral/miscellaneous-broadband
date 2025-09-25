@@ -186,9 +186,14 @@ void save_to_text(const gw_stats_report *report) {
     // system_stats_t linked list
     const system_stats_t *system_stats = report->system_stats;
     while (system_stats) {
+        // NULL checks for string pointers
         fprintf(file, "system_params: %s|%llu|%s|%s|%s|%s|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%u|%u|%u|%u\n",
-                timestamp, system_stats->timestamp_ms, system_stats->model, system_stats->firmware, system_stats->cmac,
-                system_stats->uptime, system_stats->cpu_usage, system_stats->free_memory, system_stats->slab_memory,
+                timestamp, system_stats->timestamp_ms,
+                system_stats->model ? system_stats->model : "",
+                system_stats->firmware ? system_stats->firmware : "",
+                system_stats->cmac ? system_stats->cmac : "",
+                system_stats->uptime ? system_stats->uptime : "",
+                system_stats->cpu_usage, system_stats->free_memory, system_stats->slab_memory,
                 system_stats->avail_memory, system_stats->cached_mem, system_stats->slab_unreclaim,
                 system_stats->loadavg_1min, system_stats->loadavg_5min, system_stats->loadavg_15min,
                 system_stats->rootfs_used_kb, system_stats->rootfs_total_kb,
@@ -200,10 +205,18 @@ void save_to_text(const gw_stats_report *report) {
     const wan_stats_t *wan_stats = report->wan_stats;
     while (wan_stats) {
         fprintf(file, "wan: %s|%lld|%s|%s|%s|%s|%s|%s|%s|%s|%.3f|%.3f|%.3f|%.3f|%s|%s\n",
-                timestamp, wan_stats->timestamp_ms, wan_stats->gateway_status, wan_stats->interface_status, wan_stats->ipv4_address,
-                wan_stats->ipv6_address, wan_stats->rx_bytes, wan_stats->tx_bytes, wan_stats->rx_dropped,
-                wan_stats->tx_dropped, wan_stats->packet_loss, wan_stats->latency, wan_stats->jitter, wan_stats->dns_time,
-                wan_stats->ipv4_lease, wan_stats->ipv6_lease);
+                timestamp, wan_stats->timestamp_ms,
+                wan_stats->gateway_status ? wan_stats->gateway_status : "",
+                wan_stats->interface_status ? wan_stats->interface_status : "",
+                wan_stats->ipv4_address ? wan_stats->ipv4_address : "",
+                wan_stats->ipv6_address ? wan_stats->ipv6_address : "",
+                wan_stats->rx_bytes ? wan_stats->rx_bytes : "",
+                wan_stats->tx_bytes ? wan_stats->tx_bytes : "",
+                wan_stats->rx_dropped ? wan_stats->rx_dropped : "",
+                wan_stats->tx_dropped ? wan_stats->tx_dropped : "",
+                wan_stats->packet_loss, wan_stats->latency, wan_stats->jitter, wan_stats->dns_time,
+                wan_stats->ipv4_lease ? wan_stats->ipv4_lease : "",
+                wan_stats->ipv6_lease ? wan_stats->ipv6_lease : "");
         wan_stats = wan_stats->next;
     }
 
@@ -211,26 +224,38 @@ void save_to_text(const gw_stats_report *report) {
     const lan_stats_t *lan_stats = report->lan_stats;
     while (lan_stats) {
         fprintf(file, "lan: %s|%lld|%s|%s|%s|%s|%s|%s\n",
-                timestamp, lan_stats->timestamp_ms, lan_stats->ipv4_address, lan_stats->ipv6_address, lan_stats->rx_bytes,
-                lan_stats->tx_bytes, lan_stats->rx_dropped, lan_stats->tx_dropped);
+                timestamp, lan_stats->timestamp_ms,
+                lan_stats->ipv4_address ? lan_stats->ipv4_address : "",
+                lan_stats->ipv6_address ? lan_stats->ipv6_address : "",
+                lan_stats->rx_bytes ? lan_stats->rx_bytes : "",
+                lan_stats->tx_bytes ? lan_stats->tx_bytes : "",
+                lan_stats->rx_dropped ? lan_stats->rx_dropped : "",
+                lan_stats->tx_dropped ? lan_stats->tx_dropped : "");
         lan_stats = lan_stats->next;
     }
 
     // client_stats_t linked list
     const client_stats_t *client_stats = report->client_stats;
     while (client_stats) {
-        for (int i = 0; i < client_stats->client_count; ++i) {
-            const client_details_t *cd = &client_stats->clients[i];
-            fprintf(file,
-            "client: cnt: %d |%llu|%s|%s|%s|%s|%s|%s|%d|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u\n",
-            client_stats->client_count, client_stats->timestamp_ms,
-            cd->ip_addr, cd->host_name, cd->tx_bytes, cd->rx_bytes,
-            cd->mac_address, cd->status, cd->tcp_est_counts,
-            cd->ipv4_synack_min_latency, cd->ipv4_synack_max_latency, cd->ipv4_synack_avg_latency,
-            cd->ipv4_ack_min_latency, cd->ipv4_ack_max_latency, cd->ipv4_ack_avg_latency,
-            cd->ipv6_synack_min_latency, cd->ipv6_synack_max_latency, cd->ipv6_synack_avg_latency,
-            cd->ipv6_ack_min_latency, cd->ipv6_ack_max_latency, cd->ipv6_ack_avg_latency
-            );
+        if (client_stats->clients) {
+            for (int i = 0; i < client_stats->client_count; ++i) {
+                const client_details_t *cd = &client_stats->clients[i];
+                fprintf(file,
+                "client: cnt: %d |%llu|%s|%s|%s|%s|%s|%s|%d|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u|%u\n",
+                client_stats->client_count, client_stats->timestamp_ms,
+                cd->ip_addr ? cd->ip_addr : "",
+                cd->host_name ? cd->host_name : "",
+                cd->tx_bytes ? cd->tx_bytes : "",
+                cd->rx_bytes ? cd->rx_bytes : "",
+                cd->mac_address ? cd->mac_address : "",
+                cd->status ? cd->status : "",
+                cd->tcp_est_counts,
+                cd->ipv4_synack_min_latency, cd->ipv4_synack_max_latency, cd->ipv4_synack_avg_latency,
+                cd->ipv4_ack_min_latency, cd->ipv4_ack_max_latency, cd->ipv4_ack_avg_latency,
+                cd->ipv6_synack_min_latency, cd->ipv6_synack_max_latency, cd->ipv6_synack_avg_latency,
+                cd->ipv6_ack_min_latency, cd->ipv6_ack_max_latency, cd->ipv6_ack_avg_latency
+                );
+            }
         }
         client_stats = client_stats->next;
     }
@@ -238,11 +263,13 @@ void save_to_text(const gw_stats_report *report) {
     // pid_stats_t linked list
     const pid_stats_t *pid_stats = report->pid_stats;
     while (pid_stats) {
-        for (int i = 0; i < pid_stats->count; ++i) {
-            const pid_details_t *pd = &pid_stats->pid_details[i];
-            fprintf(file, "pid_stats: %llu|%u|%s|%u|%u|%u|%u\n",
-                    pid_stats->timestamp_ms, pd->pid, pd->pName, pd->rss,
-                    pd->pss, pd->mem_util, pd->cpu_util);
+        if (pid_stats->pid_details) {
+            for (int i = 0; i < pid_stats->count; ++i) {
+                const pid_details_t *pd = &pid_stats->pid_details[i];
+                fprintf(file, "pid_stats: %llu|%u|%s|%u|%u|%u|%u\n",
+                        pid_stats->timestamp_ms, pd->pid, pd->pName ? pd->pName : "",
+                        pd->rss, pd->pss, pd->mem_util, pd->cpu_util);
+            }
         }
         pid_stats = pid_stats->next;
     }
@@ -252,13 +279,13 @@ void save_to_text(const gw_stats_report *report) {
     while (tcp_stats) {
         fprintf(file, "tcp|%lld|%s|%s|%s|%s|%s|%s|%s\n",
             tcp_stats->timestamp_ms,
-            tcp_stats->TCPLostRetransmit,
-            tcp_stats->TCPRetransFail,
-            tcp_stats->TCPSackFailures,
-            tcp_stats->TCPTimeouts,
-            tcp_stats->TCPAbortOnTimeout,
-            tcp_stats->ListenOverflows,
-            tcp_stats->TCPOrigDataSent);
+            tcp_stats->TCPLostRetransmit ? tcp_stats->TCPLostRetransmit : "",
+            tcp_stats->TCPRetransFail ? tcp_stats->TCPRetransFail : "",
+            tcp_stats->TCPSackFailures ? tcp_stats->TCPSackFailures : "",
+            tcp_stats->TCPTimeouts ? tcp_stats->TCPTimeouts : "",
+            tcp_stats->TCPAbortOnTimeout ? tcp_stats->TCPAbortOnTimeout : "",
+            tcp_stats->ListenOverflows ? tcp_stats->ListenOverflows : "",
+            tcp_stats->TCPOrigDataSent ? tcp_stats->TCPOrigDataSent : "");
         tcp_stats = tcp_stats->next;
     }
 
@@ -266,8 +293,11 @@ void save_to_text(const gw_stats_report *report) {
     const ipv6_mon_stats_t *ipv6_stats = report->ipv6_stats;
     while (ipv6_stats) {
         fprintf(file, "ipv6_monitoring: %s|%lld|%s|%s|%s|%.3f|%.3f|%.3f|%.3f\n",
-                timestamp, ipv6_stats->timestamp_ms, ipv6_stats->ipv6_reachability, ipv6_stats->global_ipv6_address,
-                ipv6_stats->link_local_ipv6_address, ipv6_stats->ipv4_latency, ipv6_stats->ipv6_latency,
+                timestamp, ipv6_stats->timestamp_ms,
+                ipv6_stats->ipv6_reachability ? ipv6_stats->ipv6_reachability : "",
+                ipv6_stats->global_ipv6_address ? ipv6_stats->global_ipv6_address : "",
+                ipv6_stats->link_local_ipv6_address ? ipv6_stats->link_local_ipv6_address : "",
+                ipv6_stats->ipv4_latency, ipv6_stats->ipv6_latency,
                 ipv6_stats->ipv4_packet_loss, ipv6_stats->ipv6_packet_loss);
         ipv6_stats = ipv6_stats->next;
     }
@@ -420,8 +450,7 @@ int gw_stats_reset() {
 
 int gw_stats_free_buffer(gw_stats_report *report) {
     if (!report) return -1;
-    gw_stats_reset(report);
+    gw_stats_reset();
     free(report);
-
     return 0;
 }

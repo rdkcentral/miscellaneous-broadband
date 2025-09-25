@@ -62,10 +62,10 @@ static SystemStats** system_stats_struct_create(system_stats_t *src, size_t n_sy
         systemStatsArray[i]->tmpfs_used_kb = curr->tmpfs_used_kb;
         systemStatsArray[i]->tmpfs_total_kb = curr->tmpfs_total_kb;
 
-        systemStatsArray[i]->model = strdup(curr->model);
-        systemStatsArray[i]->firmware = strdup(curr->firmware);
-        systemStatsArray[i]->cmac = strdup(curr->cmac);
-        systemStatsArray[i]->uptime = strdup(curr->uptime);
+    systemStatsArray[i]->model = curr->model ? strdup(curr->model) : NULL;
+    systemStatsArray[i]->firmware = curr->firmware ? strdup(curr->firmware) : NULL;
+    systemStatsArray[i]->cmac = curr->cmac ? strdup(curr->cmac) : NULL;
+    systemStatsArray[i]->uptime = curr->uptime ? strdup(curr->uptime) : NULL;
 
         curr = curr->next;
         i++;
@@ -107,16 +107,16 @@ WanStats **wan_stats_struct_create (wan_stats_t *src, size_t n_wan_stats)
         wanStatsArray[i]->jitter = curr->jitter;
         wanStatsArray[i]->dns_time = curr->dns_time;
 
-        wanStatsArray[i]->interface_status = strdup(curr->interface_status);
-        wanStatsArray[i]->ipv4_address = strdup(curr->ipv4_address);
-        wanStatsArray[i]->ipv6_address = strdup(curr->ipv6_address);
-        wanStatsArray[i]->gateway_status = strdup(curr->gateway_status);
-        wanStatsArray[i]->rx_bytes = strdup(curr->rx_bytes);
-        wanStatsArray[i]->tx_bytes = strdup(curr->tx_bytes);
-        wanStatsArray[i]->rx_dropped = strdup(curr->rx_dropped);
-        wanStatsArray[i]->tx_dropped = strdup(curr->tx_dropped);
-        wanStatsArray[i]->ipv4_lease = strdup(curr->ipv4_lease);
-        wanStatsArray[i]->ipv6_lease = strdup(curr->ipv6_lease);
+    wanStatsArray[i]->interface_status = curr->interface_status ? strdup(curr->interface_status) : NULL;
+    wanStatsArray[i]->ipv4_address = curr->ipv4_address ? strdup(curr->ipv4_address) : NULL;
+    wanStatsArray[i]->ipv6_address = curr->ipv6_address ? strdup(curr->ipv6_address) : NULL;
+    wanStatsArray[i]->gateway_status = curr->gateway_status ? strdup(curr->gateway_status) : NULL;
+    wanStatsArray[i]->rx_bytes = curr->rx_bytes ? strdup(curr->rx_bytes) : NULL;
+    wanStatsArray[i]->tx_bytes = curr->tx_bytes ? strdup(curr->tx_bytes) : NULL;
+    wanStatsArray[i]->rx_dropped = curr->rx_dropped ? strdup(curr->rx_dropped) : NULL;
+    wanStatsArray[i]->tx_dropped = curr->tx_dropped ? strdup(curr->tx_dropped) : NULL;
+    wanStatsArray[i]->ipv4_lease = curr->ipv4_lease ? strdup(curr->ipv4_lease) : NULL;
+    wanStatsArray[i]->ipv6_lease = curr->ipv6_lease ? strdup(curr->ipv6_lease) : NULL;
 
         curr = curr->next;
         i++;
@@ -154,12 +154,12 @@ LanStats **lan_stats_struct_create (lan_stats_t *src, size_t n_lan_stats)
 
         lanStatsArray[i]->timestamp_ms = curr->timestamp_ms;
 
-        lanStatsArray[i]->ipv4_address = strdup(curr->ipv4_address);
-        lanStatsArray[i]->ipv6_address = strdup(curr->ipv6_address);
-        lanStatsArray[i]->rx_bytes = strdup(curr->rx_bytes);
-        lanStatsArray[i]->tx_bytes = strdup(curr->tx_bytes);
-        lanStatsArray[i]->rx_dropped = strdup(curr->rx_dropped);
-        lanStatsArray[i]->tx_dropped = strdup(curr->tx_dropped);
+    lanStatsArray[i]->ipv4_address = curr->ipv4_address ? strdup(curr->ipv4_address) : NULL;
+    lanStatsArray[i]->ipv6_address = curr->ipv6_address ? strdup(curr->ipv6_address) : NULL;
+    lanStatsArray[i]->rx_bytes = curr->rx_bytes ? strdup(curr->rx_bytes) : NULL;
+    lanStatsArray[i]->tx_bytes = curr->tx_bytes ? strdup(curr->tx_bytes) : NULL;
+    lanStatsArray[i]->rx_dropped = curr->rx_dropped ? strdup(curr->rx_dropped) : NULL;
+    lanStatsArray[i]->tx_dropped = curr->tx_dropped ? strdup(curr->tx_dropped) : NULL;
 
         curr = curr->next;
         i++;
@@ -200,9 +200,9 @@ IPv6MonitoringStats **ipv6Mon_stats_struct_create (ipv6_mon_stats_t *src, size_t
         ipv6MonStatsArray[i]->ipv6_latency = curr->ipv6_latency;
         ipv6MonStatsArray[i]->ipv4_packet_loss = curr->ipv4_packet_loss;
         ipv6MonStatsArray[i]->ipv6_packet_loss = curr->ipv6_packet_loss;
-        ipv6MonStatsArray[i]->ipv6_reachability = strdup(curr->ipv6_reachability);
-        ipv6MonStatsArray[i]->global_ipv6_address = strdup(curr->global_ipv6_address);
-        ipv6MonStatsArray[i]->link_local_ipv6_address = strdup(curr->link_local_ipv6_address);
+    ipv6MonStatsArray[i]->ipv6_reachability = curr->ipv6_reachability ? strdup(curr->ipv6_reachability) : NULL;
+    ipv6MonStatsArray[i]->global_ipv6_address = curr->global_ipv6_address ? strdup(curr->global_ipv6_address) : NULL;
+    ipv6MonStatsArray[i]->link_local_ipv6_address = curr->link_local_ipv6_address ? strdup(curr->link_local_ipv6_address) : NULL;
 
         curr = curr->next;
         i++;
@@ -240,13 +240,13 @@ TcpStats **tcp_stats_struct_create (tcp_stats_t *src, size_t n_tcp_stats)
 
         tcpStatsArray[i]->timestamp_ms = curr->timestamp_ms;
 
-        tcpStatsArray[i]->tcplostretransmit = strdup(curr->TCPLostRetransmit);
-        tcpStatsArray[i]->tcpretransfail = strdup(curr->TCPRetransFail);
-        tcpStatsArray[i]->tcpsackfailures = strdup(curr->TCPSackFailures);
-        tcpStatsArray[i]->tcptimeouts = strdup(curr->TCPTimeouts);
-        tcpStatsArray[i]->tcpabortontimeout = strdup(curr->TCPAbortOnTimeout);
-        tcpStatsArray[i]->listenoverflows = strdup(curr->ListenOverflows);
-        tcpStatsArray[i]->tcporigdatasent = strdup(curr->TCPOrigDataSent);
+    tcpStatsArray[i]->tcplostretransmit = curr->TCPLostRetransmit ? strdup(curr->TCPLostRetransmit) : NULL;
+    tcpStatsArray[i]->tcpretransfail = curr->TCPRetransFail ? strdup(curr->TCPRetransFail) : NULL;
+    tcpStatsArray[i]->tcpsackfailures = curr->TCPSackFailures ? strdup(curr->TCPSackFailures) : NULL;
+    tcpStatsArray[i]->tcptimeouts = curr->TCPTimeouts ? strdup(curr->TCPTimeouts) : NULL;
+    tcpStatsArray[i]->tcpabortontimeout = curr->TCPAbortOnTimeout ? strdup(curr->TCPAbortOnTimeout) : NULL;
+    tcpStatsArray[i]->listenoverflows = curr->ListenOverflows ? strdup(curr->ListenOverflows) : NULL;
+    tcpStatsArray[i]->tcporigdatasent = curr->TCPOrigDataSent ? strdup(curr->TCPOrigDataSent) : NULL;
 
         curr = curr->next;
         i++;
@@ -317,12 +317,12 @@ ClientStats **client_stats_struct_create (client_stats_t *src, size_t n_client_s
                     return NULL;
                 }
                 client_details__init(clientStatsArray[i]->client_details[j]);
-                clientStatsArray[i]->client_details[j]->mac_address = strdup(curr->clients[j].mac_address);
-                clientStatsArray[i]->client_details[j]->ip_addr = strdup(curr->clients[j].ip_addr);
-                clientStatsArray[i]->client_details[j]->host_name = strdup(curr->clients[j].host_name);
-                clientStatsArray[i]->client_details[j]->status = strdup(curr->clients[j].status);
-                clientStatsArray[i]->client_details[j]->tx_bytes = strdup(curr->clients[j].tx_bytes);
-                clientStatsArray[i]->client_details[j]->rx_bytes = strdup(curr->clients[j].rx_bytes);
+                clientStatsArray[i]->client_details[j]->mac_address = curr->clients[j].mac_address ? strdup(curr->clients[j].mac_address) : NULL;
+                clientStatsArray[i]->client_details[j]->ip_addr = curr->clients[j].ip_addr ? strdup(curr->clients[j].ip_addr) : NULL;
+                clientStatsArray[i]->client_details[j]->host_name = curr->clients[j].host_name ? strdup(curr->clients[j].host_name) : NULL;
+                clientStatsArray[i]->client_details[j]->status = curr->clients[j].status ? strdup(curr->clients[j].status) : NULL;
+                clientStatsArray[i]->client_details[j]->tx_bytes = curr->clients[j].tx_bytes ? strdup(curr->clients[j].tx_bytes) : NULL;
+                clientStatsArray[i]->client_details[j]->rx_bytes = curr->clients[j].rx_bytes ? strdup(curr->clients[j].rx_bytes) : NULL;
                 clientStatsArray[i]->client_details[j]->tcp_est_counts = curr->clients[j].tcp_est_counts;
                 clientStatsArray[i]->client_details[j]->ipv4_synack_min_latency = curr->clients[j].ipv4_synack_min_latency;
                 clientStatsArray[i]->client_details[j]->ipv4_synack_max_latency = curr->clients[j].ipv4_synack_max_latency;
@@ -413,7 +413,7 @@ PidStats **pid_stats_struct_create (pid_stats_t *src, size_t n_pid_stats)
                 pidStatsArray[i]->pid_details[j]->pss = curr->pid_details[j].pss;
                 pidStatsArray[i]->pid_details[j]->mem_util = curr->pid_details[j].mem_util;
                 pidStatsArray[i]->pid_details[j]->cpu_util = curr->pid_details[j].cpu_util;
-                pidStatsArray[i]->pid_details[j]->pname = strdup(curr->pid_details[j].pName);
+                pidStatsArray[i]->pid_details[j]->pname = curr->pid_details[j].pName ? strdup(curr->pid_details[j].pName) : NULL;
             }
         }
         curr = curr->next;
@@ -445,7 +445,7 @@ static RestartCountStats* restart_count_stats_struct_create(restart_count_stats_
             return NULL;
         }
         for (int i = 0; i < src->fw_restart_count; i++) {
-            restartCountStats->fw_restart_time[i] = strdup(src->fw_restart_time[i]);
+            restartCountStats->fw_restart_time[i] = src->fw_restart_time[i] ? strdup(src->fw_restart_time[i]) : NULL;
         }
     }
 
@@ -465,7 +465,7 @@ static RestartCountStats* restart_count_stats_struct_create(restart_count_stats_
             return NULL;
         }
         for (int i = 0; i < src->wan_restart_count; i++) {
-            restartCountStats->wan_restart_time[i] = strdup(src->wan_restart_time[i]);
+            restartCountStats->wan_restart_time[i] = src->wan_restart_time[i] ? strdup(src->wan_restart_time[i]) : NULL;
         }
     }
     return restartCountStats;
@@ -670,12 +670,15 @@ void* encode_report(gw_stats_report *rpt, size_t *buff_len) {
 
     if (!rpt) {
         log_message("%s: rpt is NULL\n", __FUNCTION__);
+        if (buff_len) *buff_len = 0;
         return NULL;
     }
 
     report = report_struct_create();
     if (!report) {
         log_message("%s: report_struct_create FAILED\n", __FUNCTION__);
+        if (buff_len) *buff_len = 0;
+        return NULL;
     }
 
     systemStats  = system_stats_struct_create(rpt->system_stats, rpt->n_system_stats);
