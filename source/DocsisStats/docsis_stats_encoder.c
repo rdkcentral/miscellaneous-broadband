@@ -24,8 +24,6 @@ static DsChannelStats** dsChannelStats_struct_create(dsChannelStats_t *ds_stats,
         return NULL;
     }
 
-    int ind = 0;
-
     int total_cnt = 0;
     dsChannelStats_t *current = ds_stats;
     for (size_t i=0; i < count; i++) {
@@ -82,8 +80,6 @@ static UsChannelStats** usChannelStats_struct_create(usChannelStats_t *us_stats,
     if (!us_stats || count == 0) {
         return NULL;
     }
-
-    int ind = 0;
 
     int total_cnt = 0;
     usChannelStats_t *current = us_stats;
