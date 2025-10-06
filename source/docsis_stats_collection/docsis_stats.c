@@ -2,6 +2,7 @@
 
 #define LOG_FILE "/rdklogs/logs/docsis_stats_logs.txt"
 
+
 // Function to log messages to a file
 void log_message(const char *format, ...) {
     FILE *logfp = fopen(LOG_FILE, "a+");
