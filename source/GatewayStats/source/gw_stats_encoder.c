@@ -738,6 +738,39 @@ void* encode_report(gw_stats_report *rpt, size_t *buff_len) {
     *buff_len = len;
     log_message("%s: Encoded report size: %zu bytes\n", __FUNCTION__, len);
 
+    // Debug: Log first 16 bytes of encoded data
+    uint8_t *debug_buf = (uint8_t*)buffer;
+    log_message("%s: First 16 bytes of encoded data: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
+                __FUNCTION__,
+                debug_buf[0], debug_buf[1], debug_buf[2], debug_buf[3],
+                debug_buf[4], debug_buf[5], debug_buf[6], debug_buf[7],
+                debug_buf[8], debug_buf[9], debug_buf[10], debug_buf[11],
+                debug_buf[12], debug_buf[13], debug_buf[14], debug_buf[15]);
+
+    // Debug: Log protobuf field analysis
+    unsigned int field_number = (debug_buf[0]) >> 3;
+    unsigned int wire_type = (debug_buf[0]) & 0x07;
+    log_message("%s: First field - number: %u, wire type: %u\n", __FUNCTION__, field_number, wire_type);
+
+    // Debug: Log report contents
+    log_message("%s: Report contents - timestamp: %lu\n", __FUNCTION__, report->timestamp_ms);
+    log_message("%s: Report stats counts - system:%zu, wan:%zu, lan:%zu, ipv6:%zu, tcp:%zu, client:%zu, pid:%zu\n",
+                __FUNCTION__,
+                report->n_systemstats, report->n_wanstats, report->n_lanstats,
+                report->n_ipv6monstats, report->n_tcpstats, report->n_clientstats, report->n_pidstats);
+
+    // Debug: Test unpacking immediately after packing to verify encoding is correct
+    log_message("%s: Testing immediate unpack to verify encoding...\n", __FUNCTION__);
+    Report *test_report = report__unpack(NULL, len, (uint8_t*)buffer);
+    if (test_report) {
+        log_message("%s: SUCCESS - Immediate unpack worked! Report timestamp: %lu\n", __FUNCTION__, test_report->timestamp_ms);
+        log_message("%s: Unpacked stats counts - system:%zu, wan:%zu, lan:%zu\n", __FUNCTION__,
+                    test_report->n_systemstats, test_report->n_wanstats, test_report->n_lanstats);
+        report__free_unpacked(test_report, NULL);
+    } else {
+        log_message("%s: ERROR - Immediate unpack FAILED! This indicates encoding problem\n", __FUNCTION__);
+    }
+
 cleanup:
     free_report_struct(report);
     return buffer;
