@@ -81,6 +81,13 @@ if [ "xcompleted" != "x`syscfg get psm_migration`" ];then
 		psmcli set dmsb.l2net.2.Port.2.Name "eth1"
 		psmcli set dmsb.l2net.2.Port.2.LinkName "eth1"
 		psmcli get dmsb.l2net.2.Members.SW ""
+ 
+		if [ "$MODEL_NUM" == "CGM601TCOM" ] ||  [ "$MODEL_NUM" == "SG417DBCT" ];then
+                    if [ ! -f "/nvram/.psm_disable_ethwan_selection" ];then
+                        psmcli set dmsb.wanmanager.if.2.Selection.Enable "FALSE"
+                        touch /nvram/.psm_disable_ethwan_selection
+                    fi
+                fi
 		
 		migrationCompleteFlag=1
 	fi
