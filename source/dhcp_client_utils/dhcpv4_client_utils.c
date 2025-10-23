@@ -25,7 +25,7 @@
 #include <syscfg/syscfg.h>
 #include <string.h>
 
-#define HOTSPOT_IF_NAME 	"brww0"
+#define HOTSPOT_IF_NAME "brww0"
 
 /*
  * get_dhcpv4_opt_list ()
