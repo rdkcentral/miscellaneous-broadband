@@ -40,11 +40,11 @@ migrationCompleteFlag=0
 cbr2_migrationCompleteFlag=0
 MIGRATION_FILE="/nvram/.migration_to_psm_complete"
 if [ "xcompleted" != "x`syscfg get psm_migration`" ];then
-	if [ "$MODEL_NUM" = "CGM4140COM" ] || [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "CGM601TCOM" ] ||  [ "$MODEL_NUM" == "SG417DBCT" ] || [ "$MODEL_NUM" = "CGM4331COM" ];then
+	if [ "$MODEL_NUM" = "CGM4140COM" ] || [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "CGM601TCOM" ] ||  [ "$MODEL_NUM" == "SG417DBCT" ] || [ "$MODEL_NUM" == "CWA438TCOM" ] || [ "$MODEL_NUM" = "CGM4331COM" ];then
 		rm -rf "$MIGRATION_FILE"
 		psmcli set dmsb.l2net.1.Members.SW ""
 		psmcli set dmsb.l2net.9.Members.SW ""
-		if [ "$MODEL_NUM" = "CGM4331COM" ] || [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "CGM601TCOM" ] || [ "$MODEL_NUM" == "SG417DBCT" ];then
+		if [ "$MODEL_NUM" = "CGM4331COM" ] || [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "CGM601TCOM" ] || [ "$MODEL_NUM" == "SG417DBCT" ] || [ "$MODEL_NUM" == "CWA438TCOM" ];then
 			psmcli set dmsb.l2net.6.Members.WiFi "wl0.3 wl1.3 wl0.5 wl1.5"
 		else
 			psmcli set dmsb.l2net.6.Members.WiFi "ath6 ath7 ath10 ath11"
@@ -62,6 +62,8 @@ if [ "xcompleted" != "x`syscfg get psm_migration`" ];then
 		if [ "$PORT2ENABLE" = "1" ];then
 			if [ "$MODEL_NUM" = "CGM4331COM" ] || [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "CGM601TCOM" ] || [ "$MODEL_NUM" == "SG417DBCT" ];then
 				psmcli set dmsb.l2net.1.Members.Eth "eth0 eth2 eth3"
+			elif [ "$MODEL_NUM" = "CWA438TCOM" ];then
+				psmcli set dmsb.l2net.1.Members.Eth "eth0 eth2"
 			else
 				psmcli set dmsb.l2net.1.Members.Eth "eth0"
 			fi
@@ -69,6 +71,8 @@ if [ "xcompleted" != "x`syscfg get psm_migration`" ];then
 		else
 			if [ "$MODEL_NUM" = "CGM4331COM" ] || [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "CGM601TCOM" ] || [ "$MODEL_NUM" == "SG417DBCT" ];then
                         	psmcli set dmsb.l2net.1.Members.Eth "eth0 eth1 eth2 eth3"
+			elif [ "$MODEL_NUM" = "CWA438TCOM" ];then
+				psmcli set dmsb.l2net.1.Members.Eth "eth0 eth1 eth2"
                         else
 				psmcli set dmsb.l2net.1.Members.Eth "eth0 eth1"
 			fi
@@ -143,7 +147,7 @@ fi
 #if device is FR in other builds which is not having bridgeUtil or OVS support, device will have wrong psm config. 
 #need to correct psm config 
 if [ "$migrationCompleteFlag" -eq 0 ];then
-	if [ "$MODEL_NUM" = "CGM4140COM" ] || [ "$MODEL_NUM" = "TG3482G" ] || [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "CGM601TCOM" ] || [ "$MODEL_NUM" == "SG417DBCT" ] || [ "$MODEL_NUM" = "CGM4331COM" ] || [ "$MODEL_NUM" = "TG4482A" ];then
+	if [ "$MODEL_NUM" = "CGM4140COM" ] || [ "$MODEL_NUM" = "TG3482G" ] || [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "CGM601TCOM" ] || [ "$MODEL_NUM" == "SG417DBCT" ] || [ "$MODEL_NUM" == "CWA438TCOM" ] || [ "$MODEL_NUM" = "CGM4331COM" ] || [ "$MODEL_NUM" = "TG4482A" ];then
 		for i in 1 2
 		do
 			if [ "xl2sd0-t" = "x`psmcli get dmsb.l2net."$i".Members.Link`" ];then
