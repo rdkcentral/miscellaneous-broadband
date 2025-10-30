@@ -346,6 +346,7 @@ void acllist_watcher_once(void) {
 
 static pthread_once_t acllist_once = PTHREAD_ONCE_INIT;
 static bool log_fp_initialized = false;
+static bool container_mode_enabled = false;
 __attribute__((constructor))
 void init_library() {
     if (!log_fp_initialized) {
@@ -375,13 +376,20 @@ void init_library() {
     strncpy(acl_json_filename, env, sizeof(acl_json_filename)-1);
     acl_json_filename[sizeof(acl_json_filename)-1] = '\0';
 
+    const char *container_mode = getenv("CONTAINER_MODE");
+    if (container_mode) {
+        container_mode_enabled = true;
+    }
+
     // Initial load of the acllist
     pthread_mutex_lock(&reload_acllist_mutex);
     reload_acllist();
     pthread_mutex_unlock(&reload_acllist_mutex);
 
-    pthread_once(&acllist_once, acllist_watcher_once);
-    pthread_atfork(NULL, NULL, acllist_watcher_once);
+    if (!container_mode_enabled) {
+        pthread_once(&acllist_once, acllist_watcher_once);
+        pthread_atfork(NULL, NULL, acllist_watcher_once);
+    }
 }
 
 static bool is_api_allowed(const char *name, char list[][MAX_API_NAME_LEN], int count, bool is_rbus) {
