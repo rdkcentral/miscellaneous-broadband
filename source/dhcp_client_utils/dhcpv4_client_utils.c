@@ -25,8 +25,6 @@
 #include <syscfg/syscfg.h>
 #include <string.h>
 
-#define HOTSPOT_IF_NAME "brww0"
-
 /*
  * get_dhcpv4_opt_list ()
  * @description: Returns a list of DHCP REQ and a list of DHCP SEND options
@@ -125,7 +123,7 @@ pid_t start_dhcpv4_client (dhcp_params * params)
     // building args and starting dhcpv4 client
     DBG_PRINT("%s %d: Starting DHCP Clients\n", __FUNCTION__, __LINE__);
 #ifdef DHCPV4_CLIENT_UDHCPC
-    if ((params->ifType == WAN_LOCAL_IFACE) && ( 0 != strncmp(params->ifname, HOTSPOT_IF_NAME, sizeof(HOTSPOT_IF_NAME) - 1 ) ))
+    if (params->ifType == WAN_LOCAL_IFACE)
     {
     pid =  start_udhcpc (params, req_opt_list, send_opt_list);
     }
