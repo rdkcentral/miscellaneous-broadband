@@ -1789,9 +1789,15 @@ OVSACTION:
         	}
 #endif
 
-			strncpy(pGwConfig->parent_bridge,bridgeInfo->bridgeName,sizeof(pGwConfig->parent_bridge)-1); ;
+			strncpy(pGwConfig->parent_bridge,bridgeInfo->bridgeName,sizeof(pGwConfig->parent_bridge)-1);
+
+			/*CID 339902: String not null terminated (STRING_NULL)*/
+			pGwConfig->parent_bridge[sizeof(pGwConfig->parent_bridge)-1] = '\0';
+
 		    	pGwConfig->if_type = if_type ;
-	                if ( IF_UP_CMD_TYPE != OprType ) 
+				
+					/*CID 559724: Overflowed constant (INTEGER_OVERFLOW)*/
+	                if ( ( IF_UP_CMD_TYPE != OprType ) && ( OprType != -1 ) ) 
                             pGwConfig->if_cmd = OprType;
 
 				if ( ( if_type == GRE_IF_TYPE_VALUE ) || ( if_type == VLAN_IF_TYPE_VALUE )  )

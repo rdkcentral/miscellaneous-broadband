@@ -120,7 +120,14 @@ static void eventReceiveHandler(
 void handle_sigint(int sig)
 {
 	printf("User Interrupt '%d': Unsubscribing the event '%s'\n", sig, argEventName);
-	rbusEvent_Unsubscribe(handle,argEventName);
+	/* CID 280214:  Unchecked return value (CHECKED_RETURN) */
+	int rbus_ret = rbusEvent_Unsubscribe(handle,argEventName);
+	if(rbus_ret != RBUS_ERROR_SUCCESS){
+		printf("status code - '%d' : Unsubscribing the event '%s' returned an error \n",rbus_ret,argEventName);
+	}
+	else{
+		printf("status code - '%d' : Successfully Unsubscribed the event '%s' \n",rbus_ret, argEventName);
+	}
 	exit(0);
 }
 
