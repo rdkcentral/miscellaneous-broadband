@@ -835,6 +835,10 @@ void cli_subdoc_parser(char *ptr, int no_of_bytes)
 	{
 		if(count < SUBDOC_TAG_COUNT)
 		{
+			/* CID 349680: Dereference after null check (FORWARD_NULL) */
+			if(ptr_lb == NULL){
+				break;
+			}
 			ptr_lb1 =  memchr(ptr_lb+1, '\n', no_of_bytes - (ptr_lb - str_body));
 			if(ptr_lb1 != NULL && 0 != memcmp(ptr_lb1-1, "\r",1 ))
 			{
@@ -843,12 +847,13 @@ void cli_subdoc_parser(char *ptr, int no_of_bytes)
 			index2 = ptr_lb1-str_body;
 			index1 = ptr_lb-str_body;
 			cli_line_parser(str_body+index1+1,index2 - index1 - 2, &name_space, &etag, &data, &data_size);
-			/* CID 280264: Dereference null return value */
-			if(ptr_lb != NULL)
-			{
-			    ptr_lb++;
-			}
+			ptr_lb++;
 			ptr_lb = memchr(ptr_lb, '\n', no_of_bytes - (ptr_lb - str_body));
+			
+			/* CID 349680: Dereference after null check (FORWARD_NULL) */
+			if(ptr_lb == NULL){
+				break;
+			}
 			count++;
 		}
 		else             //For data bin segregation
@@ -964,6 +969,12 @@ int cli_parseMultipartDocument(void *config_data, char *ct , size_t data_size)
 		while((ptr - str_body) < (int)data_size)
 		{
 			ptr = memchr(ptr, '-', data_size - (ptr - str_body));
+
+			/* CID 280258 (12/15) Dereference null return value */
+			if(ptr == NULL){
+				break;
+			}
+
 			if(0 == memcmp(ptr, last_line_boundary, strlen(last_line_boundary)))
 			{
 				//printf("last line boundary \n");
@@ -977,6 +988,12 @@ int cli_parseMultipartDocument(void *config_data, char *ct , size_t data_size)
 				while(0 != part_count % 2)
 				{
 					ptr1 = memchr(ptr1, '-', data_size - (ptr1 - str_body));
+					
+					/* CID 280258 (13/15) Dereference null return value */
+					if(ptr1 == NULL){
+						break;
+					}
+
 					if(0 == memcmp(ptr1, last_line_boundary, strlen(last_line_boundary)))
 					{
 						index_2 = ptr1-str_body;
@@ -993,10 +1010,20 @@ int cli_parseMultipartDocument(void *config_data, char *ct , size_t data_size)
 						count++;
 					}
 					ptr1 = memchr(ptr1, '\n', data_size - (ptr1 - str_body));
+
+					/* CID 280258 (14/15) Dereference null return value */
+					if(ptr1 == NULL){
+						break;
+					}
 					ptr1++;
 				}
 			}
 			ptr = memchr(ptr, '\n', data_size - (ptr - str_body));
+			
+			/* CID 280258 (15/15) Dereference null return value */
+			if(ptr == NULL){
+				break;
+			}
 			ptr++;
 		}
 		free(str_body);

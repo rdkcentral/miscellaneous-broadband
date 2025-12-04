@@ -54,12 +54,15 @@ int ServiceControl_Init()
     pthread_mutex_init(&gVarMutex, NULL);
     pthread_cond_init(&svcCond, NULL);
     pthread_mutex_lock(&svcMutex);
+    /* CID 559701 & 559607: Data race condition (MISSING_LOCK) */
+    pthread_mutex_lock(&gVarMutex);
     g_pServiceList = (char *) malloc(1024*sizeof(char));
     if (g_pServiceList == NULL)
     {
         SvcCtrlError(("%s : memory allocation for g_pServiceList failed.\n", __FUNCTION__));
         ret = -1;
     }
+    pthread_mutex_unlock(&gVarMutex);
     svc_queue = queue_create();
     if (svc_queue == NULL)
     {
@@ -78,7 +81,10 @@ void ServiceControl_Deinit()
     SvcCtrlDebug(("In %s\n", __FUNCTION__));
     // Gracefully exit the thread
     pthread_mutex_lock(&svcMutex);
+    /* CID 559701 & 559607: Data race condition (MISSING_LOCK) */
+    pthread_mutex_lock(&gVarMutex);
     free(g_pServiceList);
+    pthread_mutex_unlock(&gVarMutex);
     exit_svc_queue_loop = true;
     svc_queue_wakeup = true;
     if (svc_queue)
