@@ -108,6 +108,7 @@ bool brctl_interact(Gateway_Config_t * gw_config)
 
 #ifdef CORE_NET_LIB
                 struct bridge_info bridge_Init;
+				libnet_status status;
 				int i=0;
 				bridge_util_log("CORE_NET_LIB gw_config->if_name:%s using core net lib\n",gw_config->if_name);
 				bridge_get_info(gw_config->if_name,&bridge_Init);
@@ -118,7 +119,15 @@ bool brctl_interact(Gateway_Config_t * gw_config)
 					interface_delete(bridge_Init.slave_name[i]);
 				}
 				interface_down(gw_config->if_name);
-				bridge_delete(gw_config->if_name);
+				/* CID 514451:  Unchecked return value (CHECKED_RETURN) */
+				status = bridge_delete(gw_config->if_name);
+				if (status == CNL_STATUS_SUCCESS) {
+		        	bridge_util_log("status code - '%d' : Successfully deleted bridge '%s'\n",status, gw_config->if_name);
+		        }
+		        else {
+		            bridge_util_log("status code - '%d' : Failed to delete bridge '%s' \n",status, gw_config->if_name);
+		        }
+
 #else
 				snprintf(cmd,sizeof(cmd),"for iface in `brctl show %s | sed '1d' | awk '{print $NF}'` ;\
 					do \
@@ -220,11 +229,19 @@ bool brctl_interact(Gateway_Config_t * gw_config)
 
 #ifdef CORE_NET_LIB
 				struct bridge_info check_bridge;
+				libnet_status status;
 				bridge_util_log("CORE_NET_LIB cmd:%s using core net lib\n",gw_config->parent_bridge);
 				bridge_get_info(gw_config->parent_bridge,&check_bridge);
 				if(check_bridge.slave_count==0)
 				{
-					bridge_create(gw_config->parent_bridge);
+				    /* CID 514450:  Unchecked return value (CHECKED_RETURN) */
+					status = bridge_create(gw_config->parent_bridge);
+					if (status == CNL_STATUS_SUCCESS) {
+		        		bridge_util_log("status code - '%d' : Successfully created bridge '%s'\n",status, gw_config->parent_bridge);
+					}
+					else {
+						bridge_util_log("status code - '%d' : Failed to create bridge '%s' \n",status, gw_config->parent_bridge);
+					}
 					interface_up(gw_config->parent_bridge);
 				}
 #else
