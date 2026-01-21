@@ -164,6 +164,7 @@ AC_CONFIG_FILES(
 	source/ServiceCtrl/Makefile
 	source/webcfg_decoder/Makefile
 	source/MemFrag_Calc/Makefile
+	source/onestack/Makefile
 	source/EventSubscription/Makefile
 	source/Makefile
 	source/dhcp_client_utils/Makefile
