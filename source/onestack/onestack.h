@@ -6,10 +6,18 @@
 #ifdef _ONESTACK_PRODUCT_REQ_
 
 /**
- * @brief Check if the current partner is BCI (Comcast Business)
- * @return true if partner is comcast-business, false otherwise
+ * @brief Get partner ID with fallback mechanism
+ * 
+ * This function attempts to retrieve the partner ID using the following priority:
+ * 1. HAL API (platform_hal_getFactoryPartnerId) with 3 retries
+ * 2. Read from /nvram/.partner_ID file
+ * 3. Read from syscfg (PartnerID)
+ * 
+ * @param pValue Buffer to store the partner ID
+ * @param size Size of the buffer
+ * @return 0 on success, -1 on failure
  */
-bool is_bci_partner(void);
+int getpartnerid(char *pValue, int size);
 
 #endif
 

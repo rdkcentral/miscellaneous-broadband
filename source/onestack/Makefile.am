@@ -20,8 +20,12 @@ AM_CFLAGS = -Wall -Werror
 
 bin_PROGRAMS = onestack
 
-onestack_SOURCES = onestack.c
+onestack_SOURCES = onestack.c onestack_log.c
 
 onestack_CPPFLAGS = -I$(top_srcdir)/source/onestack
 
-onestack_LDFLAGS = -lsyscfg
+if ONESTACK_ENABLE
+onestack_CPPFLAGS += -D_ONESTACK_PRODUCT_REQ_
+endif
+
+onestack_LDFLAGS = -lsyscfg -lrdkloggers -lhal_platform
