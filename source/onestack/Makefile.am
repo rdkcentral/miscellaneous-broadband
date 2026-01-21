@@ -24,8 +24,4 @@ onestack_SOURCES = onestack.c onestack_log.c
 
 onestack_CPPFLAGS = -I$(top_srcdir)/source/onestack
 
-if ONESTACK_ENABLE
-onestack_CPPFLAGS += -D_ONESTACK_PRODUCT_REQ_
-endif
-
-onestack_LDFLAGS = -lsyscfg -lrdkloggers -lhal_platform
+onestack_LDADD = -lsyscfg -lrdkloggers -lhal_platform

@@ -44,6 +44,10 @@ if SOCKET_EXAMPLE_ENABLE
 SOCKET_EXAMPLE = Socket_Example
 endif
 
+if ONESTACK_ENABLE
+ONESTACK = onestack
+endif
+
 if DHCP_MANAGER_ENABLE
 DHCP_CLIENT_UTILS_EXAMPLE = 
 else
@@ -53,5 +57,5 @@ endif
 if UNIT_TEST_DOCKER_SUPPORT
 SUBDIRS = test
 else
-SUBDIRS = Psmcli parcon LTime ServiceCtrl TimeConv webcfg_decoder MemFrag_Calc onestack $(SETLED) $(MULTIPART_UTIL) $(BRIDGE_UTIL) $(WBCFG_TEST) $(DHCP_CLIENT_UTILS_EXAMPLE) msgq_util EventSubscription FwBankInfo $(RDKSCHEDULER_TESTAPP) $(SOCKET_EXAMPLE)
+SUBDIRS = Psmcli parcon LTime ServiceCtrl TimeConv webcfg_decoder MemFrag_Calc $(ONESTACK) $(SETLED) $(MULTIPART_UTIL) $(BRIDGE_UTIL) $(WBCFG_TEST) $(DHCP_CLIENT_UTILS_EXAMPLE) msgq_util EventSubscription FwBankInfo $(RDKSCHEDULER_TESTAPP) $(SOCKET_EXAMPLE)
 endif

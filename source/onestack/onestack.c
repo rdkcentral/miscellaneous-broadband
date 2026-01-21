@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include "onestack.h"
 #include "onestack_log.h"
+#include "syscfg/syscfg.h"
+#include "platform_hal.h"
 
 #if defined(_ONESTACK_PRODUCT_REQ_)
 #define BUFLEN_32 32
