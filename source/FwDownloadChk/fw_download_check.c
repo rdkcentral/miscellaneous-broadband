@@ -5,11 +5,44 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <ctype.h>
+#include <time.h>
+#include <stdarg.h>
 
 #include <syscfg/syscfg.h>
-#include "ccsp_trace.h"
 
 #include "fw_download_check.h"
+
+#define XCONF_LOG_PATH "/rdklogs/logs/xconf.txt.0"
+#define XCONF_LOG_INFO(...)  xconf_log_write("INFO", __VA_ARGS__)
+#define XCONF_LOG_ERROR(...) xconf_log_write("ERROR", __VA_ARGS__)
+
+static void xconf_log_write(const char *level, const char *fmt, ...)
+{
+    FILE *fp = fopen(XCONF_LOG_PATH, "a");
+    if (!fp) {
+        fp = stderr;
+    }
+
+    time_t now = time(NULL);
+    struct tm tm_info;
+    localtime_r(&now, &tm_info);
+    char ts[32];
+    strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", &tm_info);
+
+    fprintf(fp, "%s [%s] ", ts, level);
+
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(fp, fmt, ap);
+    va_end(ap);
+
+    if (fp != stderr) {
+        fflush(fp);
+        fclose(fp);
+    } else {
+        fflush(stderr);
+    }
+}
 
 int can_proceed_fw_download(void)
 {
@@ -25,14 +58,16 @@ int can_proceed_fw_download(void)
 
     /* 1) Fetch URL and filename */
     if(syscfg_get(NULL,"xconf_url",url, sizeof(url)) != 0){
-        CcspTraceError(("[FWCHK] Failed to get xconf_url\n"));
+        XCONF_LOG_ERROR("[FWCHK] Failed to get xconf_url\n");
         return 0;
     }
+    XCONF_LOG_INFO("[FWCHK] xconf_url: %s\n", url);
+
     if(syscfg_get(NULL,"fw_to_upgrade",fname,sizeof(fname)) != 0){
-        CcspTraceError(("[FWCHK] Failed to get fw_to_upgrade\n"));
+        XCONF_LOG_ERROR("[FWCHK] Failed to get fw_to_upgrade\n");
         return 0;
     }
-    CcspTraceInfo(("[FWCHK] URL: %s\n", url));
+    XCONF_LOG_INFO("[FWCHK] URL: %s\n", url);
 
     /* 2) Fetch Content-Length using curl CLI via popen (NO libcurl needed) */
     {
@@ -43,12 +78,12 @@ int can_proceed_fw_download(void)
 
         FILE *fp = popen(cmd, "r");
         if (!fp) {
-            CcspTraceError(("[FWCHK] popen() failed for curl\n"));
+            XCONF_LOG_ERROR("[FWCHK] popen() failed for curl\n");
             return 0;
         }
 
         if (fgets(line, sizeof(line), fp) == NULL) {
-            CcspTraceError(("[FWCHK] Content-Length not found\n"));
+            XCONF_LOG_ERROR("[FWCHK] Content-Length not found\n");
             pclose(fp);
             return 0;
         }
@@ -56,19 +91,19 @@ int can_proceed_fw_download(void)
 
         uint64_t bytes = strtoull(line, NULL, 10);
         if (bytes == 0) {
-            CcspTraceError(("[FWCHK] Invalid Content-Length\n"));
+            XCONF_LOG_ERROR("[FWCHK] Invalid Content-Length\n");
             return 0;
         }
 
         fw_kb = (bytes + 1023ULL) / 1024ULL;
-        CcspTraceInfo(("[FWCHK] Firmware size: %" PRIu64 " kB\n", fw_kb));
+        XCONF_LOG_INFO("[FWCHK] Firmware size: %" PRIu64 " kB\n", fw_kb);
     }
 
     /* 3) Read MemAvailable (kB) */
     {
         FILE *fp = fopen("/proc/meminfo", "r");
         if (!fp) {
-            CcspTraceError(("[FWCHK] Cannot read /proc/meminfo\n"));
+            XCONF_LOG_ERROR("[FWCHK] Cannot read /proc/meminfo\n");
             return 0;
         }
 
@@ -83,35 +118,41 @@ int can_proceed_fw_download(void)
         fclose(fp);
 
         if (avail_kb == 0) {
-            CcspTraceError(("[FWCHK] MemAvailable not found\n"));
+            XCONF_LOG_ERROR("[FWCHK] MemAvailable not found\n");
             return 0;
         }
-        CcspTraceInfo(("[FWCHK] MemAvailable: %" PRIu64 " kB\n", avail_kb));
+        XCONF_LOG_INFO("[FWCHK] MemAvailable: %" PRIu64 " kB\n", avail_kb);
     }
 
     /* 4) syscfg variables EXACTLY as you wanted */
-    syscfg_get(NULL, "FwDwld_AvlMem_RsrvThreshold", buf, sizeof(buf));
+    if(syscfg_get(NULL, "FwDwld_AvlMem_RsrvThreshold", buf, sizeof(buf)) != 0){
+        XCONF_LOG_ERROR("[FWCHK] Failed to get FwDwld_AvlMem_RsrvThreshold\n");
+        return 0;
+    }
     rsrv_mb = (uint64_t)atoi(buf);
     rsrv_kb = rsrv_mb * 1024ULL;
-    CcspTraceInfo(("[FWCHK] ReserveThreshold: %llu MB\n", (unsigned long long)rsrv_mb));
+    XCONF_LOG_INFO("[FWCHK] ReserveThreshold: %llu MB\n", (unsigned long long)rsrv_mb);
 
-    syscfg_get(NULL, "FwDwld_ImageProcMemPercent", buf, sizeof(buf));
+    if(syscfg_get(NULL, "FwDwld_ImageProcMemPercent", buf, sizeof(buf)) != 0){
+        XCONF_LOG_ERROR("[FWCHK] Failed to get FwDwld_ImageProcMemPercent\n");
+        return 0;
+    }
     imgp_pct = atoi(buf);
     if (imgp_pct < 0) imgp_pct = 0;
-    CcspTraceInfo(("[FWCHK] ImageProcPercent: %d %%\n", imgp_pct));
+    XCONF_LOG_INFO("[FWCHK] ImageProcPercent: %d %%\n", imgp_pct);
 
     /* 5) Required Memory calculation */
     uint64_t img_proc_kb = (fw_kb * (uint64_t)imgp_pct + 99ULL) / 100ULL;
     uint64_t required_kb = fw_kb + rsrv_kb + img_proc_kb;
 
-    CcspTraceInfo(("[FWCHK] Required Memory: %" PRIu64 " kB\n", required_kb));
+    XCONF_LOG_INFO("[FWCHK] Required Memory: %" PRIu64 " kB\n", required_kb);
 
     /* 6) Verdict */
     if (avail_kb >= required_kb) {
-        CcspTraceInfo(("[FWCHK] Verdict: PROCEED\n"));
+        XCONF_LOG_INFO("[FWCHK] Verdict: PROCEED\n");
         return 1;
     }
 
-    CcspTraceInfo(("[FWCHK] Verdict: BLOCK\n"));
+    XCONF_LOG_INFO("[FWCHK] Verdict: BLOCK\n");
     return 0;
 }
