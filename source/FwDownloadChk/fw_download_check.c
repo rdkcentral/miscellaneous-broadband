@@ -67,7 +67,7 @@ int can_proceed_fw_download(void)
         XCONF_LOG_ERROR("[FWCHK] Failed to get fw_to_upgrade\n");
         return 0;
     }
-    XCONF_LOG_INFO("[FWCHK] URL: %s\n", url);
+    XCONF_LOG_INFO("[FWCHK] fw_to_upgrade: %s\n", fname);
 
     /* 2) Fetch Content-Length using curl CLI via popen (NO libcurl needed) */
     {
