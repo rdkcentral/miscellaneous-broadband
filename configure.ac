@@ -136,6 +136,15 @@ no)  DHCP_MANAGER_ENABLE=false ;;
 esac],[DHCP_MANAGER_ENABLE=false])
 AM_CONDITIONAL([DHCP_MANAGER_ENABLE], [test x$DHCP_MANAGER_ENABLE = xtrue])
 
+AC_ARG_ENABLE([onestack],
+[  --enable-onestack    Turn on OneStack utility ],
+[case "${enableval}" in
+yes) ONESTACK_ENABLE=true ;;
+no)  ONESTACK_ENABLE=false ;;
+*) AC_MSG_ERROR([bad value ${enableval} for --enable-onestack]) ;;
+esac],[ONESTACK_ENABLE=true])
+AM_CONDITIONAL([ONESTACK_ENABLE], [test x$ONESTACK_ENABLE = xtrue])
+
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -185,6 +194,8 @@ AM_COND_IF([BRIDGE_UTILS_BIN_ENABLE], [AC_CONFIG_FILES([source/bridge_utils/brid
 AM_COND_IF([RDKSCHEDULER_TESTAPP_ENABLE], [AC_CONFIG_FILES([source/RdkSchdeuler_TestApp/Makefile])])
 
 AM_COND_IF([SOCKET_EXAMPLE_ENABLE], [AC_CONFIG_FILES([source/Socket_Example/Makefile])])
+
+AM_COND_IF([ONESTACK_ENABLE], [AC_CONFIG_FILES([source/onestack/Makefile])])
 
 AC_SUBST(GTEST_CORE_NET_LIB)
 
