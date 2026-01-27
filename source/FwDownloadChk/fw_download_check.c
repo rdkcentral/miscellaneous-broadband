@@ -9,7 +9,7 @@
 #include <stdarg.h>
 
 #include <syscfg/syscfg.h>
-
+#include <telemetry_busmessage_sender.h>
 #include "fw_download_check.h"
 
 #define XCONF_LOG_PATH "/rdklogs/logs/xconf.txt.0"
@@ -154,5 +154,6 @@ int can_proceed_fw_download(void)
     }
 
     XCONF_LOG_INFO("[FWCHK] Verdict: BLOCK\n");
+    t2_event_s("fw_dl_insufficient_memory", "Available memory is not enough to proceed with firmware download");
     return 0;
 }
