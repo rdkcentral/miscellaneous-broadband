@@ -59,13 +59,13 @@ int can_proceed_fw_download(void)
     /* 1) Fetch URL and filename */
     if(syscfg_get(NULL,"xconf_url",url, sizeof(url)) != 0){
         XCONF_LOG_ERROR("[FWCHK] Failed to get xconf_url\n");
-        return 0;
+        return -1;
     }
     XCONF_LOG_INFO("[FWCHK] xconf_url: %s\n", url);
 
     if(syscfg_get(NULL,"fw_to_upgrade",fname,sizeof(fname)) != 0){
         XCONF_LOG_ERROR("[FWCHK] Failed to get fw_to_upgrade\n");
-        return 0;
+        return -1;
     }
     XCONF_LOG_INFO("[FWCHK] fw_to_upgrade: %s\n", fname);
 
@@ -79,20 +79,20 @@ int can_proceed_fw_download(void)
         FILE *fp = popen(cmd, "r");
         if (!fp) {
             XCONF_LOG_ERROR("[FWCHK] popen() failed for curl\n");
-            return 0;
+            return -1;
         }
 
         if (fgets(line, sizeof(line), fp) == NULL) {
             XCONF_LOG_ERROR("[FWCHK] Content-Length not found\n");
             pclose(fp);
-            return 0;
+            return -1;
         }
         pclose(fp);
 
         uint64_t bytes = strtoull(line, NULL, 10);
         if (bytes == 0) {
             XCONF_LOG_ERROR("[FWCHK] Invalid Content-Length\n");
-            return 0;
+            return -1;
         }
 
         fw_kb = (bytes + 1023ULL) / 1024ULL;
@@ -104,7 +104,7 @@ int can_proceed_fw_download(void)
         FILE *fp = fopen("/proc/meminfo", "r");
         if (!fp) {
             XCONF_LOG_ERROR("[FWCHK] Cannot read /proc/meminfo\n");
-            return 0;
+            return -1;
         }
 
         while (fgets(line, sizeof(line), fp)) {
@@ -119,7 +119,7 @@ int can_proceed_fw_download(void)
 
         if (avail_kb == 0) {
             XCONF_LOG_ERROR("[FWCHK] MemAvailable not found\n");
-            return 0;
+            return -1;
         }
         XCONF_LOG_INFO("[FWCHK] MemAvailable: %" PRIu64 " kB\n", avail_kb);
     }
@@ -127,7 +127,7 @@ int can_proceed_fw_download(void)
     /* 4) syscfg variables EXACTLY as you wanted */
     if(syscfg_get(NULL, "FwDwld_AvlMem_RsrvThreshold", buf, sizeof(buf)) != 0){
         XCONF_LOG_ERROR("[FWCHK] Failed to get FwDwld_AvlMem_RsrvThreshold\n");
-        return 0;
+        return -1;
     }
     rsrv_mb = (uint64_t)atoi(buf);
     rsrv_kb = rsrv_mb * 1024ULL;
@@ -135,7 +135,7 @@ int can_proceed_fw_download(void)
 
     if(syscfg_get(NULL, "FwDwld_ImageProcMemPercent", buf, sizeof(buf)) != 0){
         XCONF_LOG_ERROR("[FWCHK] Failed to get FwDwld_ImageProcMemPercent\n");
-        return 0;
+        return -1;
     }
     imgp_pct = atoi(buf);
     if (imgp_pct < 0) imgp_pct = 0;
