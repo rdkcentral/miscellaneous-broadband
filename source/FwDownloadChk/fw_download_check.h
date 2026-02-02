@@ -19,6 +19,10 @@
 #ifndef FW_DOWNLOAD_CHECK_H
 #define FW_DOWNLOAD_CHECK_H
 
+#define FW_DWNLD_MEMCHK_SUCCEED          1
+#define FW_DWNLD_MEMCHK_FAILED          -1
+#define FW_DWNLD_MEMCHK_NOT_ENOUGH_MEM   0
+
 int can_proceed_fw_download(void);
 
 #endif /* FW_DOWNLOAD_CHECK_H */
