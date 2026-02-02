@@ -74,7 +74,6 @@ int can_proceed_fw_download(void)
     uint64_t rsrv_mb = 0, rsrv_kb = 0;
     int imgp_pct = 0;
 
-    /* 1) Fetch URL and filename */
     if(syscfg_get(NULL,"xconf_url",url, sizeof(url)) != 0){
         XCONF_LOG_ERROR("[FWCHK] Failed to get xconf_url\n");
         return -1;
@@ -87,7 +86,6 @@ int can_proceed_fw_download(void)
     }
     XCONF_LOG_INFO("[FWCHK] fw_to_upgrade: %s\n", fname);
 
-    /* 2) Fetch Content-Length using curl CLI via popen (NO libcurl needed) */
     {
         char cmd[1500];
         snprintf(cmd, sizeof(cmd),
@@ -117,7 +115,6 @@ int can_proceed_fw_download(void)
         XCONF_LOG_INFO("[FWCHK] Firmware size: %" PRIu64 " kB\n", fw_kb);
     }
 
-    /* 3) Read MemAvailable (kB) */
     {
         FILE *fp = fopen("/proc/meminfo", "r");
         if (!fp) {
@@ -142,7 +139,6 @@ int can_proceed_fw_download(void)
         XCONF_LOG_INFO("[FWCHK] MemAvailable: %" PRIu64 " kB\n", avail_kb);
     }
 
-    /* 4) syscfg variables EXACTLY as you wanted */
     if(syscfg_get(NULL, "FwDwld_AvlMem_RsrvThreshold", buf, sizeof(buf)) != 0){
         XCONF_LOG_ERROR("[FWCHK] Failed to get FwDwld_AvlMem_RsrvThreshold\n");
         return -1;
@@ -159,13 +155,11 @@ int can_proceed_fw_download(void)
     if (imgp_pct < 0) imgp_pct = 0;
     XCONF_LOG_INFO("[FWCHK] ImageProcPercent: %d %%\n", imgp_pct);
 
-    /* 5) Required Memory calculation */
     uint64_t img_proc_kb = (fw_kb * (uint64_t)imgp_pct + 99ULL) / 100ULL;
     uint64_t required_kb = fw_kb + rsrv_kb + img_proc_kb;
 
     XCONF_LOG_INFO("[FWCHK] Required Memory: %" PRIu64 " kB\n", required_kb);
 
-    /* 6) Verdict */
     if (avail_kb >= required_kb) {
         XCONF_LOG_INFO("[FWCHK] Verdict: PROCEED\n");
         return 1;
