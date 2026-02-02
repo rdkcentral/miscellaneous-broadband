@@ -154,6 +154,6 @@ int can_proceed_fw_download(void)
     }
 
     XCONF_LOG_INFO("[FWCHK] Verdict: BLOCK\n");
-    t2_event_s("fw_dl_insufficient_memory", "Available memory is not enough to proceed with firmware download");
+    t2_event_d("XCONF_Dwld_Ignored_Not_EnoughMem", 1);
     return 0;
 }
