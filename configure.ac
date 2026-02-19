@@ -135,7 +135,7 @@ no)  DHCP_MANAGER_ENABLE=false ;;
 *) AC_MSG_ERROR([bad value ${enableval} for --enable-dhcp_manager]) ;;
 esac],[DHCP_MANAGER_ENABLE=false])
 AM_CONDITIONAL([DHCP_MANAGER_ENABLE], [test x$DHCP_MANAGER_ENABLE = xtrue])
-
+AM_CONDITIONAL([ONESTACK_PRODUCT_REQ], [test "x$ONESTACK_PRODUCT_REQ" = "xtrue"])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
