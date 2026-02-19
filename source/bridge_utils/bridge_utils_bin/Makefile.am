@@ -56,5 +56,5 @@ endif
 endif
 
 if ONESTACK_PRODUCT_REQ
-libbridgeutils_la_LDFLAGS += -ldevicemode -lonestack_syscfg -lonestack_log -lrdkb_feature_mode_gate
+bridgeUtils_LDFLAGS += -ldevicemode -lonestack_syscfg -lonestack_log -lrdkb_feature_mode_gate
 endif
