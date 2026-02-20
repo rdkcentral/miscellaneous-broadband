@@ -25,13 +25,10 @@ static bool stop_thread = false;
 
 // Function to save statistics to a text file
 void save_to_text(const SystemStats *system_stats) {
-    log_message("Acquiring lan_stats_mutex in save_to_text\n");
-    pthread_mutex_lock(&lan_stats_mutex);
 
     FILE *file = fopen("/rdklogs/logs/system_stats_data.txt", "a");
     if (!file) {
         fprintf(stderr, "Failed to open file for writing\n");
-        pthread_mutex_unlock(&lan_stats_mutex);
         return;
     }
 

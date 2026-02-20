@@ -12,8 +12,6 @@
 #define LOG_FILE "/rdklogs/logs/system_stats_logs.txt"
 #define DEFAULT_INTERVAL 900 // 15 minutes in seconds
 
-// Declare the mutex for lan_stats
-extern pthread_mutex_t lan_stats_mutex;
 
 // Function declarations
 void log_message(const char *format, ...);
