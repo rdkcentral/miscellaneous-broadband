@@ -15,7 +15,7 @@
 
 SystemStats *system_stats = NULL;
 
-// static int collection_interval = 120;
+// static int collection_interval = 90;
 static int collection_interval = DEFAULT_INTERVAL;
 
 static pthread_mutex_t stats_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -36,7 +36,7 @@ void save_to_text(const SystemStats *system_stats) {
     get_current_timestamp(timestamp, sizeof(timestamp));
 
     // Write system_params
-    fprintf(file, "system_params: %s|%s|%s|%s|%s|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|[",
+    fprintf(file, "system_params: %s|%s|%s|%s|%s|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f\n",
             timestamp, system_stats->model, system_stats->firmware, system_stats->cmac,
             system_stats->uptime, system_stats->cpu_usage, system_stats->free_memory, system_stats->slab_memory,
             system_stats->avail_memory, system_stats->cached_mem, system_stats->slab_unreclaim,
