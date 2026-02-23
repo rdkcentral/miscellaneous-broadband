@@ -135,10 +135,12 @@ void get_device_uptime(char *uptime, size_t size) {
     if (fp) {
         double seconds;
         if (fscanf(fp, "%lf", &seconds) == 1) {
-            int days = seconds / 86400;
-            int hours = ((int)seconds % 86400) / 3600;
-            int minutes = ((int)seconds % 3600) / 60;
-            snprintf(uptime, size, "%d days, %d hours, %d minutes", days, hours, minutes);
+            snprintf(uptime, size, "%.0f", seconds);
+
+            // int days = seconds / 86400;
+            // int hours = ((int)seconds % 86400) / 3600;
+            // int minutes = ((int)seconds % 3600) / 60;
+            // snprintf(uptime, size, "%d days, %d hours, %d minutes", days, hours, minutes);
         } else {
             strncpy(uptime, "UNKNOWN", size);
         }
