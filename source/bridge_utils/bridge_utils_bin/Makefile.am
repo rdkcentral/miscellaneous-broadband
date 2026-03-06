@@ -31,7 +31,7 @@ bridgeUtils_CPPFLAGS = -I$(top_srcdir)/include \
 
 bridgeUtils_SOURCES = bridge_util.c bridge_creation.c main.c bridge_util_generic.c
 
-bridgeUtils_LDFLAGS =  -lrt -lccsp_common -lsyscfg -lsysevent -lprivilege -lbridge_utils -lsecure_wrapper
+bridgeUtils_LDFLAGS =  -lrt -lccsp_common -lsyscfg -lsysevent -lprivilege -lbridge_utils -lsecure_wrapper -lOvsAgentApi -lbreakpadwrapper -lpthread -lstdc++ -lm -lcjson 
 
 if BRIDGE_UTILS_BIN_ENABLE
 bridgeUtils_LDFLAGS += -lOvsAgentApi -lbreakpadwrapper -lpthread -lstdc++ -lm -lcjson

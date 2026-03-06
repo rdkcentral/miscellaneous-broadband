@@ -160,6 +160,7 @@ AC_CONFIG_FILES(
 	source/Psmcli/Makefile
 	source/LTime/Makefile
 	source/TimeConv/Makefile
+  source/FwDownloadChk/Makefile
 	source/parcon/Makefile
 	source/ServiceCtrl/Makefile
 	source/SyscfgMethodHandler/Makefile
