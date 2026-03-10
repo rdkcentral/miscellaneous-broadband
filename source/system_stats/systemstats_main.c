@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <signal.h>
 #include <errno.h>
@@ -89,7 +90,10 @@ int main()
 {
     daemonize();
 
-    SystemStats_Init();
+    if (SystemStats_Init() != 0) {
+        printf("Failed to initialize SystemStats, exiting.\n");
+        return -1;
+    }
 
     signal(SIGTERM, sig_handler);
     signal(SIGINT, sig_handler);
@@ -97,7 +101,6 @@ int main()
     signal(SIGUSR2, sig_handler);
     signal(SIGSEGV, sig_handler);
     signal(SIGBUS, sig_handler);
-    signal(SIGKILL, sig_handler);
     signal(SIGFPE, sig_handler);
     signal(SIGILL, sig_handler);
     signal(SIGQUIT, sig_handler);

@@ -1,9 +1,25 @@
 #include "system_stats.h"
-#include "helper.h"
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+
+// Converts a /proc/meminfo kB value to rounded MB (3 decimal places)
+static inline double kb_to_mb(double kb) {
+    double mb = kb / 1024.0;
+    return (int)(mb * 1000.0 + 0.5) / 1000.0;
+}
+
+// Runs a command via v_secure_popen and reads the first line of output
+static void get_deviceinfo_field(const char *cmd, char *buf, size_t size) {
+    FILE *fp = v_secure_popen("r", cmd);
+    if (fp) {
+        if (fgets(buf, size, fp)) {
+            buf[strcspn(buf, "\n")] = '\0';
+        } else {
+            strncpy(buf, "UNKNOWN", size);
+        }
+        v_secure_pclose(fp);
+    } else {
+        strncpy(buf, "UNKNOWN", size);
+    }
+}
 
 // API to initialize system statistics
 void initialize_system_stats(SystemStats *stats) {
@@ -35,47 +51,17 @@ void initialize_system_stats(SystemStats *stats) {
 
 // API to collect device model
 void get_device_model(char *model, size_t size) {
-    FILE *fp = v_secure_popen("r", "deviceinfo.sh -mo");
-    if (fp) {
-        if (fgets(model, size, fp)) {
-            model[strcspn(model, "\n")] = '\0'; // Remove newline character
-        } else {
-            strncpy(model, "UNKNOWN", size);
-        }
-        v_secure_pclose(fp);
-    } else {
-        strncpy(model, "UNKNOWN", size);
-    }
+    get_deviceinfo_field("deviceinfo.sh -mo", model, size);
 }
 
 // API to collect firmware version
 void get_firmware_version(char *firmware, size_t size) {
-    FILE *fp = v_secure_popen("r", "deviceinfo.sh -fw");
-    if (fp) {
-        if (fgets(firmware, size, fp)) {
-            firmware[strcspn(firmware, "\n")] = '\0'; // Remove newline character
-        } else {
-            strncpy(firmware, "UNKNOWN", size);
-        }
-        v_secure_pclose(fp);
-    } else {
-        strncpy(firmware, "UNKNOWN", size);
-    }
+    get_deviceinfo_field("deviceinfo.sh -fw", firmware, size);
 }
 
 // API to collect CMAC address
 void get_cmac_address(char *cmac, size_t size) {
-    FILE *fp = v_secure_popen("r", "deviceinfo.sh -cmac");
-    if (fp) {
-        if (fgets(cmac, size, fp)) {
-            cmac[strcspn(cmac, "\n")] = '\0'; // Remove newline character
-        } else {
-            strncpy(cmac, "UNKNOWN", size);
-        }
-        v_secure_pclose(fp);
-    } else {
-        strncpy(cmac, "UNKNOWN", size);
-    }
+    get_deviceinfo_field("deviceinfo.sh -cmac", cmac, size);
 }
 
 // API to collect CPU usage
@@ -139,51 +125,23 @@ void get_cpu_stats(double *cpu_user, double *cpu_system, double *cpu_idle, doubl
 // API to collect memory information
 void get_memory_info(double *total_memory, double *free_memory, double *avail_memory, double *cached_mem, double *buffers_mem, double *slab_memory, double *slab_unreclaim, double *active_memory, double *inactive_memory) {
     char buffer[256];
+    double val;
     FILE *fp = fopen("/proc/meminfo", "r");
     *total_memory = *free_memory = *avail_memory = *cached_mem = *buffers_mem = -1.0;
     *slab_memory = *slab_unreclaim = *active_memory = *inactive_memory = -1.0;
-    if (fp) {
-        while (fgets(buffer, sizeof(buffer), fp)) {
-            if (strncmp(buffer, "MemTotal:", 9) == 0) {
-                sscanf(buffer, "MemTotal: %lf", total_memory);
-                *total_memory /= 1024.0;
-                *total_memory = (int)(*total_memory * 1000.0 + 0.5) / 1000.0;
-            } else if (strncmp(buffer, "MemFree:", 8) == 0) {
-                sscanf(buffer, "MemFree: %lf", free_memory);
-                *free_memory /= 1024.0;
-                *free_memory = (int)(*free_memory * 1000.0 + 0.5) / 1000.0;
-            } else if (strncmp(buffer, "MemAvailable:", 13) == 0) {
-                sscanf(buffer, "MemAvailable: %lf", avail_memory);
-                *avail_memory /= 1024.0;
-                *avail_memory = (int)(*avail_memory * 1000.0 + 0.5) / 1000.0;
-            } else if (strncmp(buffer, "Cached:", 7) == 0) {
-                sscanf(buffer, "Cached: %lf", cached_mem);
-                *cached_mem /= 1024.0;
-                *cached_mem = (int)(*cached_mem * 1000.0 + 0.5) / 1000.0;
-            } else if (strncmp(buffer, "Buffers:", 8) == 0) {
-                sscanf(buffer, "Buffers: %lf", buffers_mem);
-                *buffers_mem /= 1024.0;
-                *buffers_mem = (int)(*buffers_mem * 1000.0 + 0.5) / 1000.0;
-            } else if (strncmp(buffer, "Slab:", 5) == 0) {
-                sscanf(buffer, "Slab: %lf", slab_memory);
-                *slab_memory /= 1024.0;
-                *slab_memory = (int)(*slab_memory * 1000.0 + 0.5) / 1000.0;
-            } else if (strncmp(buffer, "SUnreclaim:", 11) == 0) {
-                sscanf(buffer, "SUnreclaim: %lf", slab_unreclaim);
-                *slab_unreclaim /= 1024.0;
-                *slab_unreclaim = (int)(*slab_unreclaim * 1000.0 + 0.5) / 1000.0;
-            } else if (strncmp(buffer, "Active:", 7) == 0) {
-                sscanf(buffer, "Active: %lf", active_memory);
-                *active_memory /= 1024.0;
-                *active_memory = (int)(*active_memory * 1000.0 + 0.5) / 1000.0;
-            } else if (strncmp(buffer, "Inactive:", 9) == 0) {
-                sscanf(buffer, "Inactive: %lf", inactive_memory);
-                *inactive_memory /= 1024.0;
-                *inactive_memory = (int)(*inactive_memory * 1000.0 + 0.5) / 1000.0;
-            }
-        }
-        fclose(fp);
+    if (!fp) return;
+    while (fgets(buffer, sizeof(buffer), fp)) {
+        if      (sscanf(buffer, "MemTotal: %lf",    &val) == 1) *total_memory   = kb_to_mb(val);
+        else if (sscanf(buffer, "MemFree: %lf",     &val) == 1) *free_memory    = kb_to_mb(val);
+        else if (sscanf(buffer, "MemAvailable: %lf",&val) == 1) *avail_memory   = kb_to_mb(val);
+        else if (sscanf(buffer, "Cached: %lf",      &val) == 1) *cached_mem     = kb_to_mb(val);
+        else if (sscanf(buffer, "Buffers: %lf",     &val) == 1) *buffers_mem    = kb_to_mb(val);
+        else if (sscanf(buffer, "Slab: %lf",        &val) == 1) *slab_memory    = kb_to_mb(val);
+        else if (sscanf(buffer, "SUnreclaim: %lf",  &val) == 1) *slab_unreclaim = kb_to_mb(val);
+        else if (sscanf(buffer, "Active: %lf",      &val) == 1) *active_memory  = kb_to_mb(val);
+        else if (sscanf(buffer, "Inactive: %lf",    &val) == 1) *inactive_memory= kb_to_mb(val);
     }
+    fclose(fp);
 }
 
 // API to collect load average

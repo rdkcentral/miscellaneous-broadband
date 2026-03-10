@@ -7,15 +7,14 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <time.h>
 #include "ansc_platform.h"
+#include "system_stats.h"
+#include "helper.h"
 
-#define LOG_FILE "/rdklogs/logs/system_stats_logs.txt"
 #define DEFAULT_INTERVAL 900 // 15 minutes in seconds
 
-
 // Function declarations
-void log_message(const char *format, ...);
-void execute_command(const char *command, char *output, size_t size);
 int SystemStats_Init();
 int SystemStats_Collect();
 int SystemStats_Save();

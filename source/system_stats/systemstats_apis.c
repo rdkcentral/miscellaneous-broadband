@@ -1,21 +1,9 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdbool.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <stdarg.h>
-#include <time.h>
-#include <signal.h>
-#include <errno.h>
+#include "systemstats_apis.h"
 
-#include <systemstats_apis.h>
-#include "system_stats.h"
-#include "helper.h"
+#define DATA_FILE "/rdklogs/logs/system_stats_data.txt"
 
 SystemStats *system_stats = NULL;
 
-// static int collection_interval = 90;
 static int collection_interval = DEFAULT_INTERVAL;
 
 static pthread_mutex_t stats_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -26,7 +14,7 @@ static bool stop_thread = false;
 // Function to save statistics to a text file
 void save_to_text(const SystemStats *system_stats) {
 
-    FILE *file = fopen("/rdklogs/logs/system_stats_data.txt", "a");
+    FILE *file = fopen(DATA_FILE, "a");
     if (!file) {
         fprintf(stderr, "Failed to open file for writing\n");
         return;
@@ -36,7 +24,7 @@ void save_to_text(const SystemStats *system_stats) {
     get_current_timestamp(timestamp, sizeof(timestamp));
 
     // Write system_params
-    fprintf(file, "system_params: %s|%d|%s|%s|%s|%s|%s|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f\n",
+    fprintf(file, "system_params: %s|%d|%s|%s|%s|%s|%s|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f\n",
             timestamp, system_stats->hour_of_day, system_stats->day_of_week,
             system_stats->model, system_stats->firmware, system_stats->cmac,
             system_stats->uptime, system_stats->cpu_usage,
@@ -68,12 +56,20 @@ int SystemStats_Init() {
 
 // Function to collect System Statistics
 int SystemStats_Collect() {
+    if (system_stats == NULL) {
+        log_message("SystemStats_Collect: system_stats is NULL.\n");
+        return -1;
+    }
     collect_system_stats(system_stats);
     return 0;
 }
 
 // Function to save System Statistics
 int SystemStats_Save() {
+    if (system_stats == NULL) {
+        log_message("SystemStats_Save: system_stats is NULL.\n");
+        return -1;
+    }
     save_to_text(system_stats);
     return 0;
 }
@@ -83,6 +79,7 @@ int SystemStats_DeInit() {
     log_message("Deinitializing System Statistics...\n");
 
     free(system_stats);
+    system_stats = NULL;
 
     log_message("System Statistics deinitialization completed.\n");
     return 0;

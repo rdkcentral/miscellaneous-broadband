@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sysevent/sysevent.h>
+#include <time.h>
+#include <unistd.h>
+#include "helper.h"
 #include "secure_wrapper.h"
 
 // Structure to store system statistics
