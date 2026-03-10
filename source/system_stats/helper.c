@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <time.h>
-#include "systemstats_apis.h"
+#include "helper.h"
 
 // Function to log messages to a file
 void log_message(const char *format, ...) {
@@ -13,8 +13,9 @@ void log_message(const char *format, ...) {
         struct timespec ts;
         struct tm *tm_info;
 
+        struct tm tm_buf;
         clock_gettime(CLOCK_REALTIME, &ts);
-        tm_info = localtime(&ts.tv_sec);
+        tm_info = localtime_r(&ts.tv_sec, &tm_buf);
         strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
         snprintf(timestamp + strlen(timestamp), sizeof(timestamp) - strlen(timestamp), ".%03ld", ts.tv_nsec / 1000000);
         fprintf(logfp, "[%s] ", timestamp);
@@ -45,10 +46,11 @@ void execute_command(const char *command, char *output, size_t size) {
 // Function to get the current timestamp in the required format
 void get_current_timestamp(char *timestamp, size_t size) {
     struct timespec ts;
+    struct tm tm_buf;
     struct tm *tm_info;
 
     clock_gettime(CLOCK_REALTIME, &ts);
-    tm_info = localtime(&ts.tv_sec);
-    strftime(timestamp, size, "%Y-%m-%d-%H:%M:%S", tm_info); // Format: yyyy-mm-dd-hh:mm:ss
-    snprintf(timestamp + strlen(timestamp), size - strlen(timestamp), ".%03ld", ts.tv_nsec / 1000000); // Append milliseconds
+    tm_info = localtime_r(&ts.tv_sec, &tm_buf);
+    strftime(timestamp, size, "%Y-%m-%d-%H:%M:%S", tm_info);
+    snprintf(timestamp + strlen(timestamp), size - strlen(timestamp), ".%03ld", ts.tv_nsec / 1000000);
 }
