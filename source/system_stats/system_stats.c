@@ -6,21 +6,6 @@ static inline double kb_to_mb(double kb) {
     return (int)(mb * 1000.0 + 0.5) / 1000.0;
 }
 
-// Runs a command via v_secure_popen and reads the first line of output
-static void get_deviceinfo_field(const char *cmd, char *buf, size_t size) {
-    FILE *fp = v_secure_popen("r", cmd);
-    if (fp) {
-        if (fgets(buf, size, fp)) {
-            buf[strcspn(buf, "\n")] = '\0';
-        } else {
-            strncpy(buf, "UNKNOWN", size);
-        }
-        v_secure_pclose(fp);
-    } else {
-        strncpy(buf, "UNKNOWN", size);
-    }
-}
-
 // API to initialize system statistics
 void initialize_system_stats(SystemStats *stats) {
     memset(stats, 0, sizeof(SystemStats));
@@ -51,17 +36,47 @@ void initialize_system_stats(SystemStats *stats) {
 
 // API to collect device model
 void get_device_model(char *model, size_t size) {
-    get_deviceinfo_field("deviceinfo.sh -mo", model, size);
+    FILE *fp = v_secure_popen("r", "deviceinfo.sh -mo");
+    if (fp) {
+        if (fgets(model, size, fp)) {
+            model[strcspn(model, "\n")] = '\0'; // Remove newline character
+        } else {
+            strncpy(model, "UNKNOWN", size);
+        }
+        v_secure_pclose(fp);
+    } else {
+        strncpy(model, "UNKNOWN", size);
+    }
 }
 
 // API to collect firmware version
 void get_firmware_version(char *firmware, size_t size) {
-    get_deviceinfo_field("deviceinfo.sh -fw", firmware, size);
+    FILE *fp = v_secure_popen("r", "deviceinfo.sh -fw");
+    if (fp) {
+        if (fgets(firmware, size, fp)) {
+            firmware[strcspn(firmware, "\n")] = '\0'; // Remove newline character
+        } else {
+            strncpy(firmware, "UNKNOWN", size);
+        }
+        v_secure_pclose(fp);
+    } else {
+        strncpy(firmware, "UNKNOWN", size);
+    }
 }
 
 // API to collect CMAC address
 void get_cmac_address(char *cmac, size_t size) {
-    get_deviceinfo_field("deviceinfo.sh -cmac", cmac, size);
+    FILE *fp = v_secure_popen("r", "deviceinfo.sh -cmac");
+    if (fp) {
+        if (fgets(cmac, size, fp)) {
+            cmac[strcspn(cmac, "\n")] = '\0'; // Remove newline character
+        } else {
+            strncpy(cmac, "UNKNOWN", size);
+        }
+        v_secure_pclose(fp);
+    } else {
+        strncpy(cmac, "UNKNOWN", size);
+    }
 }
 
 // API to collect CPU usage
