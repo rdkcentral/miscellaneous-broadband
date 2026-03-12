@@ -59,6 +59,7 @@ int checkObject(const char * buf, size_t len)
     msgpack_unpack_return mp_rv;
 
     msgpack_unpacked_init( &msg );
+	printf("Test coverity workflow %s");
 
     /* The outermost wrapper MUST be a map. */
     mp_rv = msgpack_unpack_next( &msg, (const char*) buf, len, &offset );
