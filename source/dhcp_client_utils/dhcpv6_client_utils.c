@@ -93,9 +93,9 @@ static int get_dhcpv6_opt_list (dhcp_opt_list ** req_opt_list, dhcp_opt_list ** 
 
 /*
  * start_dhcpv6_client ()
- * @description: This API will build dhcp request/send options and start dibbler client program.
+ * @description: This API will forcefully kill any existing dibbler instance, then build dhcp request/send options and start a new dibbler client program.
  * @params     : input parameter to pass interface specific arguments
- * @return     : returns the pid of the dibbler client program else return error code on failure
+ * @return     : returns the pid (>0) of the newly started dibbler client program, or 0 on failure
  *
  */
 pid_t start_dhcpv6_client (dhcp_params * params)
@@ -115,8 +115,18 @@ pid_t start_dhcpv6_client (dhcp_params * params)
     pid = get_process_pid(DIBBLER_CLIENT, params->ifname, false);
     if (pid > 0)
     {
-        DBG_PRINT("%s %d: another instance of %s running on %s \n", __FUNCTION__, __LINE__, DIBBLER_CLIENT, params->ifname);
-        return FAILURE;
+        DBG_PRINT("%s %d: another instance of %s running on %s pid %d, killing it\n", __FUNCTION__, __LINE__, DIBBLER_CLIENT, params->ifname, pid);
+        /* Forcefully kill the existing process before starting a new one */
+        if (signal_process(pid, SIGKILL) == RETURN_OK)
+        {
+            DBG_PRINT("%s %d: Sent SIGKILL to pid %d\n", __FUNCTION__, __LINE__, pid);
+            /* Collect the killed process to prevent zombie */
+            if (collect_waiting_process(pid, 1000) != SUCCESS)
+            {
+                DBG_PRINT("%s %d: unable to collect pid %d after SIGKILL\n", __FUNCTION__, __LINE__, pid);
+            }
+        }
+        pid = 0;
     }
 
 
@@ -125,7 +135,7 @@ pid_t start_dhcpv6_client (dhcp_params * params)
     {
         DBG_PRINT("%s %d: Fail to open sysevent.\n", __FUNCTION__, __LINE__);
 	/* CID 189993 Improper use of negative value */
-	return FAILURE;
+	return 0;
     }
 
     // check if interface is ipv6 ready with a link-local address
@@ -201,9 +211,9 @@ pid_t start_dhcpv6_client (dhcp_params * params)
 
 /*
  * stop_dhcpv6_client ()
- * @description: This API will stop dhcpv6 client program for interface passed in paramter.
+ * @description: This API will stop the dhcpv6 client program for the interface specified in params.
  * @params     : input parameter to pass interface specific arguments
- * @return     : returns SUCCESS if killed else returns FAILURE
+ * @return     : returns SUCCESS (1) if stopped successfully, FAILURE (0) on error
  *
  */
 int stop_dhcpv6_client (dhcp_params * params)
