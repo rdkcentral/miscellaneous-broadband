@@ -12,7 +12,9 @@
 #include "system_stats.h"
 #include "helper.h"
 
-#define DEFAULT_INTERVAL 900 // 15 minutes in seconds
+//#define DEFAULT_INTERVAL 900 // 15 minutes in seconds
+#define DEFAULT_INTERVAL 300 // 5 minutes in seconds
+
 
 // Function declarations
 int SystemStats_Init();
