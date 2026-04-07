@@ -12,43 +12,25 @@
 
 // Structure to store system statistics
 typedef struct {
-    double cpu_usage;
-    double cpu_user;
-    double cpu_system;
-    double cpu_idle;
-    double cpu_iowait;
-    double total_memory;
-    double free_memory;
-    double avail_memory;
-    double cached_mem;
-    double buffers_mem;
-    double slab_memory;
-    double slab_unreclaim;
-    double active_memory;
-    double inactive_memory;
-    double loadavg_1min;
-    double loadavg_5min;
-    double loadavg_15min;
-    int hour_of_day;
-    char model[64];
-    char firmware[128];
     char cmac[32];
-    char uptime[64];
-    char day_of_week[16];
+    double cpu_usage;
+    double used_memory_kb;
+    double loadavg_15min;
+    double avail_memory_kb;
+    double free_memory_kb;
+    double slab_memory_kb;
+    int client_count_2g;
+    int client_count_5g;
+    int client_count_6g;
 } SystemStats;
 
 // Function declarations
 void initialize_system_stats(SystemStats *stats);
 void collect_system_stats(SystemStats *stats);
 void get_cpu_usage(double *cpu_usage);
-void get_cpu_stats(double *cpu_user, double *cpu_system, double *cpu_idle, double *cpu_iowait);
-void get_memory_info(double *total_memory, double *free_memory, double *avail_memory, double *cached_mem, double *buffers_mem, double *slab_memory, double *slab_unreclaim, double *active_memory, double *inactive_memory);
-void get_load_average(double *load1, double *load5, double *load15);
-void get_device_model(char *model, size_t size);
-void get_firmware_version(char *firmware, size_t size);
+void get_memory_info(double *used_memory_kb, double *free_memory_kb, double *avail_memory_kb, double *slab_memory_kb);
+void get_load_average(double *load15);
 void get_cmac_address(char *cmac, size_t size);
-void get_device_uptime(char *uptime, size_t size);
-void get_hour_of_day(int *hour);
-void get_day_of_week(char *day, size_t size);
+void get_wifi_client_counts(int *count_2g, int *count_5g, int *count_6g);
 
 #endif // SYSTEM_STATS_H

@@ -24,16 +24,14 @@ void save_to_text(const SystemStats *system_stats) {
     get_current_timestamp(timestamp, sizeof(timestamp));
 
     // Write system_params
-    fprintf(file, "system_params: %s|%d|%s|%s|%s|%s|%s|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f\n",
-            timestamp, system_stats->hour_of_day, system_stats->day_of_week,
-            system_stats->model, system_stats->firmware, system_stats->cmac,
-            system_stats->uptime, system_stats->cpu_usage,
-            system_stats->cpu_user, system_stats->cpu_system, system_stats->cpu_idle, system_stats->cpu_iowait,
-            system_stats->loadavg_1min, system_stats->loadavg_5min, system_stats->loadavg_15min,
-            system_stats->total_memory, system_stats->free_memory, system_stats->avail_memory,
-            system_stats->cached_mem, system_stats->buffers_mem,
-            system_stats->slab_memory, system_stats->slab_unreclaim,
-            system_stats->active_memory, system_stats->inactive_memory);
+    fprintf(file, "system_params: %s|%s|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%d|%d|%d\n",
+            timestamp, system_stats->cmac,
+            system_stats->cpu_usage, system_stats->used_memory_kb,
+            system_stats->loadavg_15min,
+            system_stats->avail_memory_kb, system_stats->free_memory_kb,
+            system_stats->slab_memory_kb,
+            system_stats->client_count_2g, system_stats->client_count_5g,
+            system_stats->client_count_6g);
 
     fclose(file);
 }
