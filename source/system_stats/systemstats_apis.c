@@ -1,6 +1,6 @@
 #include "systemstats_apis.h"
 
-#define DATA_FILE "/rdklogs/logs/system_stats_data.txt"
+#define DATA_FILE "/rdklogs/logs/system_stats_data.csv"
 
 SystemStats *system_stats = NULL;
 
@@ -24,14 +24,18 @@ void save_to_text(const SystemStats *system_stats) {
     get_current_timestamp(timestamp, sizeof(timestamp));
 
     // Write system_params
-    fprintf(file, "system_params: %s|%s|%.3f|%.3f|%.3f|%.3f|%.3f|%.3f|%d|%d|%d\n",
-            timestamp, system_stats->cmac,
-            system_stats->cpu_usage, system_stats->used_memory_kb,
-            system_stats->loadavg_15min,
-            system_stats->avail_memory_kb, system_stats->free_memory_kb,
-            system_stats->slab_memory_kb,
-            system_stats->client_count_2g, system_stats->client_count_5g,
-            system_stats->client_count_6g);
+    fprintf(file, "%s,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%d,%d\n",
+        timestamp,
+        system_stats->cmac,
+        system_stats->cpu_usage,
+        system_stats->used_memory_kb,
+        system_stats->loadavg_15min,
+        system_stats->avail_memory_kb,
+        system_stats->free_memory_kb,
+        system_stats->slab_memory_kb,
+        system_stats->client_count_2g,
+        system_stats->client_count_5g,
+        system_stats->client_count_6g);
 
     fclose(file);
 }
