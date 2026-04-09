@@ -156,6 +156,13 @@ AC_C_INLINE
 # Checks for library functions.
 AC_FUNC_MALLOC
 
+# Check for SQLite3 (required by psmcli)
+PKG_CHECK_MODULES([SQLITE3], [sqlite3 >= 3.7.0],
+    [AC_SUBST(SQLITE3_CFLAGS) AC_SUBST(SQLITE3_LIBS)],
+    [AC_CHECK_LIB([sqlite3], [sqlite3_open_v2],
+        [SQLITE3_LIBS="-lsqlite3" AC_SUBST(SQLITE3_LIBS)],
+        [AC_MSG_ERROR([sqlite3 library not found])])])
+
 AC_CONFIG_FILES(
 	source/Psmcli/Makefile
 	source/LTime/Makefile

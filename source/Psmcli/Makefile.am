@@ -22,4 +22,4 @@ bin_PROGRAMS = psmcli
 
 psmcli_SOURCES = psmcli.c
 
-psmcli_LDFLAGS = -lccsp_common
+psmcli_LDFLAGS = $(SQLITE3_LIBS)
