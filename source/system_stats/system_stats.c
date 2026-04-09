@@ -47,24 +47,46 @@ void get_cpu_usage(double *cpu_usage) {
 }
 
 // API to collect memory information
-// Values are stored in kB (raw values from /proc/meminfo).
-// used_memory_kb = MemTotal - MemFree.
+// used_memory_kb, free_memory_kb, avail_memory_kb are read from 'free' command output.
+// Expected format (procps, 7 cols):
+//               total        used        free      shared  buff/cache   available
+//   Mem:      2504768      498348     1568392       25888      438028     1951548
+// slab_memory_kb is read from /proc/meminfo (not exposed by 'free').
 void get_memory_info(double *used_memory_kb, double *free_memory_kb, double *avail_memory_kb, double *slab_memory_kb) {
     char buffer[256];
     double val;
-    double total_kb = -1.0;
-    FILE *fp = fopen("/proc/meminfo", "r");
     *used_memory_kb = *free_memory_kb = *avail_memory_kb = *slab_memory_kb = -1.0;
-    if (!fp) return;
-    while (fgets(buffer, sizeof(buffer), fp)) {
-        if      (sscanf(buffer, "MemTotal: %lf",    &val) == 1) total_kb        = val;
-        else if (sscanf(buffer, "MemFree: %lf",     &val) == 1) *free_memory_kb = val;
-        else if (sscanf(buffer, "MemAvailable: %lf",&val) == 1) *avail_memory_kb= val;
-        else if (sscanf(buffer, "Slab: %lf",        &val) == 1) *slab_memory_kb = val;
+
+    FILE *fp = v_secure_popen("r", "free");
+    if (fp) {
+        while (fgets(buffer, sizeof(buffer), fp)) {
+            /* Match the "Mem:" line directly — independent of line number */
+            long long total, used, free_kb, shared, buff, avail;
+            int n = sscanf(buffer, "Mem: %lld %lld %lld %lld %lld %lld",
+                           &total, &used, &free_kb, &shared, &buff, &avail);
+            if (n >= 3) {
+                *used_memory_kb  = (double)used;
+                *free_memory_kb  = (double)free_kb;
+            }
+            if (n == 6)
+                *avail_memory_kb = (double)avail;
+            if (n >= 3)
+                break;
+        }
+        v_secure_pclose(fp);
     }
-    fclose(fp);
-    if (total_kb >= 0.0 && *free_memory_kb >= 0.0)
-        *used_memory_kb = total_kb - *free_memory_kb;
+
+    /* Slab is not reported by 'free'; read it from /proc/meminfo */
+    FILE *mfp = fopen("/proc/meminfo", "r");
+    if (mfp) {
+        while (fgets(buffer, sizeof(buffer), mfp)) {
+            if (sscanf(buffer, "Slab: %lf", &val) == 1) {
+                *slab_memory_kb = val;
+                break;
+            }
+        }
+        fclose(mfp);
+    }
 }
 
 // API to collect 15-minute load average
