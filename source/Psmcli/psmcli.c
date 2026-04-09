@@ -124,6 +124,7 @@ static sqlite3 *open_db(int flags)
         return NULL;
     }
     sqlite3_busy_timeout(db, 5000);
+    fprintf(stderr, "psmcli: [INFO] opened SQLite DB %s (new SQLite flow)\n", PSM_DB_PATH);
     return db;
 }
 
@@ -159,8 +160,10 @@ static int process_get(int argc, char * const argv[])
         sqlite3_bind_text(stmt, 1, argv[i], -1, SQLITE_STATIC);
         if (sqlite3_step(stmt) == SQLITE_ROW) {
             const char *val = (const char *)sqlite3_column_text(stmt, 0);
+            fprintf(stderr, "psmcli: [INFO] GET '%s' -> found\n", argv[i]);
             printf("%s\n", val ? val : "");
         } else {
+            fprintf(stderr, "psmcli: [INFO] GET '%s' -> not found\n", argv[i]);
             ret = CCSP_CR_ERR_INVALID_PARAM;
         }
         sqlite3_reset(stmt);
@@ -346,6 +349,7 @@ static int process_set(int argc, char * const argv[])
         sqlite3_bind_int (set_stmt, 2, type_id);
         sqlite3_bind_text(set_stmt, 3, value,   -1, SQLITE_STATIC);
         if (sqlite3_step(set_stmt) == SQLITE_DONE) {
+            fprintf(stderr, "psmcli: [INFO] SET '%s' -> stored successfully\n", key);
             printf("%d\n", CCSP_SUCCESS);
         } else {
             fprintf(stderr, "psmcli set: failed for '%s': %s\n",
@@ -405,6 +409,8 @@ static int process_setdetail(int argc, char * const argv[])
         sqlite3_bind_int (stmt, 2, type_id);
         sqlite3_bind_text(stmt, 3, value,   -1, SQLITE_STATIC);
         if (sqlite3_step(stmt) == SQLITE_DONE) {
+            fprintf(stderr, "psmcli: [INFO] SET '%s' (type=%s) -> stored successfully\n",
+                    key, type_str);
             printf("%d\n", CCSP_SUCCESS);
         } else {
             fprintf(stderr, "psmcli setdetail: failed for '%s': %s\n",
@@ -657,6 +663,7 @@ int main(int argc, char *argv[])
     /* else: no subsys option — use argv as-is */
 
     cmd = local_argv[1];
+    fprintf(stderr, "psmcli: [INFO] dispatching command '%s' via SQLite direct (new flow)\n", cmd);
 
     /* Handle "psmcli help" (no key argument required) */
     if (strcmp(cmd, "help") == 0) {
