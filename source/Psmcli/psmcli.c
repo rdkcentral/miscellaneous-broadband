@@ -696,3 +696,8 @@ int main(int argc, char *argv[])
     if (strcmp(cmd, "getallinst") == 0)
         return process_getallinst(local_argc, local_argv);
     if (strcmp(cmd, "getinstcnt") == 0)
+        return process_getinstcnt(local_argc, local_argv);
+
+    fprintf(stderr, "psmcli: unknown command '%s'\n", cmd);
+    return 1;
+}
