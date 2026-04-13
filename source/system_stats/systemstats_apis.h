@@ -13,7 +13,8 @@
 #include "helper.h"
 
 //#define DEFAULT_INTERVAL 900 // 15 minutes in seconds
-#define DEFAULT_INTERVAL 300 // 5 minutes in seconds
+//#define DEFAULT_INTERVAL 300 // 5 minutes in seconds
+#define DEFAULT_INTERVAL 120 // 2 minutes in seconds
 
 
 // Function declarations
