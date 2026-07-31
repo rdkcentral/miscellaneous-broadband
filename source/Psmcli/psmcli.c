@@ -60,7 +60,7 @@
 #include <sqlite3.h>
 
 #ifndef PSM_DB_PATH
-#define PSM_DB_PATH "/nvram/psm.db"
+#define PSM_DB_PATH "/tmp/psm.db"
 #endif
 
 /* Return codes matching legacy CCSP/psmcli values used by scripts */
