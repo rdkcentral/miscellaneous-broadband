@@ -555,8 +555,10 @@ rbusError_t AnomalyService_PublishAnomalyEvent(const char *anomaly_type,
     char timestamp[64];
     strftime(timestamp, sizeof(timestamp), "%Y-%m-%dT%H:%M:%SZ", tm_info);
 
+    /* "model" identifies this detector to AnomalyEngine for rule dispatch */
     snprintf(payload, sizeof(payload),
-             "{\"anomaly_type\":\"%s\","
+             "{\"model\":\"anomaly\","
+             "\"anomaly_type\":\"%s\","
              "\"severity\":\"%s\","
              "\"timestamp\":\"%s\","
              "\"details\":%s}",

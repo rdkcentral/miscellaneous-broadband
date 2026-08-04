@@ -172,6 +172,7 @@ AC_CONFIG_FILES(
   source/FwBankInfo/Makefile
   source/AnomalyService/Makefile
   source/system_stats/Makefile
+  source/AnomalyEngine/Makefile
 	Makefile
 )
 

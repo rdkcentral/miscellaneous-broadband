@@ -1,0 +1,133 @@
+{
+    "version": "1.0",
+
+    "engine": {
+        "log_path":                 "/rdklogs/logs/anomaly_analysis.txt",
+        "data_path":                "/rdklogs/logs/anomaly_data",
+        "max_reports_per_model":    100,
+        "report_retention_days":    7,
+        "enable_corrective_actions": true,
+        "enable_llm_analysis":      false,
+        "llm_endpoint":             "http://localhost:8080/analyze",
+        "enable_log_analysis":      true,
+        "log_analyzer_endpoint":    "http://log-analyzer.local:8080/analyze"
+    },
+
+    "log_collection": {
+        "logs_directory":        "/rdklogs/logs",
+        "time_window_before_sec": 300,
+        "time_window_after_sec":  60,
+        "max_total_size_kb":     5120,
+        "log_files": []
+    },
+
+    "thresholds": {
+        "cpu": {
+            "system_cpu_high":      80.0,
+            "system_cpu_critical":  90.0,
+            "process_cpu_high":     50.0,
+            "load_avg_multiplier":   2.0
+        },
+        "memory": {
+            "mem_used_high":        75.0,
+            "mem_used_critical":    85.0,
+            "oom_score_alert":     700,
+            "swap_used_warning":    50.0
+        },
+        "network": {
+            "conntrack_high":       85.0,
+            "conntrack_critical":   95.0,
+            "packet_drop_warning":   0.1,
+            "time_wait_warning":  10000
+        }
+    },
+
+    "protected_services": [
+        "CcspPandMSsp",
+        "CcspCMAgentSsp",
+        "RdkWanManager",
+        "onewifi"
+    ],
+
+    "corrective_actions": {
+        "enabled":                 true,
+        "global_cooldown_seconds": 60,
+        "max_actions_per_hour":    10,
+
+        "cpu_actions": {
+            "low":      { "action": "log_and_monitor",      "cooldown_seconds": 30 },
+            "medium":   { "action": "kill_runaway_process", "signal": "SIGTERM",
+                          "cooldown_seconds": 120,
+                          "pre_conditions": { "min_cpu_percent": 80,
+                                              "exclude_processes": ["CcspPandMSsp","CcspCrSsp","webpa"] } },
+            "high":     { "action": "clear_caches",         "cache_level": 3,
+                          "cooldown_seconds": 300 },
+            "critical": { "action": "system_reboot",        "cooldown_seconds": 3600,
+                          "pre_conditions": { "require_approval": false, "log_before_action": true } }
+        },
+
+        "memory_actions": {
+            "low":      { "action": "log_and_monitor",   "cooldown_seconds": 30 },
+            "medium":   { "action": "clear_caches",      "cache_level": 1, "cooldown_seconds": 180 },
+            "high":     { "action": "kill_runaway_process", "signal": "SIGTERM",
+                          "cooldown_seconds": 300,
+                          "pre_conditions": { "min_memory_percent": 90,
+                                              "exclude_processes": ["CcspPandMSsp","CcspCrSsp"] } },
+            "critical": { "action": "system_reboot",     "cooldown_seconds": 3600 }
+        }
+    },
+
+    "collection_rules": {
+        "_comment": "mandatory checks are ALWAYS executed first for every anomaly type",
+
+        "anomaly": {
+            "CPU": {
+                "mandatory": ["cpu_mandatory"],
+                "low":       ["basic_cpu"],
+                "medium":    ["basic_cpu", "process_cpu"],
+                "high":      ["basic_cpu", "process_cpu", "cpu_extended"],
+                "critical":  ["basic_cpu", "process_cpu", "cpu_extended", "system_state"]
+            },
+            "Memory": {
+                "mandatory": ["memory_mandatory"],
+                "low":       ["basic_memory"],
+                "medium":    ["basic_memory", "process_memory"],
+                "high":      ["basic_memory", "process_memory", "memory_extended"],
+                "critical":  ["basic_memory", "process_memory", "memory_extended", "memory_system_state"]
+            },
+            "Both": {
+                "mandatory": ["cpu_mandatory", "memory_mandatory"],
+                "low":       ["basic_cpu", "basic_memory"],
+                "medium":    ["basic_cpu", "process_cpu", "basic_memory", "process_memory"],
+                "high":      ["basic_cpu", "process_cpu", "cpu_extended",
+                              "basic_memory", "process_memory", "memory_extended"],
+                "critical":  ["basic_cpu", "process_cpu", "cpu_extended", "system_state",
+                              "basic_memory", "process_memory", "memory_extended", "memory_system_state"]
+            }
+        },
+
+        "network_traffic": {
+            "ConntrackExhaustion": {
+                "mandatory": ["network_mandatory"],
+                "medium":    ["conntrack_summary", "top_connections"],
+                "high":      ["conntrack_summary", "top_connections", "socket_states"],
+                "critical":  ["conntrack_summary", "top_connections", "socket_states", "interface_stats"]
+            },
+            "PacketDrop": {
+                "mandatory": ["network_mandatory"],
+                "medium":    ["interface_stats"],
+                "high":      ["interface_stats", "socket_states"],
+                "critical":  ["interface_stats", "socket_states", "netfilter_stats"]
+            }
+        },
+
+        "docsis": {
+            "SignalDegradation": {
+                "mandatory": ["docsis_mandatory"],
+                "medium":    ["docsis_basic", "docsis_signal"],
+                "high":      ["docsis_basic", "docsis_signal", "docsis_errors"],
+                "critical":  ["docsis_basic", "docsis_signal", "docsis_errors", "docsis_full"]
+            }
+        }
+    }
+}
