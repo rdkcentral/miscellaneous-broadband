@@ -57,7 +57,8 @@ static int run_cmd(const char *cmd, char *out, size_t out_size) {
     if (!fp) { out[0] = '\0'; return -1; }
     while (len < sizeof(raw) - 1) {
         size_t n = fread(raw + len, 1, sizeof(raw) - 1 - len, fp);
-        if (n == 0) break; len += n;
+        if (n == 0) break;
+        len += n;
     }
     raw[len] = '\0'; pclose(fp);
     return json_escape(raw, out, out_size);

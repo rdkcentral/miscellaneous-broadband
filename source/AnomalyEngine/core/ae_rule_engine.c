@@ -88,6 +88,10 @@ typedef struct {
     char        str[256];
 } JLex;
 
+static void jl_init(JLex *l, const char *src, size_t len) {
+    l->src = src; l->pos = 0; l->len = len; l->str[0] = '\0';
+}
+
 static void jl_skip_ws(JLex *l) {
     while (l->pos < l->len) {
         char c = l->src[l->pos];
