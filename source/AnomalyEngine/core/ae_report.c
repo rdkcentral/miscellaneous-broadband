@@ -23,6 +23,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 
 #define REPORT_BUF_SIZE (64 * 1024)
 
@@ -54,6 +55,32 @@ static void ensure_dir(const char *path) {
     struct stat st;
     if (stat(path, &st) == 0) return;
     mkdir(path, 0755);
+}
+
+/*
+ * Tar logs_dir into /tmp/ for offline inspection.
+ * out_path must already contain the destination archive path.
+ * Returns 0 on success, -1 on failure.
+ */
+static int tar_logs_to_tmp(const char *logs_dir, const char *out_path) {
+    pid_t pid = fork();
+    if (pid < 0) return -1;
+    if (pid == 0) {
+        /* Use -C / with a relative path to avoid "removing leading '/'" warning */
+        const char *rel = (logs_dir[0] == '/') ? logs_dir + 1 : logs_dir;
+        char *argv[] = {
+            "tar", "-czf", (char *)out_path,
+            "-C", "/", (char *)rel,
+            NULL
+        };
+        execvp("tar", argv);
+        _exit(127);
+    }
+    int wstatus = 0;
+    waitpid(pid, &wstatus, 0);
+    /* tar exit 1 = some files changed/missing but archive was created; treat as success */
+    int ec = WIFEXITED(wstatus) ? WEXITSTATUS(wstatus) : -1;
+    return (ec == 0 || ec == 1) ? 0 : -1;
 }
 
 static const char *subdir_for_type(const char *anomaly_type) {
@@ -115,20 +142,36 @@ int ae_report_write(const AnomalyEvent  *ev,
     for (int i = 0; i < num_actions; i++) {
         pos += snprintf(buf + pos, REPORT_BUF_SIZE - (size_t)pos,
                         "%s{\"action\":\"%s\",\"target\":\"%s\","
-                        "\"result\":\"%s\",\"reason\":\"%s\",\"timestamp\":\"%s\"}",
+                        "\"result\":\"%s\",\"reason\":\"%s\","
+                        "\"command\":\"%s\",\"timestamp\":\"%s\"}",
                         i > 0 ? "," : "",
                         actions[i].action_name, actions[i].target,
-                        actions[i].result, actions[i].reason, actions[i].timestamp);
+                        actions[i].result, actions[i].reason,
+                        actions[i].command, actions[i].timestamp);
     }
     pos += snprintf(buf + pos, REPORT_BUF_SIZE - (size_t)pos, "],\n");
 
-    /* logs (truncated inline if small, omitted if NULL) */
+    /* logs: embed inline when small; otherwise note availability */
     if (logs_json && strlen(logs_json) < 4096) {
         pos += snprintf(buf + pos, REPORT_BUF_SIZE - (size_t)pos,
                         "  \"logs\":%s,\n", logs_json);
     } else {
         pos += snprintf(buf + pos, REPORT_BUF_SIZE - (size_t)pos,
                         "  \"logs_available\":true,\n");
+    }
+
+    /* Compute the archive path now so it appears in the JSON;
+     * the actual tar runs after the report file is written to disk. */
+    char log_archive[256] = "";
+    {
+        char ts_arc[32];
+        time_t t_arc = time(NULL);
+        struct tm *tm_arc = localtime(&t_arc);
+        strftime(ts_arc, sizeof(ts_arc), "%Y%m%d_%H%M%S", tm_arc);
+        snprintf(log_archive, sizeof(log_archive),
+                 "/tmp/anomaly_logs_%s_%s.tar.gz", ts_arc, ev->anomaly_type);
+        pos += snprintf(buf + pos, REPORT_BUF_SIZE - (size_t)pos,
+                        "  \"log_archive\":\"%s\",\n", log_archive);
     }
 
     /* recommendations */
@@ -160,6 +203,9 @@ int ae_report_write(const AnomalyEvent  *ev,
     fputs(buf, f);
     fclose(f);
     free(buf);
+
+    /* Tar after the report is on disk so this event's JSON is captured too */
+    tar_logs_to_tmp(ae_rules_logs_directory(), log_archive);
 
     /* ── Append to anomaly_summary.csv ─────────────────────────────────── */
     char summary_path[512];

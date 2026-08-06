@@ -109,19 +109,32 @@ static int exec_cmd(char *const argv[]) {
     return WIFEXITED(status) ? WEXITSTATUS(status) : -1;
 }
 
+/* Write a dry-run notice to the engine log file instead of executing. */
+static void log_dry_run(const char *action_name, const char *cmd) {
+    char ts[64];
+    iso_now(ts, sizeof(ts));
+    const char *log_path = ae_rules_log_path();
+    FILE *f = fopen(log_path, "a");
+    if (!f) return;
+    fprintf(f, "%s [DRY-RUN] %s would execute: %s\n", ts, action_name, cmd);
+    fclose(f);
+}
+
 /* ── Action implementations ───────────────────────────────────────────────── */
 
+#define ACTION_DRY_RUN 2   /* action logged but not executed */
+
 static int action_kill_process(int pid, int sig, ActionRecord *out) {
-    if (pid <= 1) { /* never kill init */
-        snprintf(out->reason, sizeof(out->reason), "invalid pid %d", pid);
+    if (pid <= 1) {
+        snprintf(out->reason,  sizeof(out->reason),  "invalid pid %d", pid);
+        snprintf(out->command, sizeof(out->command), "kill -%d %d", sig, pid);
         return -1;
     }
-    if (kill(pid, sig) == 0) {
-        snprintf(out->target, sizeof(out->target), "%d", pid);
-        return 0;
-    }
-    snprintf(out->reason, sizeof(out->reason), "kill(%d,%d) failed", pid, sig);
-    return -1;
+    snprintf(out->command, sizeof(out->command), "kill -%d %d", sig, pid);
+    snprintf(out->target,  sizeof(out->target),  "%d", pid);
+    snprintf(out->result,  sizeof(out->result),  "dry_run");
+    log_dry_run("kill_runaway_process", out->command);
+    return ACTION_DRY_RUN;
 }
 
 static int action_renice(int pid, int nice_delta, ActionRecord *out) {
@@ -129,6 +142,7 @@ static int action_renice(int pid, int nice_delta, ActionRecord *out) {
     int cur_prio = getpriority(PRIO_PROCESS, (id_t)pid);
     int new_prio = cur_prio + nice_delta;
     if (new_prio > 19) new_prio = 19;
+    snprintf(out->command, sizeof(out->command), "setpriority(PRIO_PROCESS, %d, %d)", pid, new_prio);
     if (setpriority(PRIO_PROCESS, (id_t)pid, new_prio) == 0) {
         snprintf(out->target, sizeof(out->target), "pid=%d nice=%+d", pid, nice_delta);
         return 0;
@@ -140,6 +154,7 @@ static int action_renice(int pid, int nice_delta, ActionRecord *out) {
 static int action_drop_caches(int level, ActionRecord *out) {
     char val[4];
     snprintf(val, sizeof(val), "%d", level);
+    snprintf(out->command, sizeof(out->command), "sync; echo %d > /proc/sys/vm/drop_caches", level);
     /* sync before dropping caches */
     sync();
     if (write_sysfile("/proc/sys/vm/drop_caches", val) == 0) {
@@ -155,6 +170,7 @@ static int action_restart_service(const char *service, ActionRecord *out) {
         snprintf(out->reason, sizeof(out->reason), "no service name");
         return -1;
     }
+    snprintf(out->command, sizeof(out->command), "systemctl restart %s", service);
     char *argv[] = { "systemctl", "restart", (char *)service, NULL };
     int rc = exec_cmd(argv);
     if (rc == 0) {
@@ -166,17 +182,12 @@ static int action_restart_service(const char *service, ActionRecord *out) {
 }
 
 static int action_system_reboot(const char *reason, ActionRecord *out) {
-    /* Record reboot reason via sysevent before rebooting */
-    char *argv[] = { "sysevent", "set", "reboot_reason", (char *)reason, NULL };
-    exec_cmd(argv);
-    snprintf(out->target, sizeof(out->target), "reason=%s", reason);
-    /* Give log a moment to flush before hard reboot */
-    sleep(2);
-    sync();
-    /* Use reboot(2) on Linux; fall back to shell */
-    char *rb_argv[] = { "reboot", NULL };
-    exec_cmd(rb_argv);
-    return 0; /* unreachable if reboot works */
+    snprintf(out->command, sizeof(out->command),
+             "sysevent set reboot_reason %s; reboot", reason ? reason : "anomaly");
+    snprintf(out->target, sizeof(out->target), "reason=%s", reason ? reason : "anomaly");
+    snprintf(out->result, sizeof(out->result), "dry_run");
+    log_dry_run("system_reboot", out->command);
+    return ACTION_DRY_RUN;
 }
 
 /* ── Action lookup table ──────────────────────────────────────────────────── */
@@ -276,7 +287,8 @@ int ae_action_evaluate(const char  *model,
     /* Execute */
     int rc = 1;
     if (strcmp(spec->action_name, "log_and_monitor") == 0) {
-        snprintf(out->target, sizeof(out->target), "%s/%s", anomaly_type, severity);
+        snprintf(out->target,  sizeof(out->target),  "%s/%s", anomaly_type, severity);
+        snprintf(out->command, sizeof(out->command), "logged only");
         rc = 0;
     } else if (strcmp(spec->action_name, "kill_runaway_process") == 0) {
         rc = action_kill_process(top_pid, spec->param_int, out);
@@ -290,7 +302,8 @@ int ae_action_evaluate(const char  *model,
         rc = action_system_reboot(spec->param_str ? spec->param_str : "anomaly", out);
     }
 
-    snprintf(out->result, sizeof(out->result), rc == 0 ? "taken" : "failed");
-    if (rc == 0) cooldown_record(cd_key);
+    snprintf(out->result, sizeof(out->result),
+             rc == 0 ? "taken" : (rc == ACTION_DRY_RUN ? "dry_run" : "failed"));
+    if (rc == 0 || rc == ACTION_DRY_RUN) cooldown_record(cd_key);
     return rc;
 }

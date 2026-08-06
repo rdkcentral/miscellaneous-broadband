@@ -29,6 +29,7 @@ typedef struct {
     char target[64];        /* pid string or service name     */
     char result[16];        /* "taken" | "skipped" | "failed" */
     char reason[128];       /* why skipped/failed             */
+    char command[256];      /* actual command/syscall executed */
     char timestamp[64];     /* ISO-8601 when attempted        */
 } ActionRecord;
 

@@ -177,7 +177,7 @@ static void process_event(const AnomalyEvent *ev) {
         tier_buf[0] = '\0';
         int rc = ae_registry_collect_tier(tiers[i], ev->anomaly_type, ev->severity,
                                            tier_buf, TIER_BUF_SIZE);
-        if (rc == 0 && tier_buf[0] != '\0') {
+        if (rc >= 0 && tier_buf[0] != '\0') {
             if (i > 0) safe_append(collected, ",", COLLECTED_BUF_SIZE);
             safe_append(collected, tier_buf, COLLECTED_BUF_SIZE);
         }
