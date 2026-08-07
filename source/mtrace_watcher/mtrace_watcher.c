@@ -357,6 +357,9 @@ static void mtrace_watcher_cleanup(struct ev_loop *loop)
 
 static struct ev_loop *s_owned_loop = NULL;
 
+/* Forward declaration used by mtrace_watcher_start(). */
+void mtrace_watcher_stop(void);
+
 /*
  * create_owned_loop - Create an internal ev_loop and register all watchers.
  *
@@ -391,6 +394,10 @@ static int create_owned_loop(void)
  */
 void mtrace_watcher_start(void)
 {
+    const char *trace_file = getenv("RDKB_MTRACE_LOGFILE");
+    if (!trace_file) {
+        setenv("RDKB_MTRACE_LOGFILE", "/tmp/mtrace_watcher_log.txt", 1);
+    }
     MTRACE_LOG("Inside %s\n", __FUNCTION__);
     if (!s_owned_loop) {
         if (create_owned_loop() != 0) {
