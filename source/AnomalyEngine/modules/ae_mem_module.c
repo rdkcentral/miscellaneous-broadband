@@ -171,8 +171,22 @@ static int scan_mem_procs(MemProcEntry *procs, int max) {
     return count;
 }
 
+/* Count all numeric entries in /proc to size allocations before scanning. */
+static int count_proc_pids(void) {
+    DIR *d = opendir("/proc");
+    if (!d) return 0;
+    int count = 0;
+    struct dirent *ent;
+    while ((ent = readdir(d)) != NULL)
+        if (isdigit((unsigned char)ent->d_name[0])) count++;
+    closedir(d);
+    return count;
+}
+
 static int cmp_rss_desc(const void *a, const void *b) {
-    return (int)(((const MemProcEntry *)b)->rss_bytes - ((const MemProcEntry *)a)->rss_bytes);
+    long long ra = ((const MemProcEntry *)a)->rss_bytes;
+    long long rb = ((const MemProcEntry *)b)->rss_bytes;
+    return (rb > ra) ? 1 : (rb < ra) ? -1 : 0;
 }
 
 /* ── Tier: memory_mandatory ───────────────────────────────────────────────── */
@@ -230,10 +244,12 @@ static int tier_basic_memory(char *out, size_t out_size) {
 /* ── Tier: process_memory ─────────────────────────────────────────────────── */
 
 static int tier_process_memory(char *out, size_t out_size, int top_n) {
-    MemProcEntry *procs = (MemProcEntry *)calloc((size_t)(TOP_N_MAX * 4), sizeof(MemProcEntry));
+    int total = count_proc_pids();
+    if (total < TOP_N_MAX) total = TOP_N_MAX;
+    MemProcEntry *procs = (MemProcEntry *)calloc((size_t)total, sizeof(MemProcEntry));
     if (!procs) { snprintf(out, out_size, "\"process_memory\":[]"); return 0; }
 
-    int n = scan_mem_procs(procs, TOP_N_MAX * 4);
+    int n = scan_mem_procs(procs, total);
     qsort(procs, (size_t)n, sizeof(MemProcEntry), cmp_rss_desc);
     if (top_n > n) top_n = n;
 
@@ -260,10 +276,12 @@ static int tier_process_memory(char *out, size_t out_size, int top_n) {
 /* ── Tier: memory_extended ────────────────────────────────────────────────── */
 
 static int tier_memory_extended(char *out, size_t out_size, int top_n) {
-    MemProcEntry *procs = (MemProcEntry *)calloc((size_t)(TOP_N_MAX * 4), sizeof(MemProcEntry));
+    int total = count_proc_pids();
+    if (total < TOP_N_MAX) total = TOP_N_MAX;
+    MemProcEntry *procs = (MemProcEntry *)calloc((size_t)total, sizeof(MemProcEntry));
     if (!procs) { snprintf(out, out_size, "\"memory_extended\":[]"); return 0; }
 
-    int n = scan_mem_procs(procs, TOP_N_MAX * 4);
+    int n = scan_mem_procs(procs, total);
     qsort(procs, (size_t)n, sizeof(MemProcEntry), cmp_rss_desc);
     if (top_n > n) top_n = n;
 
@@ -295,7 +313,8 @@ static int tier_memory_extended(char *out, size_t out_size, int top_n) {
             char *ep = strrchr(buf, ')');
             if (ep) {
                 unsigned long minflt, majflt;
-                if (sscanf(ep + 2, "%*c %*d %*d %*d %*d %*d %lu %*u %lu",
+                /* fields after ')': state ppid pgrp session tty_nr tpgid flags minflt cminflt majflt */
+                if (sscanf(ep + 2, "%*c %*d %*d %*d %*d %*d %*u %lu %*u %lu",
                            &minflt, &majflt) == 2) {
                     minor_faults = (long long)minflt;
                     major_faults = (long long)majflt;

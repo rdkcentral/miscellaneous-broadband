@@ -134,6 +134,18 @@ static int read_proc_stat(int pid, ProcStat *out) {
     return 0;
 }
 
+/* Count all numeric entries in /proc to size allocations before scanning. */
+static int count_proc_pids(void) {
+    DIR *d = opendir("/proc");
+    if (!d) return 0;
+    int count = 0;
+    struct dirent *ent;
+    while ((ent = readdir(d)) != NULL)
+        if (isdigit((unsigned char)ent->d_name[0])) count++;
+    closedir(d);
+    return count;
+}
+
 /* Comparison function for qsort: descending total ticks */
 static int cmp_proc_ticks(const void *a, const void *b) {
     const ProcStat *pa = (const ProcStat *)a;
@@ -239,74 +251,55 @@ static int tier_basic_cpu(char *out, size_t out_size) {
 /* ── Tier: process_cpu ───────────────────────────────────────────────────── */
 
 static int tier_process_cpu(char *out, size_t out_size, int top_n) {
-    ProcStat *procs1 = (ProcStat *)calloc(TOP_N_MAX * 4, sizeof(ProcStat));
-    ProcStat *procs2 = (ProcStat *)calloc(TOP_N_MAX * 4, sizeof(ProcStat));
-    if (!procs1 || !procs2) { free(procs1); free(procs2);
-        snprintf(out, out_size, "\"process_cpu\":[]"); return 0; }
+    char cmd[128];
+    /* top -b -n 1 already outputs processes sorted by CPU%; parse its output directly */
+    snprintf(cmd, sizeof(cmd), "top -b -n 1 2>/dev/null | head -n %d", top_n + 4);
 
-    /* Two samples with 200ms gap for delta CPU% */
-    CpuTicks ct1, ct2;
-    read_cpu_ticks(&ct1);
-    int n1 = scan_all_procs(procs1, TOP_N_MAX * 4);
-    usleep(200000);
-    read_cpu_ticks(&ct2);
-    int n2 = scan_all_procs(procs2, TOP_N_MAX * 4);
-
-    unsigned long long total_delta =
-        (ct2.user + ct2.nice + ct2.system + ct2.idle + ct2.iowait + ct2.irq + ct2.softirq) -
-        (ct1.user + ct1.nice + ct1.system + ct1.idle + ct1.iowait + ct1.irq + ct1.softirq);
-    if (total_delta == 0) total_delta = 1;
-
-    /* Match pids and compute delta */
-    typedef struct { int pid; float cpu_pct; ProcStat s2; } ProcResult;
-    ProcResult *results = (ProcResult *)calloc((size_t)n2, sizeof(ProcResult));
-    if (!results) { free(procs1); free(procs2); snprintf(out, out_size, "\"process_cpu\":[]"); return 0; }
-
-    for (int i = 0; i < n2; i++) {
-        results[i].s2  = procs2[i];
-        unsigned long long delta_proc = procs2[i].utime + procs2[i].stime;
-        for (int j = 0; j < n1; j++) {
-            if (procs1[j].pid == procs2[i].pid) {
-                delta_proc -= (procs1[j].utime + procs1[j].stime);
-                break;
-            }
-        }
-        results[i].pid     = procs2[i].pid;
-        results[i].cpu_pct = (float)delta_proc / (float)total_delta * 100.0f;
-    }
-
-    /* Sort descending by cpu_pct */
-    for (int i = 0; i < n2 - 1; i++)
-        for (int j = i + 1; j < n2; j++)
-            if (results[j].cpu_pct > results[i].cpu_pct) {
-                ProcResult tmp = results[i]; results[i] = results[j]; results[j] = tmp;
-            }
-
-    if (top_n > n2) top_n = n2;
+    FILE *fp = popen(cmd, "r");
+    if (!fp) { snprintf(out, out_size, "\"process_cpu\":[]"); return 0; }
 
     int pos = snprintf(out, out_size, "\"process_cpu\":[");
-    for (int i = 0; i < top_n && (size_t)pos < out_size - 200; i++) {
-        ProcStat *s = &results[i].s2;
+    char line[256];
+    int first = 1;
+
+    while (fgets(line, sizeof(line), fp) && (size_t)pos < out_size - 200) {
+        int pid, ppid;
+        char user[32], stat[8], vsz[16], vsz_pct[8], cpu_pct_str[8], fullcmd[128];
+
+        /* Lines that don't start with a numeric PID (headers) are skipped by sscanf */
+        if (sscanf(line, " %d %d %31s %7s %15s %7s %7s %127[^\n]",
+                   &pid, &ppid, user, stat, vsz, vsz_pct, cpu_pct_str, fullcmd) < 7)
+            continue;
+
+        float cpu_pct = atof(cpu_pct_str); /* atof stops at '%', returns the number */
+
+        /* Use basename of command path; strip arguments after first space */
+        char *name = strrchr(fullcmd, '/');
+        name = name ? name + 1 : fullcmd;
+        char *sp = strchr(name, ' ');
+        if (sp) *sp = '\0';
+
         pos += snprintf(out + pos, out_size - (size_t)pos,
                         "%s{\"pid\":%d,\"name\":\"%s\",\"state\":\"%c\","
-                        "\"cpu_percent\":%.2f,\"priority\":%ld,\"nice\":%ld,"
-                        "\"num_threads\":%ld}",
-                        i > 0 ? "," : "",
-                        s->pid, s->name, s->state,
-                        (double)results[i].cpu_pct,
-                        s->priority, s->nice_val, s->num_threads);
+                        "\"cpu_percent\":%.2f}",
+                        first ? "" : ",",
+                        pid, name, stat[0], (double)cpu_pct);
+        first = 0;
     }
-    pos += snprintf(out + pos, out_size - (size_t)pos, "]");
+    pclose(fp);
 
-    free(procs1); free(procs2); free(results);
+    pos += snprintf(out + pos, out_size - (size_t)pos, "]");
     return pos;
 }
 
 /* ── Tier: cpu_extended ──────────────────────────────────────────────────── */
 
 static int tier_cpu_extended(char *out, size_t out_size, int top_n) {
-    ProcStat procs[TOP_N_MAX * 4];
-    int n = scan_all_procs(procs, TOP_N_MAX * 4);
+    int total = count_proc_pids();
+    if (total < TOP_N_MAX) total = TOP_N_MAX;
+    ProcStat *procs = (ProcStat *)calloc((size_t)total, sizeof(ProcStat));
+    if (!procs) { snprintf(out, out_size, "\"cpu_extended\":[]"); return 0; }
+    int n = scan_all_procs(procs, total);
     qsort(procs, (size_t)n, sizeof(ProcStat), cmp_proc_ticks);
     if (top_n > n) top_n = n;
 
@@ -355,6 +348,7 @@ static int tier_cpu_extended(char *out, size_t out_size, int top_n) {
                         vol_ctxt, nonvol_ctxt, fd_count, buf);
     }
     pos += snprintf(out + pos, out_size - (size_t)pos, "]");
+    free(procs);
     return pos;
 }
 
