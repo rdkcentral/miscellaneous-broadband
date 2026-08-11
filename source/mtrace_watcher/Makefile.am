@@ -19,5 +19,5 @@
 
 lib_LTLIBRARIES = libmtrace_watcher.la
 libmtrace_watcher_la_SOURCES = mtrace_watcher.c
-libmtrace_watcher_la_LDFLAGS = -shared -fPIC -lev -lpthread
+libmtrace_watcher_la_LDFLAGS = -shared -fPIC -lev
 
