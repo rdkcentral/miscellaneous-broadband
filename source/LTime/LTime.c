@@ -50,11 +50,8 @@ int getTimeOffsetFromSysevent(char *name, int version)
         {
             if(a[0] != '@')
             {
-                if(version == 6)
-                     //Offset is interger already which was converted from HEX to INT by DHCPMANAGER
-                    off = atoi(a);
-                else
-                    off = atoi(a);
+                //Offset is interger already which was converted from HEX to INT by DHCPMANAGER
+                off = atoi(a);
             }
             else
             {
