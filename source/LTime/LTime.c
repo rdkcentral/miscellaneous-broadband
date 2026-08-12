@@ -35,7 +35,7 @@
 
 #ifdef UTC_ENABLE
 
-int getTimeOffsetFromSysevent(char *name, int version)
+int getTimeOffsetFromSysevent(char *name)
 {
     char a[100];
     FILE *fp;
@@ -50,7 +50,7 @@ int getTimeOffsetFromSysevent(char *name, int version)
         {
             if(a[0] != '@')
             {
-                //Offset is interger already which was converted from HEX to INT by DHCPMANAGER
+                //Offset is Decimal now, which was converted from HEX to Decimal by DHCPMANAGER
                 off = atoi(a);
             }
             else
@@ -81,13 +81,13 @@ time_t getOffset()
 	}
     }
 
-    off = getTimeOffsetFromSysevent("ipv6-timeoffset", 6);
+    off = getTimeOffsetFromSysevent("ipv6-timeoffset");
     if(off != -1)
     {
         return off;
     }
 
-    off = getTimeOffsetFromSysevent("ipv4-timeoffset", 4);
+    off = getTimeOffsetFromSysevent("ipv4-timeoffset");
     if(off != -1)
     {
         return off;
