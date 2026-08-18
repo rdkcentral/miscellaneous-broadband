@@ -485,6 +485,8 @@ MemTrace_SetParamUlongValue
         ULONG                       uValue
     )
 {
+    (void) hInsContext;
+
     if( (strcmp(ParamName, "Interval") == 0) ||
         (strcmp(ParamName, "RSSThreshold") == 0) ||
         (strcmp(ParamName, "InitialSnapshotUptime") == 0)
