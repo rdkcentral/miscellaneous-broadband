@@ -175,7 +175,6 @@ AC_CONFIG_FILES(
   source/FwDownloadChk/Makefile
 	source/parcon/Makefile
 	source/ServiceCtrl/Makefile
-	source/mtrace_watcher/Makefile
 	source/memtraced/Makefile
 	source/webcfg_decoder/Makefile
 	source/MemFrag_Calc/Makefile
