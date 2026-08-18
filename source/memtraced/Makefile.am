@@ -17,9 +17,7 @@
 # limitations under the License.
 ##########################################################################
 
-lib_LTLIBRARIES = libmtrace_watcher.la libmtrace_watcher_thread.la
-libmtrace_watcher_la_SOURCES = mtrace_watcher.c
-libmtrace_watcher_thread_la_SOURCES = mtrace_watcher.c
-libmtrace_watcher_la_LDFLAGS = -shared -fPIC -lev
-libmtrace_watcher_thread_la_LDFLAGS = -shared -fPIC -lev -lpthread
-
+bin_PROGRAMS = memtraced
+memtraced_CFLAGS = -Wall -Werror -I$(PKG_CONFIG_SYSROOT_DIR)${includedir}/ -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rbus -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/ccsp
+memtraced_SOURCES = MemTrace.c MemTrace_log.c MemTrace_rbus.c
+memtraced_LDFLAGS = -lpthread -lrdkloggers -lsyscfg -lrbus -lccsp_common
