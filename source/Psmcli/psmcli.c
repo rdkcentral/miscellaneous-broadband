@@ -57,10 +57,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <sqlite3.h>
 
 #ifndef PSM_DB_PATH
 #define PSM_DB_PATH "/tmp/psm.db"
+#endif
+
+#ifndef PSM_BAK_XML_PATH
+#define PSM_BAK_XML_PATH "/nvram/bbhm_bak_cfg.xml"
 #endif
 
 /* Return codes matching legacy CCSP/psmcli values used by scripts */
@@ -126,6 +131,65 @@ static sqlite3 *open_db(int flags)
     sqlite3_busy_timeout(db, 5000);
     fprintf(stderr, "psmcli: [INFO] opened SQLite DB %s (new SQLite flow)\n", PSM_DB_PATH);
     return db;
+}
+
+/* -----------------------------------------------------------------------
+ * XML backup export — keep /nvram/bbhm_bak_cfg.xml in sync so that
+ * a downgrade to the old XML-based image finds current values.
+ * --------------------------------------------------------------------- */
+static void psm_export_to_bak_xml(sqlite3 *db)
+{
+    sqlite3_stmt *stmt = NULL;
+    FILE         *fp   = NULL;
+    char          tmp_path[sizeof(PSM_BAK_XML_PATH) + 4];
+    int           count = 0;
+
+    snprintf(tmp_path, sizeof(tmp_path), "%s.tmp", PSM_BAK_XML_PATH);
+
+    fp = fopen(tmp_path, "w");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "psmcli: export: cannot open %s: %s\n",
+                tmp_path, strerror(errno));
+        return;
+    }
+
+    fprintf(fp, "<?xml version=\"1.0\"  encoding=\"UTF-8\" ?>\n<Provision>\n");
+
+    if (sqlite3_prepare_v2(db,
+            "SELECT name, type, value FROM psm_records ORDER BY name;",
+            -1, &stmt, NULL) == SQLITE_OK)
+    {
+        while (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            const char *name  = (const char *)sqlite3_column_text(stmt, 0);
+            int         type  = sqlite3_column_int(stmt, 1);
+            const char *value = (const char *)sqlite3_column_text(stmt, 2);
+
+            if (!name || !value) continue;
+
+            if (type == 0) /* ccsp_string — no contentType attribute */
+                fprintf(fp, "  <Record name=\"%s\" type=\"astr\">%s</Record>\n",
+                        name, value);
+            else
+                fprintf(fp, "  <Record name=\"%s\" type=\"astr\" contentType=\"%s\">%s</Record>\n",
+                        name, type_name(type), value);
+            count++;
+        }
+        sqlite3_finalize(stmt);
+    }
+    else
+    {
+        fprintf(stderr, "psmcli: export: sqlite3_prepare_v2 failed: %s\n",
+                sqlite3_errmsg(db));
+    }
+
+    fprintf(fp, "</Provision>\n");
+    fclose(fp);
+
+    if (rename(tmp_path, PSM_BAK_XML_PATH) != 0)
+        fprintf(stderr, "psmcli: export: rename to %s failed: %s\n",
+                PSM_BAK_XML_PATH, strerror(errno));
 }
 
 /* -----------------------------------------------------------------------
@@ -362,6 +426,8 @@ static int process_set(int argc, char * const argv[])
 
     sqlite3_finalize(get_type_stmt);
     sqlite3_finalize(set_stmt);
+    if (ret == CCSP_SUCCESS)
+        psm_export_to_bak_xml(db);
     sqlite3_close(db);
     return ret;
 }
@@ -422,6 +488,8 @@ static int process_setdetail(int argc, char * const argv[])
     }
 
     sqlite3_finalize(stmt);
+    if (ret == CCSP_SUCCESS)
+        psm_export_to_bak_xml(db);
     sqlite3_close(db);
     return ret;
 }
