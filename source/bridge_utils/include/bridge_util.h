@@ -106,6 +106,7 @@ void getSettings();
 int checkIfExists(char* iface_name);
 void removeIfaceFromList(char *str, const char *sub);
 int bridgeUtils_main(int argc, char *argv[]);
+int GetMultinetInstances();
 int getMTU(int InstanceNumber);
 void assignIpToBridge(char* bridgeName, char* l3netName);
 void removePgdInterfacesFromCurrentIfList(char *current_if_list);

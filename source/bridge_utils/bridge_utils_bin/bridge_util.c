@@ -39,6 +39,7 @@
 #define WFO_ENABLED        "/etc/WFO_enabled"
 #define DEFAULT_NETMASK_ADDR "255.255.255.0"
 #define BRCTL_INTERACT_ENABLE_FILE "/var/tmp/brctl_interact_enable.txt"
+#define MAX_MULTINET_INSTANCES 64
 #define isValidSubnetByte(byte) (((byte == 255) || (byte == 254) || (byte == 252) || \
                                   (byte == 248) || (byte == 240) || (byte == 224) || \
                                   (byte == 192) || (byte == 128)) ? 1 : 0)
@@ -3044,6 +3045,82 @@ int HandleWifiInterface(char *Cmd_Opr)
 	return -1;
 }
 
+int GetMultinetInstances()
+{
+	char instanceValue[16] = {0};
+	char paramName[128] = {0};
+	char instanceListStr[MAX_MULTINET_INSTANCES * 8] = {0};
+	char *bridgeName = NULL;
+	unsigned int *instanceList = NULL;
+	unsigned int instanceCount = 0;
+	unsigned int publishedCount = 0;
+	unsigned int i;
+	int ret;
+
+	ret = PsmGetNextLevelInstances(bus_handle, g_Subsystem, "dmsb.l2net.",
+	                               &instanceCount, &instanceList);
+	if (ret != CCSP_SUCCESS)
+	{
+		bridge_util_log("%s: failed to get dmsb.l2net instances, ret code %d\n", __func__, ret);
+		return -1;
+	}
+
+	if (instanceCount > 0 && instanceList == NULL)
+	{
+		bridge_util_log("%s: PSM returned %u instances with no instance list\n", __func__, instanceCount);
+		return -1;
+	}
+
+	for (i = 0; i < instanceCount; i++)
+	{
+		snprintf(paramName, sizeof(paramName), l2netBridgeName, instanceList[i]);
+		bridgeName = NULL;
+		if (PSM_Get_Record_Value2(bus_handle, g_Subsystem, paramName, NULL, &bridgeName) != CCSP_SUCCESS ||
+		    bridgeName == NULL || bridgeName[0] == '\0')
+		{
+			if (bridgeName != NULL)
+			{
+				((CCSP_MESSAGE_BUS_INFO *)bus_handle)->freefunc(bridgeName);
+				bridgeName = NULL;
+			}
+			continue;
+		}
+
+		((CCSP_MESSAGE_BUS_INFO *)bus_handle)->freefunc(bridgeName);
+		bridgeName = NULL;
+
+		snprintf(instanceValue, sizeof(instanceValue), "%u", instanceList[i]);
+		if (publishedCount > 0)
+		{
+			strncat(instanceListStr, " ", sizeof(instanceListStr) - strlen(instanceListStr) - 1);
+		}
+		strncat(instanceListStr, instanceValue, sizeof(instanceListStr) - strlen(instanceListStr) - 1);
+		publishedCount++;
+	}
+
+	ret = sysevent_set(syseventfd_vlan, sysevent_token_vlan, "multinet-instances", instanceListStr, 0);
+	if (ret != 0)
+	{
+		bridge_util_log("%s: failed to set multinet-instances\n", __func__);
+		goto cleanup;
+	}
+
+	printf("%s\n", instanceListStr);
+	ret = 0;
+
+cleanup:
+	if (bridgeName != NULL)
+	{
+		((CCSP_MESSAGE_BUS_INFO *)bus_handle)->freefunc(bridgeName);
+	}
+	if (instanceList != NULL)
+	{
+		((CCSP_MESSAGE_BUS_INFO *)bus_handle)->freefunc(instanceList);
+	}
+
+	return ret;
+}
+
 int bridgeUtils_main(int argc, char *argv[])
 {
 		
@@ -3053,7 +3130,7 @@ int bridgeUtils_main(int argc, char *argv[])
     	breakpad_ExceptionHandler();
     	#endif
 
-	if ( argc < 3 )
+	if ( argc < 3 && (argc < 2 || strcmp(argv[1], "multinet-instances") != 0) )
 	{
 		bridge_util_log(" ERROR : Missing arguments, please pass valid number of arguments\n");
 		return -1;
@@ -3114,6 +3191,12 @@ int bridgeUtils_main(int argc, char *argv[])
 	}
 	
 	getSettings();
+
+	if (strcmp(Cmd_Opr, "multinet-instances") == 0)
+	{
+		rc = GetMultinetInstances();
+		goto EXIT;
+	}
 
 #if defined(USE_LINUX_BRIDGE)
 	if(bridgeUtilEnable == 0)

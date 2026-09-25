@@ -68,9 +68,10 @@ graph LR
   - Example: `psmcli get dmsb.l2net.1.Name`
 
 - **Bridge Utilities (bridge_utils)**: Linux bridge management toolkit implementing network bridge operations via brctl commands (`brctl addbr`, `brctl addif`, `brctl delif`, `brctl delbr`) and VLAN configuration using vconfig (`vconfig add` for802.1Q tagging), PSM parameter namespace `dmsb.l2net.*` for persistent configuration storage, sysevent integration for runtime coordination, platform capability detection through file system checks (`/etc/onewifi_enabled` for OneWifi, `/sys/module/openvswitch` for OpenVSwitch, `/etc/WFO_enabled` for WiFi Offload), supports MoCA isolation with separate bridge instances when MoCA is not disabled via NO_MOCA_FEATURE_SUPPORT flag
-  - CLI: `bridge_util <operation> <instance_number>`
-  - Operations: `multinet-up`, `multinet-down`, `multinet-start`, `multinet-stop`, `multinet-restart`, `multinet-syncMembers`, `add-port`, `del-port`, `lnf-setup`, `lnf-down`, `meshbhaul-setup`, `meshonboard-setup`, `meshethbhaul-up`, `meshethbhaul-down`
+  - CLI: `bridge_util <operation> <instance_number>`; `multinet-instances` takes no instance number
+  - Operations: `multinet-up`, `multinet-down`, `multinet-start`, `multinet-stop`, `multinet-restart`, `multinet-syncMembers`, `multinet-instances`, `add-port`, `del-port`, `lnf-setup`, `lnf-down`, `meshbhaul-setup`, `meshonboard-setup`, `meshethbhaul-up`, `meshethbhaul-down`
   - Example: `bridge_util multinet-start 1`
+  - Run `bridge_util multinet-instances` to publish all configured multinet instance numbers as a single space-separated list to the `multinet-instances` sysevent.
 
 - **Service Control (ServiceCtrl)**: RBus-based daemon implementing service restart management through data element `Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.ServiceCtrl.ServiceRestartList` with queue-based request processing using pthread mutexes and condition variables for thread synchronization, automatically daemonizes via fork()/setsid() pattern, spawns dedicated worker thread (`spawn_svc_restart_queue_loop()`) for sequential service restart execution preventing race conditions, maintains restart queue using custom queue_t data structure with queue_push/queue_pop operations protected by pthread_mutex_lock
   - No direct CLI - accessed via RBus set operation on ServiceRestartList parameter
