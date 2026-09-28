@@ -1907,6 +1907,10 @@ OVSACTION:
 int CreateBrInterface()
 {
 	char event_name[64] = {0};
+	char instanceList[256] = {0};
+	char instanceValue[16] = {0};
+	char instanceSearchList[272] = {0};
+	char instanceSearchValue[18] = {0};
 	snprintf(event_name,sizeof(event_name),"multinet_%d-status",InstanceNumber);
 	sysevent_set(syseventfd_vlan, sysevent_token_vlan, event_name, "partial", 0);
 	char val[16] = {0} ;
@@ -1993,6 +1997,23 @@ int CreateBrInterface()
     	snprintf(event_name,sizeof(event_name),"multinet_%d-status",InstanceNumber);
 	sysevent_set(syseventfd_vlan, sysevent_token_vlan, event_name, "ready", 0);
 
+		if (sysevent_get(syseventfd_vlan, sysevent_token_vlan, "multinet-instances", instanceList, sizeof(instanceList)) != 0)
+		{
+			instanceList[0] = '\0';
+		}
+		snprintf(instanceValue, sizeof(instanceValue), "%d", InstanceNumber);
+		snprintf(instanceSearchList, sizeof(instanceSearchList), " %s ", instanceList);
+		snprintf(instanceSearchValue, sizeof(instanceSearchValue), " %s ", instanceValue);
+		if (strstr(instanceSearchList, instanceSearchValue) == NULL)
+		{
+			if (instanceList[0] != '\0')
+			{
+				strncat(instanceList, " ", sizeof(instanceList) - strlen(instanceList) - 1);
+			}
+			strncat(instanceList, instanceValue, sizeof(instanceList) - strlen(instanceList) - 1);
+			sysevent_set(syseventfd_vlan, sysevent_token_vlan, "multinet-instances", instanceList, 0);
+		}
+
 	sysevent_set(syseventfd_vlan, sysevent_token_vlan, "firewall-restart", NULL, 0);
 
 	return 0;
@@ -2072,11 +2093,28 @@ int DeleteBrInterface()
     	snprintf(event_name,sizeof(event_name),"multinet_%d-status",InstanceNumber);
 	sysevent_set(syseventfd_vlan, sysevent_token_vlan, event_name, "stopped", 0);
 
-	sysevent_set(syseventfd_vlan, sysevent_token_vlan, "firewall-restart", NULL, 0);
+	char instanceList[256] = {0};
+	char instanceValue[16] = {0};
+	char filteredList[256] = {0};
+	char *token = NULL;
+	char *saveptr = NULL;
 
-	return 0;
-}
-
+	if (sysevent_get(syseventfd_vlan, sysevent_token_vlan, "multinet-instances", instanceList, sizeof(instanceList)) == 0)
+	{
+		snprintf(instanceValue, sizeof(instanceValue), "%d", InstanceNumber);
+		for (token = strtok_r(instanceList, " ", &saveptr); token != NULL; token = strtok_r(NULL, " ", &saveptr))
+		{
+			if (strcmp(token, instanceValue) != 0)
+			{
+				if (filteredList[0] != '\0')
+				{
+					strncat(filteredList, " ", sizeof(filteredList) - strlen(filteredList) - 1);
+				}
+				strncat(filteredList, token, sizeof(filteredList) - strlen(filteredList) - 1);
+			}
+		}
+		sysevent_set(syseventfd_vlan, sysevent_token_vlan, "multinet-instances", filteredList, 0);
+	}
 
 /*********************************************************************************************
 
@@ -3045,82 +3083,6 @@ int HandleWifiInterface(char *Cmd_Opr)
 	return -1;
 }
 
-int GetMultinetInstances()
-{
-	char instanceValue[16] = {0};
-	char paramName[128] = {0};
-	char instanceListStr[MAX_MULTINET_INSTANCES * 8] = {0};
-	char *bridgeName = NULL;
-	unsigned int *instanceList = NULL;
-	unsigned int instanceCount = 0;
-	unsigned int publishedCount = 0;
-	unsigned int i;
-	int ret;
-
-	ret = PsmGetNextLevelInstances(bus_handle, g_Subsystem, "dmsb.l2net.",
-	                               &instanceCount, &instanceList);
-	if (ret != CCSP_SUCCESS)
-	{
-		bridge_util_log("%s: failed to get dmsb.l2net instances, ret code %d\n", __func__, ret);
-		return -1;
-	}
-
-	if (instanceCount > 0 && instanceList == NULL)
-	{
-		bridge_util_log("%s: PSM returned %u instances with no instance list\n", __func__, instanceCount);
-		return -1;
-	}
-
-	for (i = 0; i < instanceCount; i++)
-	{
-		snprintf(paramName, sizeof(paramName), l2netBridgeName, instanceList[i]);
-		bridgeName = NULL;
-		if (PSM_Get_Record_Value2(bus_handle, g_Subsystem, paramName, NULL, &bridgeName) != CCSP_SUCCESS ||
-		    bridgeName == NULL || bridgeName[0] == '\0')
-		{
-			if (bridgeName != NULL)
-			{
-				((CCSP_MESSAGE_BUS_INFO *)bus_handle)->freefunc(bridgeName);
-				bridgeName = NULL;
-			}
-			continue;
-		}
-
-		((CCSP_MESSAGE_BUS_INFO *)bus_handle)->freefunc(bridgeName);
-		bridgeName = NULL;
-
-		snprintf(instanceValue, sizeof(instanceValue), "%u", instanceList[i]);
-		if (publishedCount > 0)
-		{
-			strncat(instanceListStr, " ", sizeof(instanceListStr) - strlen(instanceListStr) - 1);
-		}
-		strncat(instanceListStr, instanceValue, sizeof(instanceListStr) - strlen(instanceListStr) - 1);
-		publishedCount++;
-	}
-
-	ret = sysevent_set(syseventfd_vlan, sysevent_token_vlan, "multinet-instances", instanceListStr, 0);
-	if (ret != 0)
-	{
-		bridge_util_log("%s: failed to set multinet-instances\n", __func__);
-		goto cleanup;
-	}
-
-	printf("%s\n", instanceListStr);
-	ret = 0;
-
-cleanup:
-	if (bridgeName != NULL)
-	{
-		((CCSP_MESSAGE_BUS_INFO *)bus_handle)->freefunc(bridgeName);
-	}
-	if (instanceList != NULL)
-	{
-		((CCSP_MESSAGE_BUS_INFO *)bus_handle)->freefunc(instanceList);
-	}
-
-	return ret;
-}
-
 int bridgeUtils_main(int argc, char *argv[])
 {
 		
@@ -3130,7 +3092,7 @@ int bridgeUtils_main(int argc, char *argv[])
     	breakpad_ExceptionHandler();
     	#endif
 
-	if ( argc < 3 && (argc < 2 || strcmp(argv[1], "multinet-instances") != 0) )
+	if ( argc < 3 )
 	{
 		bridge_util_log(" ERROR : Missing arguments, please pass valid number of arguments\n");
 		return -1;
@@ -3191,12 +3153,6 @@ int bridgeUtils_main(int argc, char *argv[])
 	}
 	
 	getSettings();
-
-	if (strcmp(Cmd_Opr, "multinet-instances") == 0)
-	{
-		rc = GetMultinetInstances();
-		goto EXIT;
-	}
 
 #if defined(USE_LINUX_BRIDGE)
 	if(bridgeUtilEnable == 0)
