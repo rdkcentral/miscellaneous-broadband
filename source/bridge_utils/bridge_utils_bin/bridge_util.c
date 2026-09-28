@@ -2116,6 +2116,11 @@ int DeleteBrInterface()
 		sysevent_set(syseventfd_vlan, sysevent_token_vlan, "multinet-instances", filteredList, 0);
 	}
 
+	sysevent_set(syseventfd_vlan, sysevent_token_vlan, "firewall-restart", NULL, 0);
+
+	return 0;
+}
+
 /*********************************************************************************************
 
     caller:  SyncBrInterfaces
