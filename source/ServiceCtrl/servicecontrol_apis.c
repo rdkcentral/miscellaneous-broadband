@@ -55,7 +55,7 @@ int ServiceControl_Init()
     pthread_cond_init(&svcCond, NULL);
     pthread_mutex_lock(&svcMutex);
     /* CID 559701 & 559607: Data race condition (MISSING_LOCK) */
-    pthread_mutex_lock(&gVarMutex);
+    //pthread_mutex_lock(&gVarMutex);
     g_pServiceList = (char *) malloc(1024*sizeof(char));
     if (g_pServiceList == NULL)
     {
@@ -71,7 +71,7 @@ int ServiceControl_Init()
     }
     svc_queue_wakeup = false;
     exit_svc_queue_loop = false;
-    pthread_mutex_unlock(&svcMutex);
+    //pthread_mutex_unlock(&svcMutex);
     SvcCtrlDebug(("Out %s\n", __FUNCTION__));
     return ret;
 }
@@ -82,9 +82,9 @@ void ServiceControl_Deinit()
     // Gracefully exit the thread
     pthread_mutex_lock(&svcMutex);
     /* CID 559701 & 559607: Data race condition (MISSING_LOCK) */
-    pthread_mutex_lock(&gVarMutex);
+    //pthread_mutex_lock(&gVarMutex);
     free(g_pServiceList);
-    pthread_mutex_unlock(&gVarMutex);
+   // pthread_mutex_unlock(&gVarMutex);
     exit_svc_queue_loop = true;
     svc_queue_wakeup = true;
     if (svc_queue)
@@ -95,7 +95,7 @@ void ServiceControl_Deinit()
     pthread_cond_signal(&svcCond);
     // Destroy pthread mutex and condition
     pthread_mutex_destroy(&svcMutex);
-    pthread_mutex_destroy(&gVarMutex);
+   // pthread_mutex_destroy(&gVarMutex);
     pthread_cond_destroy(&svcCond);
     SvcCtrlDebug(("Out %s\n", __FUNCTION__));
 }
