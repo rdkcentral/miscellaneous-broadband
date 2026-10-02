@@ -420,8 +420,20 @@ int stop_dibbler (dhcp_params * params)
     }
     if (waitTime <= 0)
     {
-        DBG_PRINT("%s %d: Waited for %d millisec, dibbler-client still running\n", __FUNCTION__, __LINE__, DIBBLER_CLIENT_TERMINATE_TIMEOUT);
-        return FAILURE;
+        DBG_PRINT("%s %d: Waited for %d millisec, dibbler-client still running. Sending SIGKILL\n", __FUNCTION__, __LINE__, DIBBLER_CLIENT_TERMINATE_TIMEOUT);
+        /* SIGTERM didn't work, forcefully kill with SIGKILL */
+        if (signal_process(pid, SIGKILL) != RETURN_OK)
+        {
+            DBG_PRINT("%s %d: unable to send SIGKILL to pid %d\n", __FUNCTION__, __LINE__, pid);
+            return FAILURE;
+        }
+        /* Collect the killed process to prevent zombie */
+        if (collect_waiting_process(pid, 1000) != SUCCESS)
+        {
+            DBG_PRINT("%s %d: unable to collect pid %d after SIGKILL\n", __FUNCTION__, __LINE__, pid);
+            return FAILURE;
+        }
+        DBG_PRINT("%s %d: dibbler-client killed with SIGKILL\n", __FUNCTION__, __LINE__);
     }
 
     return SUCCESS;
