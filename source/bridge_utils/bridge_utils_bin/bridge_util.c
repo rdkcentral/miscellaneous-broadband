@@ -40,6 +40,7 @@
 #define DEFAULT_NETMASK_ADDR "255.255.255.0"
 #define BRCTL_INTERACT_ENABLE_FILE "/var/tmp/brctl_interact_enable.txt"
 #define MAX_MULTINET_INSTANCES 64
+#define MAX_BRIDGE_READY_RETRY 5
 #define isValidSubnetByte(byte) (((byte == 255) || (byte == 254) || (byte == 252) || \
                                   (byte == 248) || (byte == 240) || (byte == 224) || \
                                   (byte == 192) || (byte == 128)) ? 1 : 0)
@@ -1301,6 +1302,20 @@ void assignIpToBridge(char* bridgeName, char* l3netName)
     char ipaddr[64] = {0} ;
     char subNetMask[64] = {0};
     int L3NetIdx = 0;
+    int retryCount = 0;
+
+    while (checkIfExists(bridgeName) == INTERFACE_NOT_EXIST)
+    {
+        if (retryCount >= MAX_BRIDGE_READY_RETRY)
+        {
+            bridge_util_log("%s : bridge [%s] not present after %d sec, skipping IP assignment\n", __FUNCTION__, bridgeName, retryCount);
+            return;
+        }
+        bridge_util_log("%s : Waiting for bridge [%s] to be ready...\n", __FUNCTION__, bridgeName);
+        sleep(1);
+        retryCount++;
+    }
+
     snprintf(paramName,sizeof(paramName), l3netName);
     retPsmGet = PSM_Get_Record_Value2(bus_handle,g_Subsystem, paramName, NULL, &paramValue);
     if (retPsmGet == CCSP_SUCCESS)
