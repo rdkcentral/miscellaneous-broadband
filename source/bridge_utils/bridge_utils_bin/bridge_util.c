@@ -92,6 +92,9 @@ static char *l2netWiFiMembers = "dmsb.l2net.%d.Members.WiFi";
 #endif
 static char *l2netLinkMembers = "dmsb.l2net.%d.Members.Link";
 static char *l2netVirualParentIfname = "dmsb.l2net.%d.Members.VirtualParentIfname";
+#if defined (FEATURE_RNDIS_HAL)
+static char *l2netRndisMembers = "dmsb.l2net.%d.Members.Rndis";
+#endif
 
 static char *l2netEthWanInterface = "dmsb.l2net.EthWanInterface";
 #if !defined (NO_MOCA_FEATURE_SUPPORT)
@@ -1030,6 +1033,28 @@ int getIfList(bridgeDetails *bridgeInfo)
     {
 		bridge_util_log("%s: psm call failed for %s, ret code %d\n", __func__, paramName, retPsmGet);
     }
+#if defined (FEATURE_RNDIS_HAL)
+    memset(paramName,0,sizeof(paramName));
+
+    snprintf(paramName,sizeof(paramName), l2netRndisMembers, InstanceNumber);
+    retPsmGet = PSM_Get_Record_Value2(bus_handle,g_Subsystem, paramName, NULL, &paramValue);
+    if (retPsmGet == CCSP_SUCCESS)
+    {
+               bridge_util_log("%s: %s returned %s\n", __func__, paramName, paramValue);
+
+               strncpy(bridgeInfo->RndisIfList,paramValue,sizeof(bridgeInfo->RndisIfList)-1);
+                       if(bus_handle != NULL)
+                       {
+                       ((CCSP_MESSAGE_BUS_INFO *)bus_handle)->freefunc(paramValue);
+                       paramValue = NULL;
+                       }
+
+     }
+    else
+    {
+               bridge_util_log("%s: psm call failed for %s, ret code %d\n", __func__, paramName, retPsmGet);
+    }
+#endif
 
      return 0;
 }
@@ -2368,6 +2393,22 @@ void removeIfaceFromBridge(bridgeDetails *bridgeInfo,char *current_if_list)
 					}
 				}
 			}
+#if defined (FEATURE_RNDIS_HAL)
+                       if ( (DeviceMode !=0) )
+                       {
+                               strncpy(IfList_Copy,bridgeInfo->RndisIfList,sizeof(IfList_Copy)-1);
+                               rest_newlist = IfList_Copy;
+                               while ((token_newlist = strtok_r(rest_newlist, " ", &rest_newlist)))
+                               {
+                                       if ( strcmp(token_newlist,token_curlist) == 0)
+                                       {
+                                               removeIface = 0;
+                                               goto IF_REMOVE;
+                                       }
+                               }
+                       }
+
+#endif
 
 IF_REMOVE:
 		if ( removeIface == 1 )
