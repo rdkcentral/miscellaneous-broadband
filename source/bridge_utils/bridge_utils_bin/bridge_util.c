@@ -21,6 +21,7 @@
 #include "bridge_util_generic.h"
 #include "bridge_creation.h"
 #include <unistd.h>
+#include <strings.h>
 #include <stdint.h>
 #include "cap.h"
 #include "secure_wrapper.h"
@@ -1985,6 +1986,8 @@ int CreateBrInterface()
 	HandlePostConfigGeneric(bridgeInfo,InstanceNumber);
 	HandlePostConfigVendorGeneric(bridgeInfo,InstanceNumber);
 
+	int bridgeNameValid = ( bridgeInfo->bridgeName[0] != '\0' && strcasecmp(bridgeInfo->bridgeName, "none") != 0 );
+
 	if ( bridgeInfo != NULL )
 	{
 		free(bridgeInfo);
@@ -1997,21 +2000,28 @@ int CreateBrInterface()
     	snprintf(event_name,sizeof(event_name),"multinet_%d-status",InstanceNumber);
 	sysevent_set(syseventfd_vlan, sysevent_token_vlan, event_name, "ready", 0);
 
-		if (sysevent_get(syseventfd_vlan, sysevent_token_vlan, "multinet-instances", instanceList, sizeof(instanceList)) != 0)
+		if (!bridgeNameValid)
 		{
-			instanceList[0] = '\0';
+			bridge_util_log("%s : Bridge name is empty or none for instance %d, not adding to multinet-instances\n",__FUNCTION__,InstanceNumber);
 		}
-		snprintf(instanceValue, sizeof(instanceValue), "%d", InstanceNumber);
-		snprintf(instanceSearchList, sizeof(instanceSearchList), " %s ", instanceList);
-		snprintf(instanceSearchValue, sizeof(instanceSearchValue), " %s ", instanceValue);
-		if (strstr(instanceSearchList, instanceSearchValue) == NULL)
+		else
 		{
-			if (instanceList[0] != '\0')
+			if (sysevent_get(syseventfd_vlan, sysevent_token_vlan, "multinet-instances", instanceList, sizeof(instanceList)) != 0)
 			{
-				strncat(instanceList, " ", sizeof(instanceList) - strlen(instanceList) - 1);
+				instanceList[0] = '\0';
 			}
-			strncat(instanceList, instanceValue, sizeof(instanceList) - strlen(instanceList) - 1);
-			sysevent_set(syseventfd_vlan, sysevent_token_vlan, "multinet-instances", instanceList, 0);
+			snprintf(instanceValue, sizeof(instanceValue), "%d", InstanceNumber);
+			snprintf(instanceSearchList, sizeof(instanceSearchList), " %s ", instanceList);
+			snprintf(instanceSearchValue, sizeof(instanceSearchValue), " %s ", instanceValue);
+			if (strstr(instanceSearchList, instanceSearchValue) == NULL)
+			{
+				if (instanceList[0] != '\0')
+				{
+					strncat(instanceList, " ", sizeof(instanceList) - strlen(instanceList) - 1);
+				}
+				strncat(instanceList, instanceValue, sizeof(instanceList) - strlen(instanceList) - 1);
+				sysevent_set(syseventfd_vlan, sysevent_token_vlan, "multinet-instances", instanceList, 0);
+			}
 		}
 
 	sysevent_set(syseventfd_vlan, sysevent_token_vlan, "firewall-restart", NULL, 0);
