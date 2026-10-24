@@ -1658,6 +1658,7 @@ int updateBridgeInfo(bridgeDetails *bridgeInfo, char* ifNameToBeUpdated, int Opr
 
 			vlanId = bridgeInfo->vlanID ;
 			break;
+#if !defined (NO_WIFI_FEATURE_SUPPORT)
 		case IF_WIFI_BRIDGEUTIL:
 			if( ifNameToBeUpdated[0] != '\0' )
 			{
@@ -1669,6 +1670,7 @@ int updateBridgeInfo(bridgeDetails *bridgeInfo, char* ifNameToBeUpdated, int Opr
 			}
 
 			break;
+#endif
 		case IF_ETH_BRIDGEUTIL: 
 			if( ifNameToBeUpdated[0] != '\0' )
 			{
@@ -1680,7 +1682,8 @@ int updateBridgeInfo(bridgeDetails *bridgeInfo, char* ifNameToBeUpdated, int Opr
 			}
 			if_type = ETH_IF_TYPE_VALUE;
 			break;
-		case IF_GRE_BRIDGEUTIL: 
+#if !defined (NO_WIFI_FEATURE_SUPPORT)
+		case IF_GRE_BRIDGEUTIL:
 			if( ifNameToBeUpdated[0] != '\0' )
 			{
 				strncpy(IfList_Copy, ifNameToBeUpdated, sizeof(IfList_Copy)-1);
@@ -1695,6 +1698,7 @@ int updateBridgeInfo(bridgeDetails *bridgeInfo, char* ifNameToBeUpdated, int Opr
 
 			vlanId = bridgeInfo->vlanID ;
 			break;
+#endif
 #if !defined (NO_MOCA_FEATURE_SUPPORT)
 		case IF_MOCA_BRIDGEUTIL: 
 			if( ifNameToBeUpdated[0] != '\0' )
@@ -1948,6 +1952,7 @@ int CreateBrInterface()
 		updateBridgeInfo(bridgeInfo,"",IF_UP_CMD,IF_VLAN_BRIDGEUTIL);		
         }
 
+#if !defined (NO_WIFI_FEATURE_SUPPORT)
     	if ( bridgeInfo->GreIfList[0] != '\0')
     	{
             if( 1== getXfinityEnableStatus() )
@@ -1956,6 +1961,7 @@ int CreateBrInterface()
                 updateBridgeInfo(bridgeInfo,"",IF_UP_CMD,IF_GRE_BRIDGEUTIL);
             }
     	}
+#endif
 
     	if ( bridgeInfo->ethIfList[0] != '\0')
     	{
@@ -1971,12 +1977,14 @@ int CreateBrInterface()
 	}	
 #endif
 
+#if !defined (NO_WIFI_FEATURE_SUPPORT)
 	if ( bridgeInfo->WiFiIfList[0] != '\0')
 	{		     						 
     		need_wifi_gw_refresh = 1;
                 bridgeCreated = 1 ;
 		updateBridgeInfo(bridgeInfo,"",IF_UP_CMD,IF_WIFI_BRIDGEUTIL); 				
 	}
+#endif
 		
         if ( bridgeCreated == 0 )
         {
@@ -2061,16 +2069,18 @@ int DeleteBrInterface()
                 
         }
 
+#if !defined (NO_WIFI_FEATURE_SUPPORT)
         if ( bridgeInfo->GreIfList[0] != '\0')
         {
         	updateBridgeInfo(bridgeInfo,"",IF_DELETE_CMD,IF_GRE_BRIDGEUTIL);               
         } 
 		
-	updateBridgeInfo(bridgeInfo,"",IF_DELETE_CMD,IF_BRIDGE_BRIDGEUTIL); 				
-    	if ( bridgeInfo->WiFiIfList[0] != '\0' )
+	if ( bridgeInfo->WiFiIfList[0] != '\0' )
     	{
 		need_wifi_gw_refresh = 1;
 	}
+#endif
+        updateBridgeInfo(bridgeInfo,"",IF_DELETE_CMD,IF_BRIDGE_BRIDGEUTIL); 
 
 	if ( bridgeInfo->ethIfList[0] != '\0' )
     	{
@@ -2276,6 +2286,7 @@ void removeIfaceFromBridge(bridgeDetails *bridgeInfo,char *current_if_list)
 			}  			
     		}
 
+#if !defined (NO_WIFI_FEATURE_SUPPORT)
 		if ( bridgeInfo->GreIfList[0] != '\0' )
     		{
 
@@ -2297,7 +2308,7 @@ void removeIfaceFromBridge(bridgeDetails *bridgeInfo,char *current_if_list)
 				}
 			}  			
     		}
-
+#endif
 
 		if ( bridgeInfo->ethIfList[0] != '\0' )
     		{
@@ -2336,6 +2347,7 @@ void removeIfaceFromBridge(bridgeDetails *bridgeInfo,char *current_if_list)
 			
     		}
 #endif
+#if !defined (NO_WIFI_FEATURE_SUPPORT)
     		if ( bridgeInfo->WiFiIfList[0] != '\0' )
     		{
     			strncpy(IfList_Copy,bridgeInfo->WiFiIfList,sizeof(IfList_Copy)-1);
@@ -2354,6 +2366,7 @@ void removeIfaceFromBridge(bridgeDetails *bridgeInfo,char *current_if_list)
 			}  
 			
     		}
+#endif
 			if ( (DeviceMode !=0) && (vendorIfaces != NULL) )
 			{
 				bridge_util_log("%s: vendorIfaces are %s\n",__FUNCTION__, vendorIfaces);
@@ -2459,6 +2472,7 @@ void addIfaceToBridge(bridgeDetails *bridgeInfo,char *current_if_list)
 		
     	}
 
+#if !defined (NO_WIFI_FEATURE_SUPPORT)
 	if (( bridgeInfo->GreIfList[0] != '\0' ) && ( 1 == getXfinityEnableStatus()))
     	{
     		if ( 0 ==  wait_for_gre_ready(bridgeInfo->GreIfList) )
@@ -2496,6 +2510,7 @@ void addIfaceToBridge(bridgeDetails *bridgeInfo,char *current_if_list)
 		}  
 		
     	}
+#endif
 
 	if ( bridgeInfo->ethIfList[0] != '\0' )
     	{
@@ -2563,6 +2578,7 @@ void addIfaceToBridge(bridgeDetails *bridgeInfo,char *current_if_list)
     	}
 #endif
 
+#if !defined (NO_WIFI_FEATURE_SUPPORT)
     	if ( bridgeInfo->WiFiIfList[0] != '\0' )
     	{
     		need_wifi_gw_refresh = 1 ;
@@ -2594,6 +2610,7 @@ void addIfaceToBridge(bridgeDetails *bridgeInfo,char *current_if_list)
 		}  
 		
     	}
+#endif
     	return;
 }
 
